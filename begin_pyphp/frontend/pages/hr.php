@@ -372,7 +372,7 @@ require __DIR__ . '/../components/header.php';
 </div>
 
 <script>
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = '<?php echo api_base_url(); ?>';
 const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
 const headers = {
     'Content-Type': 'application/json',

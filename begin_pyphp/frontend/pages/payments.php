@@ -68,7 +68,7 @@ document.getElementById('processPaymentForm').addEventListener('submit', async (
     e.preventDefault();
     const amount = document.getElementById('amount').value;
     const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
-    const API_BASE_URL = 'http://localhost:8000';
+    const API_BASE_URL = '<?php echo api_base_url(); ?>';
     
     // Centralized API headers
     const headers = {

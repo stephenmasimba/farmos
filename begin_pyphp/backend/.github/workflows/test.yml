@@ -1,0 +1,154 @@
+name: PHP Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.0', '8.1', '8.2']
+        mysql-version: ['5.7', '8.0']
+
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql-version }}
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: farmos_test
+          MYSQL_USER: farmos_test
+          MYSQL_PASSWORD: test_password
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: json, pdo, pdo_mysql, mbstring, curl, redis
+        tools: composer
+        coverage: xdebug
+
+    - name: Validate composer.json
+      run: composer validate --strict
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Install dependencies
+      run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+    - name: Create test env file
+      run: |
+        cp .env.example .env.testing
+        sed -i 's/DB_HOST=.*/DB_HOST=127.0.0.1/' .env.testing
+        sed -i 's/DB_PORT=.*/DB_PORT=3306/' .env.testing
+        sed -i 's/DB_USER=.*/DB_USER=farmos_test/' .env.testing
+        sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=test_password/' .env.testing
+
+    - name: Wait for MySQL
+      run: |
+        while ! mysqladmin ping -h "127.0.0.1" -u "farmos_test" -p"test_password" --silent; do
+          sleep 1
+        done
+
+    - name: Create test database
+      run: |
+        mysql -h 127.0.0.1 -u farmos_test -p"test_password" -e "CREATE DATABASE IF NOT EXISTS farmos_test;"
+
+    - name: Run PHP Lint
+      run: find src tests -name "*.php" -exec php -l {} \;
+
+    - name: Run PHPUnit
+      run: vendor/bin/phpunit --coverage-clover coverage.xml --coverage-text
+
+    - name: Run Code Sniffer
+      run: vendor/bin/phpcs --standard=PSR12 src/ || true
+
+    - name: Run PHPStan
+      run: vendor/bin/phpstan analyse src/ --level=5 || true
+
+    - name: Upload coverage reports
+      if: matrix.php-version == '8.2' && matrix.mysql-version == '8.0'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+    - name: Archive test reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-reports-php${{ matrix.php-version }}-mysql${{ matrix.mysql-version }}
+        path: build/
+
+  code-quality:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        tools: composer
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Install dependencies
+      run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+    - name: Run Code Sniffer
+      run: vendor/bin/phpcs --standard=PSR12 src/ || true
+
+    - name: Run PHPStan
+      run: vendor/bin/phpstan analyse src/ --level=5 || true
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    - name: Check for security vulnerabilities
+      run: |
+        curl -L https://get.sensiolabs.org/security-checker.phar > security-checker
+        php security-checker security:check --end-point=https://security.sensiolabs.org/check_lock
+      continue-on-error: true

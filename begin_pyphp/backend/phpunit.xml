@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         cacheResultFile=".phpunit.cache/test-results"
+         executionOrder="depends,defects"
+         forceCoversAnnotatedCoveredMethods="false"
+         beStrictAboutCoverage="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         beStrictAboutTodoTestedCode="false"
+         colors="true"
+         displayDetailsOnIncompleteTests="true"
+         displayDetailsOnSkippedTests="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerErrors="true"
+         displayDetailsOnTestsThatTriggerNotices="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         failOnDeprecation="true"
+         failOnEmptyTestSuite="true"
+         failOnIncomplete="false"
+         failOnNotice="true"
+         failOnRisky="true"
+         failOnSkipped="false"
+         failOnWarning="true"
+         failOnRiskyTest="false"
+         ignoreDeprecatedCodeUnitsFromCodeCoverage="true"
+         processIsolation="false"
+         randomOrderSeed="false"
+         stopOnDefect="false"
+         stopOnError="false"
+         stopOnFailure="false"
+         stopOnIncomplete="false"
+         stopOnRisky="false"
+         stopOnSkipped="false"
+         testSuiteLoaderClass="PHPUnit\Runner\StandardTestSuiteLoader"
+         timeoutForLargeTests="60"
+         timeoutForMediumTests="10"
+         timeoutForSmallTests="1"
+         verbose="true">
+    <testsuites>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage processUncoveredFiles="true"
+              pathCoverage="false"
+              ignoreDeprecatedCodeUnitsFromCodeCoverage="true"
+              disableCodeCoverageIgnore="false"
+              cacheDirectory=".phpunit.cache/code-coverage"
+              includeUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory suffix="Interface.php">src</directory>
+        </exclude>
+        <report>
+            <html outputDirectory="build/coverage" />
+            <text outputFile="php://stdout" showUncoveredFiles="true" />
+            <clover outputFile="build/coverage.xml" />
+        </report>
+    </coverage>
+
+    <php>
+        <ini name="display_errors" value="1" />
+        <ini name="error_reporting" value="-1" />
+        <ini name="memory_limit" value="-1" />
+        <env name="BOOTSTRAP_CLEAR_CACHE" value="0" />
+        <env name="DB_HOST" value="localhost" />
+        <env name="DB_PORT" value="3306" />
+        <env name="DB_USER" value="farmos_test" />
+        <env name="DB_PASSWORD" value="test_password" />
+        <env name="JWT_SECRET" value="test_secret_key_for_jwt_testing" />
+        <env name="APP_ENV" value="testing" />
+    </php>
+</phpunit>

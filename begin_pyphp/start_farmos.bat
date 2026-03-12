@@ -17,13 +17,13 @@ echo.
 cd /d "%~dp0backend"
 
 echo 🔍 Checking if FarmOS server is already running...
-python -c "import requests; print('✅ Running' if requests.get('http://127.0.0.1:8000/health', timeout=2).status_code == 200 else '❌ Stopped')" 2>nul
+curl -s http://127.0.0.1:8001/health >nul 2>&1
 
 if %errorlevel% equ 0 (
     echo.
     echo ✅ FarmOS server is already running!
     echo 🌐 Access at: http://localhost:8081/farmos/
-    echo 🔧 API at: http://127.0.0.1:8000
+    echo 🔧 API at: http://127.0.0.1:8001
     echo.
     echo 📋 Login Credentials:
     echo 📧 Admin: admin@masimba.farm / admin123
@@ -38,15 +38,14 @@ echo.
 echo 🚀 Starting FarmOS server...
 echo.
 
-python auto_start.py
+start "FarmOS PHP Backend" php -S 127.0.0.1:8001 -t public
 
 if %errorlevel% neq 0 (
     echo.
     echo ❌ Failed to start FarmOS server
     echo 💡 Please check:
-    echo    1. Python is installed and in PATH
-    echo    2. Required packages are installed: pip install fastapi uvicorn sqlalchemy pymysql bcrypt requests
-    echo    3. Database is running: MySQL service started
+    echo    1. PHP is installed and in PATH
+    echo    2. Database is running: MySQL service started
     echo.
     pause
 )

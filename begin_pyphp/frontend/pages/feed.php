@@ -217,7 +217,7 @@ function closeAddIngredientModal() {
     document.getElementById('addIngredientModal').classList.add('hidden');
 }
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = '<?php echo api_base_url(); ?>';
 const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer <?php echo $_SESSION['access_token'] ?? ''; ?>`,

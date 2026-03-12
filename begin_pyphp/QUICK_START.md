@@ -116,17 +116,6 @@ Use `netstat -ano | findstr :8000` then `taskkill /PID <PID> /F`.
 - Check CORS_ORIGIN in backend .env
 - Clear browser cache (Ctrl+Shift+Delete)
 
-### "Docker containers won't start"
-
-```bash
-# Check logs
-docker-compose -f docker/docker-compose.yml logs mysql
-
-# Rebuild images
-docker-compose -f docker/docker-compose.yml build --no-cache
-docker-compose -f docker/docker-compose.yml up -d
-```
-
 ## Next Steps
 
 1. **Read Full Setup Guide**: [docs/SETUP.md](docs/SETUP.md)
@@ -142,7 +131,6 @@ begin-masimba-farmos/
 ├── backend/              # Python FastAPI
 ├── frontend/             # PHP frontend
 ├── database/             # Schema & migrations
-├── docker/               # Containerization
 ├── docs/                 # Documentation
 └── README.md             # Project overview
 ```

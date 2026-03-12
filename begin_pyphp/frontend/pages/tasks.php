@@ -104,7 +104,7 @@ require __DIR__ . '/../components/header.php';
 </div>
 
 <script>
-    const API_BASE_URL = 'http://localhost:8000';
+    const API_BASE_URL = '<?php echo api_base_url(); ?>';
     const headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + '<?php echo $_SESSION['access_token'] ?? ''; ?>',
@@ -145,10 +145,11 @@ require __DIR__ . '/../components/header.php';
             if (navigator.onLine) {
                 const resp = await fetch(`${API_BASE_URL}/api/tasks/`, { headers });
                 if (resp.ok) {
-                    const data = await resp.json();
-                    renderTasks(data);
-                    if (Array.isArray(data)) {
-                        for (const t of data) await window.OfflineService.storeData('tasks', t);
+                    const payload = await resp.json();
+                    const tasks = payload?.tasks || [];
+                    renderTasks(tasks);
+                    if (Array.isArray(tasks)) {
+                        for (const t of tasks) await window.OfflineService.storeData('tasks', t);
                     }
                 }
             }

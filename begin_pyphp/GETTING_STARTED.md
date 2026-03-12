@@ -127,8 +127,6 @@ begin-masimba-farmos/
 │   └── pages/                 # UI pages
 ├── database/
 │   └── schema.sql             # Database schema
-└── docker/
-    └── docker-compose.yml     # Container setup
 ```
 
 ---
@@ -147,9 +145,6 @@ npm run dev:frontend         # Just frontend
 ```bash
 # If using npm run dev:
 Ctrl+C in each terminal
-
-# If using Docker:
-docker-compose -f docker/docker-compose.yml down
 ```
 
 ### Database Operations
@@ -170,13 +165,6 @@ npm run test                # Run tests
 ## 🐛 Troubleshooting Guide
 
 ### "Cannot Connect to Database"
-
-**If using Docker**:
-```bash
-docker-compose -f docker/docker-compose.yml logs postgres
-# Look for connection errors
-```
-
 **If using Local PostgreSQL**:
 ```bash
 # 1. Check PostgreSQL is running
@@ -213,21 +201,6 @@ taskkill /PID <PID> /F                    # Windows
 2. Check CORS_ORIGIN in backend/.env matches frontend URL
 3. Clear browser cache: Ctrl+Shift+Delete
 4. Hard refresh: Ctrl+Shift+R
-
-### "Docker Containers Won't Start"
-
-```bash
-# 1. Check system resources (need 4GB+ RAM)
-docker stats
-
-# 2. Check logs
-docker-compose -f docker/docker-compose.yml logs
-
-# 3. Rebuild from scratch
-docker-compose -f docker/docker-compose.yml down
-docker-compose -f docker/docker-compose.yml build --no-cache
-docker-compose -f docker/docker-compose.yml up -d
-```
 
 ### "npm install Fails"
 
@@ -370,7 +343,6 @@ If stuck:
 1. **Check the logs**
    - Backend: Terminal output
    - Frontend: Browser console (F12)
-   - Docker: `docker-compose logs`
 
 2. **Read the documentation**
    - [docs/SETUP.md](docs/SETUP.md) for detailed setup
@@ -398,7 +370,7 @@ If stuck:
 ## ✅ Final Checklist
 
 - [ ] All prerequisites installed and verified
-- [ ] Setup method chosen (Docker OR Local)
+- [ ] Setup method chosen (Local)
 - [ ] All services running successfully
 - [ ] Health checks passing
 - [ ] Frontend loads in browser

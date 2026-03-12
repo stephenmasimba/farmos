@@ -189,7 +189,7 @@ require __DIR__ . '/../components/header.php';
 
 <script>
 const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = '<?php echo api_base_url(); ?>';
 const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,

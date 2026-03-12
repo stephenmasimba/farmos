@@ -4,9 +4,28 @@
  */
 
 function api_base_url() {
-    $host = getenv('PY_API_HOST') ?: '127.0.0.1';
-    $port = getenv('PY_API_PORT') ?: '8000';
-    return "http://{$host}:{$port}";
+    $explicit = getenv('PHP_API_BASE_URL') ?: getenv('API_BASE_URL');
+    if (!empty($explicit)) {
+        return rtrim($explicit, '/');
+    }
+
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? '127.0.0.1';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $dir = str_replace('\\', '/', rtrim(dirname($scriptName), '/'));
+
+    $base = $dir;
+    if (str_ends_with($base, '/frontend/public')) {
+        $base = substr($base, 0, -strlen('/frontend/public'));
+    } elseif (str_ends_with($base, '/frontend')) {
+        $base = substr($base, 0, -strlen('/frontend'));
+    }
+
+    if ($base === '' || $base === '.') {
+        $base = '/farmos/begin_pyphp';
+    }
+
+    return "{$scheme}://{$host}{$base}/backend";
 }
 
 function api_headers() {
@@ -75,7 +94,7 @@ function call_api($path, $method = 'GET', $data = null, $retry_count = 2) {
             
             if ($attempt == $retry_count) {
                 return [
-                    'error' => $json['message'] ?? "HTTP $httpcode", 
+                    'error' => $json['error']['message'] ?? ($json['message'] ?? "HTTP $httpcode"), 
                     'status' => $httpcode,
                     'data' => get_fallback_data($path, "HTTP $httpcode")['data']
                 ];

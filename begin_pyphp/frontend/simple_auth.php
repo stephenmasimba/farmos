@@ -1,7 +1,7 @@
 <?php
 /**
  * Simple PHP Authentication for FarmOS
- * Bypasses Python backend for direct database authentication
+ * Direct database authentication
  */
 
 // Start session only if not already started
@@ -42,7 +42,7 @@ function authenticate_user($email, $password) {
                 return $user;
             }
             
-            // If that fails, try to detect and handle bcrypt hashes from Python
+            // If that fails, try other bcrypt variants
             $hash = $user['hashed_password'];
             
             // Check if it's a bcrypt hash

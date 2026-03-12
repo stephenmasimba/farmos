@@ -18,42 +18,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $email = $_POST['email'] ?? '';
   $password = $_POST['password'] ?? '';
   
-  // Debug: Log the attempt
-  error_log("Login attempt: email=" . $email . ", password_length=" . strlen($password));
-  
-  // Try Python API first
   $api_response = call_api('/api/auth/login', 'POST', ['email' => $email, 'password' => $password]);
   
   if ($api_response['status'] === 200 && !empty($api_response['data']['access_token'])) {
-    error_log("Python API login successful for: " . $email);
     $_SESSION['access_token'] = $api_response['data']['access_token'];
     $_SESSION['user'] = $api_response['data']['user'];
     
-    // Redirect to dashboard
-    $redirect_url = '../public/index.php?page=dashboard';
-    error_log("Redirecting to: " . $redirect_url);
-    header('Location: ' . $redirect_url);
+    header('Location: ../public/index.php?page=dashboard');
     exit;
-  } else {
-    error_log("Python API login failed for: " . $email);
-    // Fallback to pure PHP authentication
-    $user = authenticate_user($email, $password);
-    
-    if ($user) {
-      error_log("Pure PHP fallback successful for: " . $email);
-      $_SESSION['user'] = [
-          'id' => $user['id'],
-          'name' => $user['name'],
-          'email' => $user['email'],
-          'role' => $user['role']
-      ];
-      header('Location: ../public/index.php?page=dashboard');
-      exit;
-    } else {
-      error_log("Both API and PHP auth failed for: " . $email);
-      $error = 'Invalid email or password';
-    }
   }
+
+  $user = authenticate_user($email, $password);
+  if ($user) {
+    $_SESSION['user'] = [
+        'id' => $user['id'],
+        'name' => $user['name'],
+        'email' => $user['email'],
+        'role' => $user['role']
+    ];
+    header('Location: ../public/index.php?page=dashboard');
+    exit;
+  }
+
+  $error = 'Invalid email or password';
 }
 ?>
 <!DOCTYPE html>

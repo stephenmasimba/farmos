@@ -108,7 +108,7 @@ function closeModal() {
 }
 
 const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = '<?php echo api_base_url(); ?>';
 const API_KEY = '<?php echo getenv('API_KEY') ?: 'local-dev-key'; ?>';
 const TENANT_ID = '<?php echo getenv('TENANT_ID') ?: '1'; ?>';
 

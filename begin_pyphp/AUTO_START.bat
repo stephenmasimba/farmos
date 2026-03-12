@@ -8,7 +8,7 @@ if "%1"=="hidden" (
 )
 
 :: Check if already running
-tasklist /FI "WINDOWTITLE eq FarmOS Auto-Start*" 2>NUL | find /I "python.exe" >NUL
+tasklist /FI "WINDOWTITLE eq FarmOS Auto-Start*" 2>NUL | find /I "php.exe" >NUL
 if %errorlevel% equ 0 (
     exit /b
 )
@@ -20,7 +20,7 @@ exit /b
 :start_hidden
 cd /d "%~dp0"
 
-:: Start the Python launcher
-python START_FARMOS.py
+cd backend
+start "FarmOS PHP Backend" php -S 127.0.0.1:8001 -t public
 
 exit
