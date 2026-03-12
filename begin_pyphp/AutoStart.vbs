@@ -10,7 +10,7 @@ currentDir = fso.GetParentFolderName(WScript.ScriptFullName)
 ' Check if server is already running
 On Error Resume Next
 Set http = CreateObject("MSXML2.XMLHTTP")
-http.open "GET", "http://127.0.0.1:8000/health", False
+http.open "GET", "http://127.0.0.1:8001/health", False
 http.send
 
 If Err.Number = 0 And http.Status = 200 Then
