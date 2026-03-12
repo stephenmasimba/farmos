@@ -259,15 +259,19 @@ class DashboardController
                 'farm_id' => $farmId,
             ]);
 
+            $status = 'needs_attention';
+            if ($overallScore >= 80) {
+                $status = 'excellent';
+            } elseif ($overallScore >= 60) {
+                $status = 'good';
+            } elseif ($overallScore >= 40) {
+                $status = 'fair';
+            }
+
             return Response::success([
                 'scores' => $scores,
                 'overall_health_score' => round($overallScore, 2),
-                'status' => match(true) {
-                    $overallScore >= 80 => 'excellent',
-                    $overallScore >= 60 => 'good',
-                    $overallScore >= 40 => 'fair',
-                    default => 'needs_attention'
-                },
+                'status' => $status,
                 'metrics' => [
                     'livestock' => $livestockStatus,
                     'inventory' => $inventory,

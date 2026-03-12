@@ -23,22 +23,31 @@ abstract class ApiTestCase extends TestCase
     public static function setUpBeforeClass(): void
     {
         try {
+            $host = getenv('DB_HOST') ?: 'localhost';
+            $port = getenv('DB_PORT') ?: '3306';
+            $user = getenv('DB_USER') ?: 'root';
+            $pass = getenv('DB_PASSWORD') ?: '';
+
             self::$db = Database::init(
-                'mysql:host=' . getenv('DB_HOST') . ':' . getenv('DB_PORT'),
-                getenv('DB_USER'),
-                getenv('DB_PASSWORD')
+                'mysql:host=' . $host . ';port=' . $port . ';charset=utf8mb4',
+                $user,
+                $pass
             );
 
             // Create test database
-            self::$db->exec('DROP DATABASE IF EXISTS ' . self::$testDbName);
-            self::$db->exec('CREATE DATABASE ' . self::$testDbName);
-            self::$db->exec('USE ' . self::$testDbName);
+            self::$db->execute('DROP DATABASE IF EXISTS ' . self::$testDbName);
+            self::$db->execute('CREATE DATABASE ' . self::$testDbName);
+            self::$db->execute('USE ' . self::$testDbName);
 
             // Run migrations
             self::runMigrations();
 
             // Create test user
             self::createTestUser();
+
+            putenv('DATABASE_URL=mysql:host=' . $host . ';port=' . $port . ';dbname=' . self::$testDbName . ';charset=utf8mb4');
+            putenv('DB_USER=' . $user);
+            putenv('DB_PASSWORD=' . $pass);
         } catch (\Exception $e) {
             echo "Database setup failed: " . $e->getMessage() . "\n";
             exit(1);
@@ -51,24 +60,25 @@ abstract class ApiTestCase extends TestCase
     protected static function runMigrations(): void
     {
         // Users table
-        self::$db->exec('
+        self::$db->execute('
             CREATE TABLE users (
-                user_id INT PRIMARY KEY AUTO_INCREMENT,
-                email VARCHAR(255) UNIQUE NOT NULL,
-                password VARCHAR(255) NOT NULL,
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                email VARCHAR(191) UNIQUE NOT NULL,
+                password_hash VARCHAR(255) NOT NULL,
                 first_name VARCHAR(100),
                 last_name VARCHAR(100),
-                role ENUM("user", "admin", "farm_manager") DEFAULT "user",
-                status ENUM("active", "inactive", "suspended") DEFAULT "active",
+                role VARCHAR(50) DEFAULT "user",
+                status VARCHAR(20) DEFAULT "active",
+                last_login DATETIME NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         ');
 
         // Farms table
-        self::$db->exec('
+        self::$db->execute('
             CREATE TABLE farms (
-                farm_id INT PRIMARY KEY AUTO_INCREMENT,
+                id INT PRIMARY KEY AUTO_INCREMENT,
                 owner_id INT NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 type VARCHAR(100),
@@ -82,14 +92,14 @@ abstract class ApiTestCase extends TestCase
                 established_year INT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (owner_id) REFERENCES users(user_id)
+                FOREIGN KEY (owner_id) REFERENCES users(id)
             )
         ');
 
         // Livestock table
-        self::$db->exec('
+        self::$db->execute('
             CREATE TABLE livestock (
-                livestock_id INT PRIMARY KEY AUTO_INCREMENT,
+                id INT PRIMARY KEY AUTO_INCREMENT,
                 farm_id INT NOT NULL,
                 name VARCHAR(255),
                 species VARCHAR(100) NOT NULL,
@@ -104,14 +114,14 @@ abstract class ApiTestCase extends TestCase
                 tag_number VARCHAR(100),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (farm_id) REFERENCES farms(farm_id)
+                FOREIGN KEY (farm_id) REFERENCES farms(id)
             )
         ');
 
         // Inventory table
-        self::$db->exec('
+        self::$db->execute('
             CREATE TABLE inventory (
-                inventory_id INT PRIMARY KEY AUTO_INCREMENT,
+                id INT PRIMARY KEY AUTO_INCREMENT,
                 farm_id INT NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 category VARCHAR(100),
@@ -125,16 +135,17 @@ abstract class ApiTestCase extends TestCase
                 location VARCHAR(255),
                 expiry_date DATE,
                 batch_number VARCHAR(100),
+                notes TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (farm_id) REFERENCES farms(farm_id)
+                FOREIGN KEY (farm_id) REFERENCES farms(id)
             )
         ');
 
         // Financial records table
-        self::$db->exec('
+        self::$db->execute('
             CREATE TABLE financial_records (
-                financial_id INT PRIMARY KEY AUTO_INCREMENT,
+                id INT PRIMARY KEY AUTO_INCREMENT,
                 farm_id INT NOT NULL,
                 type ENUM("income", "expense") NOT NULL,
                 category VARCHAR(100),
@@ -148,14 +159,14 @@ abstract class ApiTestCase extends TestCase
                 notes TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (farm_id) REFERENCES farms(farm_id)
+                FOREIGN KEY (farm_id) REFERENCES farms(id)
             )
         ');
 
         // Tasks table
-        self::$db->exec('
+        self::$db->execute('
             CREATE TABLE tasks (
-                task_id INT PRIMARY KEY AUTO_INCREMENT,
+                id INT PRIMARY KEY AUTO_INCREMENT,
                 farm_id INT NOT NULL,
                 title VARCHAR(255) NOT NULL,
                 description TEXT,
@@ -167,16 +178,16 @@ abstract class ApiTestCase extends TestCase
                 created_by INT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (farm_id) REFERENCES farms(farm_id),
-                FOREIGN KEY (assigned_to) REFERENCES users(user_id),
-                FOREIGN KEY (created_by) REFERENCES users(user_id)
+                FOREIGN KEY (farm_id) REFERENCES farms(id),
+                FOREIGN KEY (assigned_to) REFERENCES users(id),
+                FOREIGN KEY (created_by) REFERENCES users(id)
             )
         ');
 
         // Weather table
-        self::$db->exec('
+        self::$db->execute('
             CREATE TABLE weather (
-                weather_id INT PRIMARY KEY AUTO_INCREMENT,
+                id INT PRIMARY KEY AUTO_INCREMENT,
                 farm_id INT NOT NULL,
                 observation_date DATETIME,
                 temperature DECIMAL(6,2),
@@ -187,14 +198,14 @@ abstract class ApiTestCase extends TestCase
                 wind_speed DECIMAL(6,2),
                 wind_direction VARCHAR(3),
                 precipitation DECIMAL(8,2),
-                condition VARCHAR(100),
+                `condition` VARCHAR(100),
                 visibility DECIMAL(8,2),
                 uv_index INT,
                 source VARCHAR(100),
                 notes TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (farm_id) REFERENCES farms(farm_id)
+                FOREIGN KEY (farm_id) REFERENCES farms(id)
             )
         ');
     }
@@ -219,24 +230,35 @@ abstract class ApiTestCase extends TestCase
      */
     protected function apiCall(string $method, string $path, ?array $data = null, ?string $token = null): array
     {
-        $baseUrl = getenv('API_BASE_URL') ?: 'http://localhost:8001';
-        $url = rtrim($baseUrl, '/') . $path;
-        
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . ($token ?? self::$testToken),
-        ]);
-
-        if ($data) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $uri = $path;
+        $parsed = parse_url($uri);
+        $requestPath = $parsed['path'] ?? $uri;
+        $_GET = [];
+        if (!empty($parsed['query'])) {
+            parse_str($parsed['query'], $_GET);
         }
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        $_SERVER['REQUEST_METHOD'] = $method;
+        $_SERVER['REQUEST_URI'] = $uri;
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+        $_SERVER['HTTP_CONTENT_TYPE'] = 'application/json';
+
+        $bearer = $token ?? self::$testToken;
+        if (!empty($bearer)) {
+            $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . $bearer;
+        } else {
+            unset($_SERVER['HTTP_AUTHORIZATION']);
+        }
+
+        $GLOBALS['__FARMOS_TEST_RAW_BODY'] = $data ? json_encode($data) : '';
+
+        http_response_code(200);
+        ob_start();
+        include BASE_PATH . '/public/index.php';
+        $response = ob_get_clean();
+        $httpCode = http_response_code();
+        unset($GLOBALS['__FARMOS_TEST_RAW_BODY']);
 
         return [
             'status' => $httpCode,
@@ -250,19 +272,19 @@ abstract class ApiTestCase extends TestCase
     protected function getTestFarmId(): int
     {
         $result = self::$db->query(
-            'SELECT farm_id FROM farms LIMIT 1'
+            'SELECT id FROM farms LIMIT 1'
         );
 
         if (empty($result)) {
             // Create test farm
-            $result = self::$db->query(
+            self::$db->execute(
                 'INSERT INTO farms (owner_id, name, type, location) VALUES (?, ?, ?, ?)',
                 [1, 'Test Farm', 'dairy', 'Test Location']
             );
             return self::$db->lastInsertId();
         }
 
-        return $result[0]['farm_id'] ?? 0;
+        return (int) ($result[0]['id'] ?? 0);
     }
 
     /**
@@ -279,7 +301,7 @@ abstract class ApiTestCase extends TestCase
     public static function tearDownAfterClass(): void
     {
         try {
-            self::$db->exec('DROP DATABASE ' . self::$testDbName);
+            self::$db->execute('DROP DATABASE ' . self::$testDbName);
         } catch (\Exception $e) {
             echo "Database cleanup failed: " . $e->getMessage() . "\n";
         }

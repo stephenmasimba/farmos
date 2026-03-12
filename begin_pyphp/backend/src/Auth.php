@@ -11,7 +11,7 @@ class Auth
 
     public function __construct(Database $db)
     {
-        $this->$db = $db;
+        $this->db = $db;
     }
 
     /**
@@ -100,16 +100,31 @@ class Auth
         try {
             $this->db->execute(
                 'INSERT INTO users (email, password_hash, first_name, last_name, status, role) VALUES (?, ?, ?, ?, ?, ?)',
-                [$email, $passwordHash, $firstName, $lastName, 'active', 'viewer']
+                [$email, $passwordHash, $firstName, $lastName, 'active', 'user']
             );
 
             $userId = $this->db->lastInsertId();
 
             Logger::info('User registered', ['user_id' => $userId, 'email' => $email]);
 
+            $token = Security::encodeJWT([
+                'user_id' => $userId,
+                'email' => $email,
+                'role' => 'user',
+            ]);
+
             return [
                 'id' => $userId,
                 'email' => $email,
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'expires_in' => 3600,
+                'user' => [
+                    'id' => $userId,
+                    'email' => $email,
+                    'role' => 'user',
+                    'status' => 'active',
+                ],
                 'message' => 'User registered successfully',
             ];
         } catch (\Exception $e) {

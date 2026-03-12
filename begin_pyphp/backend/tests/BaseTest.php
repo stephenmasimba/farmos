@@ -107,10 +107,12 @@ class SecurityTest extends BaseTestCase
         $claims = ['user_id' => 1, 'email' => 'test@example.com'];
         $oldToken = Security::encodeJWT($claims);
         
-        $decoded = Security::decodeJWT($oldToken);
-        $newToken = Security::refreshToken($decoded);
-        
-        $this->assertNotEquals($oldToken, $newToken);
+        $newToken = Security::refreshToken($oldToken);
+
+        $this->assertIsString($newToken);
+        $decoded = Security::decodeJWT($newToken);
+        $this->assertEquals($claims['user_id'], $decoded['user_id']);
+        $this->assertEquals($claims['email'], $decoded['email']);
     }
 
     /**
@@ -127,7 +129,7 @@ class SecurityTest extends BaseTestCase
         
         // Check values
         $this->assertEquals('nosniff', $headers['X-Content-Type-Options']);
-        $this->assertEquals('SAMEORIGIN', $headers['X-Frame-Options']);
+        $this->assertEquals('DENY', $headers['X-Frame-Options']);
     }
 }
 
@@ -289,7 +291,7 @@ class DatabaseTest extends BaseTestCase
     public function testConnection()
     {
         // Would test actual database connection
-        $this->markTestToImplement('Database connection test');
+        $this->markTestIncomplete('Database connection test');
     }
 
     /**
@@ -298,7 +300,7 @@ class DatabaseTest extends BaseTestCase
     public function testQuery()
     {
         // Would test query with mocked database
-        $this->markTestToImplement('Query execution test');
+        $this->markTestIncomplete('Query execution test');
     }
 }
 

@@ -39,11 +39,8 @@
          timeoutForSmallTests="1"
          verbose="true">
     <testsuites>
-        <testsuite name="Feature">
-            <directory>tests/Feature</directory>
-        </testsuite>
-        <testsuite name="Unit">
-            <directory>tests/Unit</directory>
+        <testsuite name="Tests">
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 
@@ -73,9 +70,9 @@
         <env name="BOOTSTRAP_CLEAR_CACHE" value="0" />
         <env name="DB_HOST" value="localhost" />
         <env name="DB_PORT" value="3306" />
-        <env name="DB_USER" value="farmos_test" />
-        <env name="DB_PASSWORD" value="test_password" />
-        <env name="JWT_SECRET" value="test_secret_key_for_jwt_testing" />
+        <env name="DB_USER" value="root" />
+        <env name="DB_PASSWORD" value="" />
+        <env name="JWT_SECRET" value="test_secret_key_for_jwt_testing_1234567890" />
         <env name="APP_ENV" value="testing" />
     </php>
 </phpunit>

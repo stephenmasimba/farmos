@@ -32,16 +32,16 @@ $defaults = [
     'APP_NAME' => 'FarmOS',
     'APP_ENV' => 'development',
     'APP_DEBUG' => 'false',
-    'APP_URL' => 'http://localhost:8001',
-    'APP_PORT' => 8001,
+    'APP_URL' => 'http://localhost:8081',
+    'APP_PORT' => 8081,
     
     // Database
     'DATABASE_HOST' => 'localhost',
     'DATABASE_PORT' => '3306',
-    'DATABASE_NAME' => 'farmos_db',
-    'DB_USER' => 'farmos_user',
-    'DB_PASSWORD' => 'farmos_password',
-    'DATABASE_URL' => 'mysql:host=localhost;port=3306;dbname=farmos_db;charset=utf8mb4',
+    'DATABASE_NAME' => 'begin_masimba_farm',
+    'DB_USER' => 'root',
+    'DB_PASSWORD' => '',
+    'DATABASE_URL' => 'mysql:host=localhost;port=3306;dbname=begin_masimba_farm;charset=utf8mb4',
     
     // JWT
     'JWT_SECRET' => 'your-secret-key-here-change-in-production',

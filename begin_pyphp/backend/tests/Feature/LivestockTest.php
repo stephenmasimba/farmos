@@ -26,7 +26,7 @@ class LivestockTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/livestock?farm_id=' . $this->farmId);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('data', $response['body']);
+        $this->assertArrayHasKey('livestock', $response['body']);
         $this->assertArrayHasKey('pagination', $response['body']);
     }
 
@@ -47,8 +47,8 @@ class LivestockTest extends ApiTestCase
         $response = $this->apiCall('POST', '/api/livestock', $data);
 
         $this->assertEquals(201, $response['status']);
-        $this->assertArrayHasKey('id', $response['body']['data']);
-        $this->livestockId = $response['body']['data']['id'];
+        $this->assertArrayHasKey('id', $response['body']);
+        $this->livestockId = $response['body']['id'];
     }
 
     /**
@@ -62,8 +62,8 @@ class LivestockTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/livestock/' . $this->livestockId);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('Bessie', $response['body']['data']['name']);
-        $this->assertEquals('cattle', $response['body']['data']['species']);
+        $this->assertEquals('Bessie', $response['body']['name']);
+        $this->assertEquals('cattle', $response['body']['species']);
     }
 
     /**
@@ -81,7 +81,7 @@ class LivestockTest extends ApiTestCase
         $response = $this->apiCall('PUT', '/api/livestock/' . $this->livestockId, $data);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('Bessie Updated', $response['body']['data']['name']);
+        $this->assertEquals('Bessie Updated', $response['body']['name']);
     }
 
     /**
@@ -104,7 +104,7 @@ class LivestockTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/livestock/stats?farm_id=' . $this->farmId);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('data', $response['body']);
+        $this->assertArrayHasKey('total', $response['body']);
     }
 
     /**
@@ -162,7 +162,7 @@ class LivestockTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/livestock/' . $this->livestockId . '/events');
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('data', $response['body']);
+        $this->assertArrayHasKey('events', $response['body']);
     }
 
     /**
@@ -184,7 +184,7 @@ class LivestockTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/livestock?farm_id=' . $this->farmId . '&page=1&per_page=2');
 
         $this->assertEquals(200, $response['status']);
-        $this->assertCount(2, $response['body']['data']);
+        $this->assertCount(2, $response['body']['livestock']);
         $this->assertEquals(1, $response['body']['pagination']['page']);
     }
 }

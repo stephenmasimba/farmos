@@ -46,6 +46,10 @@ class QueryBuilder
         if ($value === null && $operator !== null) {
             $value = $operator;
             $operator = '=';
+            if (preg_match('/^(.+?)\s*(>=|<=|<>|!=|=|<|>|LIKE)$/i', $column, $m)) {
+                $column = trim($m[1]);
+                $operator = strtoupper($m[2]);
+            }
         }
 
         $this->wheres[] = [
@@ -65,6 +69,10 @@ class QueryBuilder
         if ($value === null && $operator !== null) {
             $value = $operator;
             $operator = '=';
+            if (preg_match('/^(.+?)\s*(>=|<=|<>|!=|=|<|>|LIKE)$/i', $column, $m)) {
+                $column = trim($m[1]);
+                $operator = strtoupper($m[2]);
+            }
         }
 
         $this->wheres[] = [
@@ -82,8 +90,35 @@ class QueryBuilder
      */
     public function orderBy(string $column, string $direction = 'ASC'): self
     {
-        $this->orders[] = "$column " . strtoupper($direction);
+        $this->orders[] = [
+            'column' => $column,
+            'direction' => strtoupper($direction),
+        ];
         return $this;
+    }
+
+    public function getConnection(): Database
+    {
+        return $this->db;
+    }
+
+    protected function quoteIdentifier(string $identifier): string
+    {
+        if ($identifier === '*' || strpos($identifier, '`') !== false) {
+            return $identifier;
+        }
+
+        $parts = explode('.', $identifier);
+        foreach ($parts as $i => $part) {
+            if ($part === '*') {
+                continue;
+            }
+            if (preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $part)) {
+                $parts[$i] = '`' . $part . '`';
+            }
+        }
+
+        return implode('.', $parts);
     }
 
     /**
@@ -167,7 +202,7 @@ class QueryBuilder
                     $currentBoolean = 'OR';
                 }
 
-                $whereParts[] = $where['column'] . ' ' . $where['operator'] . ' ?';
+                $whereParts[] = $this->quoteIdentifier($where['column']) . ' ' . $where['operator'] . ' ?';
                 $params[] = $where['value'];
             }
 
@@ -176,7 +211,11 @@ class QueryBuilder
 
         // Add ORDER BY
         if (!empty($this->orders)) {
-            $sql .= ' ORDER BY ' . implode(', ', $this->orders);
+            $orderParts = [];
+            foreach ($this->orders as $order) {
+                $orderParts[] = $this->quoteIdentifier($order['column']) . ' ' . $order['direction'];
+            }
+            $sql .= ' ORDER BY ' . implode(', ', $orderParts);
         }
 
         // Add LIMIT

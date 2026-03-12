@@ -24,7 +24,7 @@ class AuthenticationTest extends ApiTestCase
         $response = $this->apiCall('POST', '/api/auth/register', $data, '');
 
         $this->assertEquals(201, $response['status']);
-        $this->assertArrayHasKey('access_token', $response['body']['data']);
+        $this->assertArrayHasKey('access_token', $response['body']);
     }
 
     /**
@@ -40,8 +40,8 @@ class AuthenticationTest extends ApiTestCase
         $response = $this->apiCall('POST', '/api/auth/login', $data, '');
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('access_token', $response['body']['data']);
-        $this->assertEquals('Bearer', $response['body']['data']['token_type']);
+        $this->assertArrayHasKey('access_token', $response['body']);
+        $this->assertEquals('Bearer', $response['body']['token_type']);
     }
 
     /**
@@ -52,8 +52,8 @@ class AuthenticationTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/auth/me');
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('user_id', $response['body']['data']);
-        $this->assertEquals(self::$testUser, $response['body']['data']['email']);
+        $this->assertArrayHasKey('user_id', $response['body']);
+        $this->assertEquals(self::$testUser, $response['body']['email']);
     }
 
     /**
@@ -64,7 +64,7 @@ class AuthenticationTest extends ApiTestCase
         $response = $this->apiCall('POST', '/api/auth/refresh-token', []);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('access_token', $response['body']['data']);
+        $this->assertArrayHasKey('access_token', $response['body']);
     }
 
     /**

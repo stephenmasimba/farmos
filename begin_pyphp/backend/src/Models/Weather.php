@@ -104,10 +104,10 @@ class Weather extends Model
     public static function getConditionStats(int $farmId, string $startDate, string $endDate, Database $db): array
     {
         return static::query($db)->getConnection()->query(
-            'SELECT condition, COUNT(*) as count 
+            'SELECT `condition`, COUNT(*) as count 
              FROM ' . static::table() . '
              WHERE farm_id = ? AND observation_date >= ? AND observation_date <= ?
-             GROUP BY condition',
+             GROUP BY `condition`',
             [$farmId, $startDate . ' 00:00:00', $endDate . ' 23:59:59']
         );
     }
@@ -121,7 +121,7 @@ class Weather extends Model
             'SELECT COUNT(DISTINCT DATE(observation_date)) as rainy_days 
              FROM ' . static::table() . '
              WHERE farm_id = ? AND observation_date >= ? AND observation_date <= ?
-             AND (precipitation > 0 OR condition IN ("rainy", "thunderstorm"))',
+             AND (precipitation > 0 OR `condition` IN ("rainy", "thunderstorm"))',
             [$farmId, $startDate . ' 00:00:00', $endDate . ' 23:59:59']
         );
 

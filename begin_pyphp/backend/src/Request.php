@@ -85,7 +85,7 @@ class Request
         $contentType = $this->getHeader('content-type') ?: '';
         
         if (strpos($contentType, 'application/json') !== false) {
-            $raw = file_get_contents('php://input');
+            $raw = isset($GLOBALS['__FARMOS_TEST_RAW_BODY']) ? (string) $GLOBALS['__FARMOS_TEST_RAW_BODY'] : file_get_contents('php://input');
             $decoded = json_decode($raw, true);
             $body = $decoded ?: [];
         } elseif (!empty($_POST)) {

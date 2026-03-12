@@ -26,7 +26,8 @@ class InventoryTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/inventory?farm_id=' . $this->farmId);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('data', $response['body']);
+        $this->assertArrayHasKey('inventory', $response['body']);
+        $this->assertArrayHasKey('pagination', $response['body']);
     }
 
     /**
@@ -48,8 +49,8 @@ class InventoryTest extends ApiTestCase
         $response = $this->apiCall('POST', '/api/inventory', $data);
 
         $this->assertEquals(201, $response['status']);
-        $this->assertArrayHasKey('id', $response['body']['data']);
-        $this->inventoryId = $response['body']['data']['id'];
+        $this->assertArrayHasKey('id', $response['body']);
+        $this->inventoryId = $response['body']['id'];
     }
 
     /**
@@ -62,8 +63,8 @@ class InventoryTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/inventory/' . $this->inventoryId);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals('Cattle Feed', $response['body']['data']['name']);
-        $this->assertEquals('feed', $response['body']['data']['category']);
+        $this->assertEquals('Cattle Feed', $response['body']['name']);
+        $this->assertEquals('feed', $response['body']['category']);
     }
 
     /**
@@ -81,7 +82,7 @@ class InventoryTest extends ApiTestCase
         $response = $this->apiCall('PUT', '/api/inventory/' . $this->inventoryId, $data);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals(80, $response['body']['data']['quantity']);
+        $this->assertEquals(80, $response['body']['quantity']);
     }
 
     /**
@@ -99,7 +100,7 @@ class InventoryTest extends ApiTestCase
         $response = $this->apiCall('POST', '/api/inventory/' . $this->inventoryId . '/adjust', $data);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals(90, $response['body']['data']['quantity']);
+        $this->assertEquals(90, $response['body']['quantity']);
     }
 
     /**
@@ -121,7 +122,8 @@ class InventoryTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/inventory/alerts?farm_id=' . $this->farmId);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('low_stock', $response['body']['data']);
+        $this->assertArrayHasKey('alerts', $response['body']);
+        $this->assertArrayHasKey('low_stock', $response['body']['alerts']);
     }
 
     /**
@@ -134,7 +136,7 @@ class InventoryTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/inventory/category/feed?farm_id=' . $this->farmId);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('data', $response['body']);
+        $this->assertArrayHasKey('inventory', $response['body']);
     }
 
     /**
@@ -147,8 +149,8 @@ class InventoryTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/inventory/stats?farm_id=' . $this->farmId);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('total_items', $response['body']['data']);
-        $this->assertArrayHasKey('total_value', $response['body']['data']);
+        $this->assertArrayHasKey('total_items', $response['body']);
+        $this->assertArrayHasKey('total_value', $response['body']);
     }
 
     /**
@@ -196,6 +198,6 @@ class InventoryTest extends ApiTestCase
         $response = $this->apiCall('POST', '/api/inventory', $data);
 
         $this->assertEquals(201, $response['status']);
-        $this->assertNotNull($response['body']['data']['expiry_date']);
+        $this->assertNotNull($response['body']['expiry_date']);
     }
 }
