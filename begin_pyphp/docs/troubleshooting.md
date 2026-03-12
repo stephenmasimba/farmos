@@ -13,15 +13,14 @@
 ### 2. API Connection Refused
 **Symptom**: Frontend shows "Failed to fetch" or connection errors.
 **Solution**:
-- Ensure the backend server is running (`uvicorn` or `gunicorn`).
-- Check if the backend is listening on port 8000 (default).
-- Verify `API_BASE_URL` in frontend JavaScript matches the backend URL.
-- Check CORS settings in `backend/app.py`.
+- Ensure your web server is serving the backend (`begin_pyphp/backend/`).
+- If using the PHP built-in server, ensure it's running on port 8001.
+- Verify `API_BASE_URL` (or `PHP_API_BASE_URL`) matches the backend URL.
+- Check CORS settings in `backend/config/env.php`.
 
 ### 3. Missing Data
 **Symptom**: Tables or lists are empty.
 **Solution**:
-- Run the seeder to populate sample data: `python backend/common/seeder.py` (or restart backend if seeder runs on startup).
 - Check database connection string in `.env`.
 - Inspect browser network tab for API errors (404, 500).
 
@@ -32,13 +31,6 @@
 - Check `Authorization` header format: `Bearer <token>`.
 - Verify `X-API-Key` and `X-Tenant-ID` headers are present.
 - Check user role permissions.
-
-### 5. Database Locked (SQLite)
-**Symptom**: "Database is locked" error.
-**Solution**:
-- Ensure no other process is holding a lock on `farmos.db`.
-- Restart the backend server.
-- Consider migrating to PostgreSQL or MySQL for high concurrency.
 
 ## Logs
 - **Backend Logs**: Check standard output or configured log files.

@@ -31,13 +31,13 @@ if ($user) {
             
             echo "<h3>Testing password verification...</h3>";
             
-            // Test with password_verify (for PHP hashes)
+            // Test with password_verify
             if (password_verify('manager123', $user['hashed_password'])) {
                 echo "<p style='color: green;'>✅ password_verify() successful!</p>";
             } else {
                 echo "<p style='color: orange;'>⚠️ password_verify() failed, trying bcrypt...</p>";
                 
-                // Test with bcrypt (for Python hashes)
+                // Test with bcrypt variants
                 if (function_exists('password_verify')) {
                     // Try to detect if it's a bcrypt hash
                     if (substr($user['hashed_password'], 0, 4) === '$2y$' || substr($user['hashed_password'], 0, 4) === '$2b$') {

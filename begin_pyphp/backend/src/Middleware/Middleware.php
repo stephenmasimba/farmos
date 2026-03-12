@@ -25,7 +25,7 @@ abstract class Middleware
      * Handle the request
      * Return true to continue, Response to return early
      */
-    abstract public function handle(): mixed;
+    abstract public function handle();
 }
 
 /**
@@ -34,7 +34,7 @@ abstract class Middleware
  */
 class AuthMiddleware extends Middleware
 {
-    public function handle(): mixed
+    public function handle()
     {
         $user = $this->request->getUser();
 
@@ -67,7 +67,7 @@ class RateLimitMiddleware extends Middleware
         $this->limit = $limit;
     }
 
-    public function handle(): mixed
+    public function handle()
     {
         $clientIP = $this->request->getIP();
 
@@ -90,7 +90,7 @@ class RateLimitMiddleware extends Middleware
  */
 class CorsMiddleware extends Middleware
 {
-    public function handle(): mixed
+    public function handle()
     {
         $origin = getenv('CORS_ORIGIN');
         $requestOrigin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -120,7 +120,7 @@ class CorsMiddleware extends Middleware
  */
 class AdminMiddleware extends Middleware
 {
-    public function handle(): mixed
+    public function handle()
     {
         $user = $this->request->getUser();
 
@@ -152,7 +152,7 @@ class ValidationMiddleware extends Middleware
         $this->rules = $rules;
     }
 
-    public function handle(): mixed
+    public function handle()
     {
         $body = $this->request->getBody();
         $errors = [];
@@ -177,7 +177,7 @@ class ValidationMiddleware extends Middleware
  */
 class LoggingMiddleware extends Middleware
 {
-    public function handle(): mixed
+    public function handle()
     {
         Logger::info('Request', [
             'method' => $this->request->getMethod(),
@@ -196,7 +196,7 @@ class LoggingMiddleware extends Middleware
  */
 class SecurityHeadersMiddleware extends Middleware
 {
-    public function handle(): mixed
+    public function handle()
     {
         $headers = Security::getSecurityHeaders();
 
@@ -245,7 +245,7 @@ class Pipeline
      * Execute pipeline
      * Returns the final response or true if all pass
      */
-    public function execute(): mixed
+    public function execute()
     {
         foreach ($this->middlewares as $middleware) {
             $result = $middleware->handle();

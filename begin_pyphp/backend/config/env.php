@@ -32,8 +32,8 @@ $defaults = [
     'APP_NAME' => 'FarmOS',
     'APP_ENV' => 'development',
     'APP_DEBUG' => 'false',
-    'APP_URL' => 'http://localhost:8000',
-    'APP_PORT' => 8000,
+    'APP_URL' => 'http://localhost:8001',
+    'APP_PORT' => 8001,
     
     // Database
     'DATABASE_HOST' => 'localhost',
@@ -56,7 +56,7 @@ $defaults = [
     'SESSION_TIMEOUT' => '1800', // 30 minutes
     
     // CORS
-    'CORS_ORIGIN' => 'http://localhost:3000',
+    'CORS_ORIGIN' => 'http://localhost',
     'CORS_METHODS' => 'GET,POST,PUT,DELETE,OPTIONS',
     'CORS_HEADERS' => 'Content-Type,Authorization',
     

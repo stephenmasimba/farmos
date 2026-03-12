@@ -58,7 +58,7 @@ abstract class Model
     /**
      * Magic getter
      */
-    public function __get(string $name): mixed
+    public function __get(string $name)
     {
         if (array_key_exists($name, $this->attributes)) {
             return $this->castAttribute($name, $this->attributes[$name]);
@@ -69,7 +69,7 @@ abstract class Model
     /**
      * Magic setter
      */
-    public function __set(string $name, mixed $value): void
+    public function __set(string $name, $value): void
     {
         if (in_array($name, static::$fillable) || !isset(static::$fillable)) {
             $this->attributes[$name] = $value;
@@ -87,7 +87,7 @@ abstract class Model
     /**
      * Cast attribute to specified type
      */
-    protected function castAttribute(string $name, mixed $value): mixed
+    protected function castAttribute(string $name, $value)
     {
         if (!isset(static::$casts[$name]) || $value === null) {
             return $value;
@@ -150,7 +150,7 @@ abstract class Model
     /**
      * Find by primary key
      */
-    public static function find(mixed $id, Database $db): ?static
+    public static function find($id, Database $db)
     {
         $result = $db->queryOne(
             'SELECT * FROM ' . static::table() . ' WHERE ' . static::primaryKey() . ' = ?',
@@ -167,7 +167,7 @@ abstract class Model
     /**
      * Find or fail
      */
-    public static function findOrFail(mixed $id, Database $db): static
+    public static function findOrFail($id, Database $db)
     {
         $model = static::find($id, $db);
         if (!$model) {
@@ -200,7 +200,7 @@ abstract class Model
     /**
      * Find by column
      */
-    public static function where(string $column, mixed $value, Database $db): ?static
+    public static function where(string $column, $value, Database $db)
     {
         $result = $db->queryOne(
             'SELECT * FROM ' . static::table() . ' WHERE ' . $column . ' = ?',
@@ -217,7 +217,7 @@ abstract class Model
     /**
      * Create a new record
      */
-    public function save(): mixed
+    public function save()
     {
         if (isset($this->attributes[static::$primaryKey])) {
             return $this->update();
@@ -229,7 +229,7 @@ abstract class Model
     /**
      * Insert new record
      */
-    protected function insert(): mixed
+    protected function insert()
     {
         $fields = [];
         $values = [];
@@ -304,7 +304,7 @@ abstract class Model
     /**
      * Delete by id
      */
-    public static function destroy(mixed $id, Database $db): int
+    public static function destroy($id, Database $db): int
     {
         $sql = 'DELETE FROM ' . static::table() . ' WHERE ' . static::primaryKey() . ' = ?';
         return $db->execute($sql, [$id]);
@@ -338,7 +338,7 @@ abstract class Model
     /**
      * Get original value
      */
-    public function getOriginal(string $field = null): mixed
+    public function getOriginal(string $field = null)
     {
         if ($field) {
             return $this->original[$field] ?? null;

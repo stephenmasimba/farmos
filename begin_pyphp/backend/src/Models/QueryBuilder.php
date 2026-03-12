@@ -40,7 +40,7 @@ class QueryBuilder
     /**
      * Add WHERE clause
      */
-    public function where(string $column, mixed $operator = null, mixed $value = null): self
+    public function where(string $column, $operator = null, $value = null): self
     {
         // Handle where(column, value) syntax
         if ($value === null && $operator !== null) {
@@ -60,7 +60,7 @@ class QueryBuilder
     /**
      * Add OR WHERE clause
      */
-    public function orWhere(string $column, mixed $operator = null, mixed $value = null): self
+    public function orWhere(string $column, $operator = null, $value = null): self
     {
         if ($value === null && $operator !== null) {
             $value = $operator;

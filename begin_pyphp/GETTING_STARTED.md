@@ -1,4 +1,4 @@
-# Begin Masimba FarmOS - Getting Started (Python + PHP)
+# Begin Masimba FarmOS - Getting Started (Pure PHP)
 
 ## Pre-Flight Checklist ✈️
 
@@ -9,16 +9,13 @@ Use this checklist to verify everything is set up correctly before starting deve
 ## 📋 System Requirements
 
 ### Prerequisites
-- [ ] **Python 3.10+** (`python --version`)
-- [ ] **pip** (`pip --version`)
+- [ ] **PHP 8.0+** (`php -v`)
 - [ ] **WAMP/XAMPP** running (Apache + PHP)
-- [ ] **MySQL** (or SQLite for local dev)
+- [ ] **MySQL/MariaDB** running
 - [ ] **Git** (`git --version`)
 
 ### Verify Installation
 ```bash
-python --version
-pip --version
 php -v
 mysql --version
 ```
@@ -29,11 +26,10 @@ mysql --version
 
 Choose **ONE** of these setup methods:
 
-### Backend (FastAPI)
-1) Open terminal in `begin_pyphp/backend`
-2) Install deps: `pip install -r requirements.txt`
-3) Run server: `uvicorn app:app --host 127.0.0.1 --port 8000 --reload`
-4) Health: `http://127.0.0.1:8000/health`
+### Backend (PHP)
+1) Ensure WAMP/XAMPP is running
+2) Backend entry point: `begin_pyphp/backend/public/index.php`
+3) Health: `http://localhost/farmos/begin_pyphp/backend/health`
 
 ---
 
@@ -42,9 +38,9 @@ Choose **ONE** of these setup methods:
 2) Visit `http://localhost/farmos/begin_pyphp/frontend/public/`
 
 **Step 4: Verify**
-- [ ] Frontend loads: http://localhost:5173
-- [ ] Backend responds: `curl http://localhost:3000/health`
-- [ ] Database ready: `psql -d begin_masimba_farm -c "SELECT COUNT(*) FROM users;"`
+- [ ] Frontend loads: http://localhost/farmos/begin_pyphp/frontend/public/
+- [ ] Backend responds: `curl http://localhost/farmos/begin_pyphp/backend/health`
+- [ ] Database ready (MySQL)
 
 ---
 
@@ -54,7 +50,7 @@ After choosing your setup method above, complete these one-time tasks:
 
 ### Login
 ```bash
-curl -X POST http://127.0.0.1:8000/api/auth/login \
+curl -X POST http://localhost/farmos/begin_pyphp/backend/api/auth/login \
   -H "Content-Type: application/json" \
   -H "X-API-Key: local-dev-key" \
   -d '{"email": "admin@example.com", "password": "password123"}'
@@ -76,8 +72,8 @@ This adds:
 After setup, verify everything works:
 
 ### Backend Health Checks
-- [ ] Health: `curl http://127.0.0.1:8000/health`
-- [ ] Version: `curl http://127.0.0.1:8000/api/version`
+- [ ] Health: `curl http://localhost/farmos/begin_pyphp/backend/health`
+- [ ] Version: `curl http://localhost/farmos/begin_pyphp/backend/api/version`
 - [ ] No error messages in terminal
 - [ ] Logs show "Server started"
 
@@ -88,22 +84,11 @@ After setup, verify everything works:
 
 ### Database Verification
 ```bash
-# Check database exists
-psql -l | grep begin_masimba_farm
-
-# Check tables were created
-psql -d begin_masimba_farm -c "\dt"
-
-# Should show 9+ tables:
-# users, livestock_batches, animal_events, crops, inventory_items,
-# transactions, sensor_readings, sales_orders, feed_ingredients, feed_formulations
+# Use your MySQL client/phpMyAdmin to verify the schema and tables.
 ```
 
-### Hot Reload (if developing locally)
-- [ ] Modify `frontend/src/App.jsx` 
-- [ ] Page automatically updates in browser
-- [ ] Modify `backend/server.js`
-- [ ] Server automatically reloads (watch "Restart" message)
+### Local Development Notes
+- Refresh the browser after editing PHP files.
 
 ---
 
@@ -118,10 +103,9 @@ begin-masimba-farmos/
 │   ├── SETUP.md               # Detailed setup guide
 │   ├── ARCHITECTURE.md        # System design
 │   └── API.md                 # API documentation (coming)
-├── backend/                    # Python FastAPI
-│   ├── app.py                 # FastAPI app
-│   ├── routers/               # API endpoints
-│   └── common/                # security, db, dependencies
+├── backend/                    # PHP backend
+│   ├── public/                # web root (index.php)
+│   └── src/                   # controllers, models, core
 ├── frontend/                   # PHP frontend
 │   ├── public/                # web root
 │   └── pages/                 # UI pages
@@ -135,29 +119,27 @@ begin-masimba-farmos/
 
 ### Start Development
 ```bash
-npm run dev                    # Start backend + frontend
-# OR
-npm run dev:backend          # Just backend
-npm run dev:frontend         # Just frontend
+# Backend and frontend run under your web server (WAMP/XAMPP).
+# Visit:
+# http://localhost/farmos/begin_pyphp/frontend/public/
 ```
 
 ### Stop Development
 ```bash
-# If using npm run dev:
-Ctrl+C in each terminal
+Stop/restart WAMP/XAMPP services as needed.
 ```
 
 ### Database Operations
 ```bash
-npm run db:migrate           # Apply migrations
-npm run db:seed             # Load sample data
-npm run db:reset            # Clear everything (dev only!)
+# Use MySQL/phpMyAdmin to inspect and manage the schema/data.
 ```
 
 ### Code Quality
 ```bash
-npm run lint                # Check code
-npm run test                # Run tests
+cd backend
+composer run lint
+composer run type-check
+composer run test
 ```
 
 ---
@@ -165,17 +147,7 @@ npm run test                # Run tests
 ## 🐛 Troubleshooting Guide
 
 ### "Cannot Connect to Database"
-**If using Local PostgreSQL**:
-```bash
-# 1. Check PostgreSQL is running
-psql -U postgres -c "SELECT version();"
-
-# 2. Check database exists
-createdb begin_masimba_farm
-
-# 3. Verify .env variables match your setup
-cat backend/.env
-```
+Verify your MySQL credentials and that the MySQL service is running.
 
 ### "Port Already in Use"
 
@@ -197,23 +169,10 @@ taskkill /PID <PID> /F                    # Windows
 
 ### "CORS Error in Browser"
 
-1. Verify backend is running: `curl http://localhost:3000/health`
-2. Check CORS_ORIGIN in backend/.env matches frontend URL
+1. Verify backend is reachable: `curl http://localhost/farmos/begin_pyphp/backend/public/health`
+2. Check CORS_ORIGIN in backend config matches your frontend URL
 3. Clear browser cache: Ctrl+Shift+Delete
 4. Hard refresh: Ctrl+Shift+R
-
-### "npm install Fails"
-
-```bash
-# Clear cache
-npm cache clean --force
-
-# Delete lock file and node_modules
-rm -rf node_modules package-lock.json
-
-# Reinstall
-npm install
-```
 
 ---
 
@@ -259,26 +218,18 @@ Once everything is verified working:
 
 ### Development Efficiency
 - Use VS Code extensions: ES7, Prettier, ESLint, Thunder Client
-- Keep `npm run dev` running in background
 - Use browser DevTools (F12) frequently
 - Check backend logs in `backend/logs/all.log`
 
 ### Database Debugging
 ```bash
-# Connect to running database
-psql -d begin_masimba_farm
-
-# Common queries
-\dt                           # List tables
-SELECT COUNT(*) FROM users;   # Count users
-\d users                      # Describe users table
-SELECT * FROM users LIMIT 5;  # View sample data
+# Use your MySQL client/phpMyAdmin to inspect tables and data.
 ```
 
 ### API Testing
 ```bash
 # Use curl
-curl http://localhost:3000/health
+curl http://localhost/farmos/begin_pyphp/backend/public/health
 
 # Or use Thunder Client in VS Code
 # Or use Postman
@@ -288,10 +239,6 @@ curl http://localhost:3000/health
 ```bash
 # Check database response times
 # Look in backend/logs/all.log for slow queries
-
-# Monitor Node.js memory
-node --inspect server.js
-# Open chrome://inspect in Chrome
 ```
 
 ---

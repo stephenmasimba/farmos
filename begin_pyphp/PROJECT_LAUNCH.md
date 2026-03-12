@@ -2,7 +2,7 @@
 
 ## ✅ Project Initialization Complete
 
-Your Begin Masimba FarmOS development project is fully scaffolded, configured, and ready for active development using the **Python FastAPI** backend and **PHP** frontend architecture.
+Your Begin Masimba FarmOS development project is scaffolded and ready for active development using a **pure PHP** backend and **PHP** frontend architecture.
 
 ---
 
@@ -10,12 +10,11 @@ Your Begin Masimba FarmOS development project is fully scaffolded, configured, a
 
 ### **Essential Modules**
 
-#### Backend (Python/FastAPI)
-- ✅ **FastAPI Server**: High-performance, async API with auto-generated docs.
+#### Backend (PHP)
+- ✅ **PHP Backend API**: Controllers + models + middleware.
 - ✅ **Authentication**: JWT-based user security and API Key protection for IoT.
-- ✅ **Modular Routers**: Separation of concerns for Livestock, Inventory, Financials, etc.
-- ✅ **Data Seeder**: Auto-populates in-memory database with realistic farm data on startup.
-- ✅ **Validation**: Pydantic models ensure data integrity.
+- ✅ **Controllers**: Separation of concerns for Livestock, Inventory, Financials, etc.
+- ✅ **Validation**: Input validation in PHP.
 
 #### Frontend (PHP/Tailwind)
 - ✅ **PHP Architecture**: Server-side rendering for speed and compatibility.
@@ -34,13 +33,12 @@ Your Begin Masimba FarmOS development project is fully scaffolded, configured, a
 
 ## 🎯 Quick Start
 
-### **1. Backend (Terminal 1)**
+### **1. Backend**
 ```bash
 cd backend
-pip install -r requirements.txt
-python app.py
-# Running on http://localhost:8000
-# Docs at http://localhost:8000/docs
+composer install
+composer run serve
+# Running on http://127.0.0.1:8001
 ```
 
 ### **2. Frontend (Browser)**
@@ -53,10 +51,10 @@ Open: `http://localhost/farmos/begin_pyphp/frontend/public/`
 
 ```
 begin-masimba-farmos/
-├── backend/                 # Python FastAPI Server
-│   ├── app.py              # Entry point
-│   ├── routers/            # API endpoints
-│   └── common/             # Shared logic
+├── backend/                 # PHP Backend API
+│   ├── public/             # Web root (index.php)
+│   ├── src/                # Controllers, models, core
+│   └── tests/              # PHPUnit
 │
 ├── frontend/                # PHP Application
 │   ├── public/             # Web root

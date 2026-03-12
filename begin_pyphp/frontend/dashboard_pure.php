@@ -50,7 +50,7 @@ $user = get_current_user_pure();
                     <p class="text-green-600">✅ Authentication: Working</p>
                     <p class="text-green-600">✅ Database: Connected</p>
                     <p class="text-green-600">✅ Session: Active</p>
-                    <p class="text-green-600">✅ Pure PHP: No Python</p>
+                    <p class="text-green-600">✅ Pure PHP: Active</p>
                 </div>
 
                 <!-- Quick Actions -->
@@ -64,8 +64,8 @@ $user = get_current_user_pure();
 
             <div class="mt-6 p-4 bg-gray-50 rounded-lg">
                 <h3 class="font-semibold mb-2">🎉 Pure PHP Authentication Successful!</h3>
-                <p class="text-gray-700">You have successfully logged in using pure PHP authentication with no Python dependencies.</p>
-                <p class="text-sm text-gray-600 mt-2">This system is completely independent of Python backend.</p>
+                <p class="text-gray-700">You have successfully logged in using pure PHP authentication.</p>
+                <p class="text-sm text-gray-600 mt-2">This system runs on PHP only.</p>
             </div>
         </div>
     </div>

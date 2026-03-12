@@ -4,10 +4,10 @@
 We welcome contributions to Begin Masimba! Please follow these guidelines to ensure code quality and consistency.
 
 ## Project Structure
-- `backend/`: FastAPI application (Python).
-  - `routers/`: API route definitions.
-  - `common/`: Shared utilities (database, auth, models).
-  - `tests/`: Pytest test suite.
+- `backend/`: PHP backend API.
+  - `public/`: Web root (index.php).
+  - `src/`: Controllers, models, and core classes.
+  - `tests/`: PHPUnit test suite.
 - `frontend/`: PHP frontend application.
   - `pages/`: UI pages.
   - `components/`: Reusable UI components.
@@ -19,16 +19,15 @@ We welcome contributions to Begin Masimba! Please follow these guidelines to ens
 ## Setup Development Environment
 
 1. **Prerequisites**:
-   - Python 3.8+
-   - PHP 7.4+
-   - MySQL/MariaDB or SQLite (default)
-   - Composer (optional)
+   - PHP 8.0+
+   - MySQL/MariaDB
+   - Composer
 
 2. **Backend Setup**:
    ```bash
    cd backend
-   pip install -r requirements.txt
-   uvicorn app:app --reload
+   composer install
+   composer run serve
    ```
 
 3. **Frontend Setup**:
@@ -40,12 +39,6 @@ We welcome contributions to Begin Masimba! Please follow these guidelines to ens
 
 ## Coding Standards
 
-### Python (Backend)
-- Follow PEP 8 style guide.
-- Use type hints for function arguments and return values.
-- Write unit tests for new logic (`pytest`).
-- Use Pydantic models for data validation.
-
 ### PHP (Frontend)
 - Follow PSR-12 coding standard.
 - Use the `call_api` helper for backend requests.
@@ -55,12 +48,11 @@ We welcome contributions to Begin Masimba! Please follow these guidelines to ens
 ## Workflow
 1. Create a new branch for your feature or bugfix.
 2. Implement your changes.
-3. Run tests (`pytest` for backend).
+3. Run tests (`composer run test` for backend).
 4. Submit a Pull Request (PR) with a clear description of your changes.
 
 ## Testing
-- **Unit Tests**: `pytest backend/tests`
-- **E2E Tests**: `pytest backend/tests/test_e2e_flow.py`
+- **Backend Tests**: `cd backend && composer run test`
 
 ## Deployment
 See `docs/deployment_guide.md` for deployment instructions.

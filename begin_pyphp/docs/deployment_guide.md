@@ -4,11 +4,9 @@
 
 ### Prerequisites
 - Linux Server (Ubuntu 20.04+ recommended)
-- Python 3.8+
-- PHP 7.4+ or 8.0+
+- PHP 8.0+
 - Web Server (Nginx or Apache)
-- Database (PostgreSQL or MySQL recommended for production)
-- Supervisor (for process management)
+- Database (MySQL recommended for production)
 
 ### Backend Deployment
 
@@ -20,40 +18,30 @@
 
 2. **Install Dependencies**:
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   pip install gunicorn
+   composer install --no-dev --optimize-autoloader
    ```
 
 3. **Configure Environment**:
    Create a `.env` file with production settings:
    ```env
-   DATABASE_URL=postgresql://user:password@localhost/dbname
-   SECRET_KEY=your-production-secret-key
-   ALGORITHM=HS256
-   ACCESS_TOKEN_EXPIRE_MINUTES=30
-   API_KEY=your-production-api-key
-   TENANT_ID=1
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_URL=https://your-domain.com
+   DATABASE_HOST=localhost
+   DATABASE_PORT=3306
+   DATABASE_NAME=begin_masimba_farm
+   DB_USER=your_db_user
+   DB_PASSWORD=your_db_password
+   JWT_SECRET=your-production-secret-key
    ```
 
-4. **Run with Gunicorn**:
-   Use Gunicorn with Uvicorn workers:
+4. **Run with PHP-FPM (Recommended)**:
    ```bash
-   gunicorn -w 4 -k uvicorn.workers.UvicornWorker app:app
+   php-fpm8.0 -t
    ```
 
-5. **Supervisor Configuration**:
-   Create `/etc/supervisor/conf.d/farmos-backend.conf`:
-   ```ini
-   [program:farmos-backend]
-   directory=/path/to/begin_pyphp/backend
-   command=/path/to/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker app:app --bind 0.0.0.0:8000
-   autostart=true
-   autorestart=true
-   stderr_logfile=/var/log/farmos-backend.err.log
-   stdout_logfile=/var/log/farmos-backend.out.log
-   ```
+5. **Serve the Backend**:
+   Point your web server document root to `backend/public/`.
 
 ### Frontend Deployment
 
@@ -73,12 +61,6 @@
        location ~ \.php$ {
            include snippets/fastcgi-php.conf;
            fastcgi_pass unix:/var/run/php/php8.0-fpm.sock;
-       }
-
-       location /api/ {
-           proxy_pass http://localhost:8000;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
        }
    }
    ```

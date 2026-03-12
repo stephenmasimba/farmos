@@ -2,7 +2,7 @@
 
 ## 📋 Overview
 
-FarmOS now includes an **automatic server start system** that launches the Python backend as soon as you access the folder, ensuring your login works immediately!
+FarmOS includes an **automatic start system** that can launch the PHP backend and open the web UI.
 
 ---
 
@@ -10,8 +10,7 @@ FarmOS now includes an **automatic server start system** that launches the Pytho
 
 ### **Method 1: One-Click Launcher** ⭐
 1. **Double-click** `LAUNCH_FARMOS.bat` in the FarmOS folder
-2. **Wait** for automatic setup (installs packages if needed)
-3. **FarmOS opens** automatically in your browser!
+2. **FarmOS opens** automatically in your browser!
 4. **Login** with: `manager@masimba.farm` / `manager123`
 
 ---
@@ -21,31 +20,9 @@ FarmOS now includes an **automatic server start system** that launches the Pytho
 ### **Option 1: Manual Launcher**
 **File**: `LAUNCH_FARMOS.bat`
 - ✅ **One-click start**
-- ✅ **Auto-installs packages**
 - ✅ **Opens browser automatically**
 - ✅ **Shows login credentials**
 - ✅ **Keeps server running**
-
-### **Option 2: Python Launcher**
-**File**: `START_FARMOS.py`
-- ✅ **Cross-platform compatible**
-- ✅ **Package checking**
-- ✅ **Background monitoring**
-- ✅ **Clean interface**
-
-### **Option 3: Background Monitor**
-**File**: `monitor_server.py`
-- ✅ **Runs in background**
-- ✅ **Auto-restarts if server crashes**
-- ✅ **Minimal resource usage**
-- ✅ **Continuous monitoring**
-
-### **Option 4: Windows Startup**
-**File**: `setup_autostart.py`
-- ✅ **Starts with Windows**
-- ✅ **Always available**
-- ✅ **Set and forget**
-- ✅ **Automatic startup**
 
 ---
 
@@ -58,16 +35,11 @@ FarmOS now includes an **automatic server start system** that launches the Pytho
 4. **Keep window open** to maintain server
 
 ### **For Development:**
-1. **Use**: `START_FARMOS.py`
-2. **Better error handling**
-3. **Clean console output**
-4. **Easy debugging**
+1. Run the backend: `start_backend.bat`
+2. Use the API health check to confirm it's running
 
 ### **For Production:**
-1. **Setup**: `python setup_autostart.py`
-2. **Auto-starts** with Windows
-3. **Always available**
-4. **Remove with**: `python setup_autostart.py remove`
+Use Apache/Nginx to serve the frontend at `begin_pyphp/frontend/public/` and the backend at `begin_pyphp/backend/` (or set backend doc root to `begin_pyphp/backend/public/`).
 
 ---
 
@@ -86,9 +58,8 @@ FarmOS now includes an **automatic server start system** that launches the Pytho
 | Service | URL |
 |---------|-----|
 | **Web Interface** | http://localhost:8081/farmos/ |
-| **API Server** | http://127.0.0.1:8000 |
-| **API Documentation** | http://127.0.0.1:8000/docs |
-| **Health Check** | http://127.0.0.1:8000/health |
+| **API Server** | http://127.0.0.1:8001 |
+| **Health Check** | http://127.0.0.1:8001/health |
 
 ---
 
@@ -96,8 +67,7 @@ FarmOS now includes an **automatic server start system** that launches the Pytho
 
 ### **Auto-Start Process:**
 1. **Folder Access** → Launcher activates
-2. **System Check** → Python & packages verified
-3. **Server Start** → Python backend launches
+2. **Server Start** → PHP backend launches
 4. **Health Check** → Server responsiveness verified
 5. **Browser Open** → FarmOS loads automatically
 6. **Login Ready** → Authentication system active
@@ -114,28 +84,21 @@ FarmOS now includes an **automatic server start system** that launches the Pytho
 
 ### **❌ Server Won't Start:**
 ```bash
-# Check Python installation
-python --version
+# Check PHP installation
+php -v
 
-# Install required packages
-pip install fastapi uvicorn sqlalchemy pymysql bcrypt requests
-
-# Start manually
+# Start backend
 cd backend
-python simple_login_server.py
+php -S 127.0.0.1:8001 -t public/
 ```
 
 ### **❌ Login Not Working:**
-```bash
-# Reset passwords
-cd backend
-python password_reset_tool.py
-```
+Verify MySQL is running and the `users` table has your login user.
 
 ### **❌ Port Already in Use:**
 ```bash
-# Check what's using port 8000
-netstat -ano | findstr :8000
+# Check what's using port 8001
+netstat -ano | findstr :8001
 
 # Kill the process
 taskkill /PID [PID_NUMBER] /F
@@ -155,13 +118,11 @@ taskkill /PID [PID_NUMBER] /F
 ```
 begin_pyphp/
 ├── LAUNCH_FARMOS.bat          # ⭐ Main launcher
-├── START_FARMOS.py            # Python launcher
+├── start_backend.bat          # Start backend (PHP built-in server)
 ├── AUTO_START.bat             # Background launcher
-├── setup_autostart.py         # Windows startup setup
+├── AutoStart.vbs              # Optional launcher helper
 ├── backend/
-│   ├── monitor_server.py      # Background monitor
-│   ├── simple_login_server.py # Authentication server
-│   └── auto_start.py          # Auto-start system
+│   └── public/                # Backend web root
 ├── frontend/
 │   ├── simple_auth.php        # PHP authentication
 │   └── pages/login.php        # Login page
@@ -174,16 +135,11 @@ begin_pyphp/
 
 ### ✅ **What You Get:**
 - **Instant access** - No manual server start
-- **Auto-recovery** - Server restarts if it crashes
-- **Package management** - Auto-installs dependencies
 - **Browser integration** - Opens automatically
 - **Background operation** - Minimal disruption
-- **Cross-platform** - Works on Windows/Mac/Linux
 
 ### ✅ **When It Activates:**
 - **Folder access** → Server starts
-- **Server crash** → Auto-restart
-- **System reboot** → Auto-start (if configured)
 - **Manual launch** → Instant start
 
 ---
@@ -208,7 +164,7 @@ begin_pyphp/
 
 ### ✅ **Working Correctly When:**
 - ✅ Launcher runs without errors
-- ✅ Server starts on port 8000
+- ✅ Server starts on port 8001
 - ✅ Browser opens to FarmOS
 - ✅ Login works with credentials
 - ✅ Dashboard loads successfully
@@ -217,7 +173,6 @@ begin_pyphp/
 ### ✅ **Auto-Start Features:**
 - ✅ Server starts automatically
 - ✅ No manual intervention needed
-- ✅ Auto-restart on crashes
 - ✅ Background monitoring
 - ✅ Clean shutdown process
 

@@ -1,7 +1,6 @@
 <?php
 /**
- * Pure PHP Authentication - No Python Dependencies
- * Complete disconnect from Python backend
+ * Pure PHP Authentication
  */
 
 // Start session if not already started

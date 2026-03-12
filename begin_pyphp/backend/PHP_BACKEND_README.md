@@ -2,7 +2,7 @@
 
 ## Overview
 
-FarmOS has been converted from a FastAPI (Python) backend to a pure PHP 8.0+ backend. This guide covers setup, development, and deployment.
+FarmOS uses a pure PHP 8.0+ backend. This guide covers setup, development, and deployment.
 
 ## System Requirements
 
@@ -60,7 +60,7 @@ API_RATE_LIMIT_AUTH=5
 API_RATE_LIMIT_API=100
 
 # CORS
-CORS_ORIGIN=http://localhost:3000
+CORS_ORIGIN=http://localhost
 
 # Logging
 LOG_DIR=/var/log/farmos
@@ -387,19 +387,19 @@ sudo chown www-data:www-data /var/log/farmos
 ## Deployment
 SSL/TLS configuration is handled by your web server (Apache/WAMP) or a reverse proxy in front of it.
 
-## Migration from FastAPI
+## Migration Notes
 
-This PHP backend replaces the original FastAPI backend with:
+This PHP backend replaces the previous backend with:
 - Same API endpoints and response format
 - Same security model (bcrypt, JWT, rate limiting)
 - Same database schema
 - Compatible with existing frontend
 
 Key differences:
-- No virtualenv or pip installation
-- PHP autoloader instead of Python imports
+- No separate runtime to install
+- PHP autoloader instead of language-level imports
 - `composer.json` instead of `requirements.txt`
-- `.htaccess` instead of Uvicorn routing
+- `.htaccess` rewrite routing (or web server rewrite rules)
 
 ## Contributing
 

@@ -19,21 +19,21 @@ class Request
         $rawPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
         $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
         $mount = $scriptName;
-        if ($mount !== '' && str_ends_with($mount, '/public/index.php')) {
+        if ($mount !== '' && substr($mount, -strlen('/public/index.php')) === '/public/index.php') {
             $mount = substr($mount, 0, -strlen('/public/index.php'));
-        } elseif ($mount !== '' && str_ends_with($mount, '/index.php')) {
+        } elseif ($mount !== '' && substr($mount, -strlen('/index.php')) === '/index.php') {
             $mount = substr($mount, 0, -strlen('/index.php'));
         }
         $mount = rtrim($mount, '/');
 
-        if ($mount !== '' && str_starts_with($rawPath, $mount)) {
+        if ($mount !== '' && strpos($rawPath, $mount) === 0) {
             $rawPath = substr($rawPath, strlen($mount));
             if ($rawPath === '') {
                 $rawPath = '/';
             }
         }
 
-        if ($rawPath !== '/' && str_ends_with($rawPath, '/')) {
+        if ($rawPath !== '/' && substr($rawPath, -1) === '/') {
             $rawPath = rtrim($rawPath, '/');
         }
 
@@ -82,7 +82,7 @@ class Request
             return $this->body;
         }
 
-        $contentType = $this->getHeader('content-type');
+        $contentType = $this->getHeader('content-type') ?: '';
         
         if (strpos($contentType, 'application/json') !== false) {
             $raw = file_get_contents('php://input');
@@ -104,7 +104,7 @@ class Request
         return $body;
     }
 
-    public function getQuery(?string $key = null, $default = null): mixed
+    public function getQuery(?string $key = null, $default = null)
     {
         if ($key === null) {
             $query = $this->query;

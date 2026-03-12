@@ -219,7 +219,8 @@ abstract class ApiTestCase extends TestCase
      */
     protected function apiCall(string $method, string $path, ?array $data = null, ?string $token = null): array
     {
-        $url = 'http://localhost:8000' . $path;
+        $baseUrl = getenv('API_BASE_URL') ?: 'http://localhost:8001';
+        $url = rtrim($baseUrl, '/') . $path;
         
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

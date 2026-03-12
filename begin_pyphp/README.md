@@ -1,13 +1,12 @@
-# Begin Masimba - Python Backend & PHP Frontend
+# Begin Masimba - Pure PHP Backend & Frontend
 
-This project uses a Python (FastAPI) backend and a PHP frontend (WAMP).
+This project uses a pure PHP backend and a PHP frontend (WAMP).
 
 ## Project Structure
 
-- **backend/**: Contains the Python FastAPI application.
-  - **app.py**: The main entry point.
-  - **routers/**: Contains API route handlers for each module.
-  - **common/**: Shared utilities (security, database).
+- **backend/**: Contains the PHP backend API.
+  - **public/**: The web root (index.php).
+  - **src/**: Controllers, models, and core classes.
 - **frontend/**: Contains the PHP application.
   - **public/**: The web root (index.php, css, js).
   - **pages/**: PHP templates for each page.
@@ -15,27 +14,16 @@ This project uses a Python (FastAPI) backend and a PHP frontend (WAMP).
 
 ## Prerequisites
 
-- **Python 3.8+**: For the backend.
+- **PHP 8.0+**: For the backend and frontend.
 - **WAMP/XAMPP**: For the PHP frontend (Apache + PHP).
-- **pip**: Python package manager.
+- **MySQL/MariaDB**: Database.
 
 ## Setup & Running
 
-### 1. Backend (Python)
+### 1. Backend (PHP)
 
-Open a terminal in the `backend` directory and install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Run the backend server:
-
-```bash
-cd backend
-uvicorn app:app --host 127.0.0.1 --port 8000 --reload
-```
-The API runs at `http://127.0.0.1:8000`.
+The backend is served by your web server at:
+`http://localhost/farmos/begin_pyphp/backend/`
 
 ### 2. Frontend (PHP)
 
@@ -44,7 +32,7 @@ Ensure WAMP is running. Access:
 
 ## Modules Implemented
 
-- **Authentication**: Login, JWT (PyJWT), API Key.
+- **Authentication**: Login, JWT, API Key.
 - **Dashboard**: Overview of alerts, tasks, livestock.
 - **Livestock**: Manage animal batches.
 - **Inventory**: Track items and stock.

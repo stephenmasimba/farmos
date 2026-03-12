@@ -15,9 +15,9 @@ function api_base_url() {
     $dir = str_replace('\\', '/', rtrim(dirname($scriptName), '/'));
 
     $base = $dir;
-    if (str_ends_with($base, '/frontend/public')) {
+    if (substr($base, -strlen('/frontend/public')) === '/frontend/public') {
         $base = substr($base, 0, -strlen('/frontend/public'));
-    } elseif (str_ends_with($base, '/frontend')) {
+    } elseif (substr($base, -strlen('/frontend')) === '/frontend') {
         $base = substr($base, 0, -strlen('/frontend'));
     }
 

@@ -1,13 +1,11 @@
 # Begin Masimba - API Documentation
 
 ## Overview
-Begin Masimba exposes a RESTful API built with FastAPI. This API powers the frontend and can be used for third-party integrations.
+Begin Masimba exposes a RESTful API built in PHP. This API powers the frontend and can be used for third-party integrations.
 
-## Interactive Documentation
-The API comes with built-in interactive documentation powered by Swagger UI and ReDoc.
-
-- **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs) - Test endpoints directly from your browser.
-- **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc) - Clean, organized reference documentation.
+## Base URL
+- WAMP/XAMPP: `http://localhost/farmos/begin_pyphp/backend`
+- PHP built-in server (optional): `http://127.0.0.1:8001`
 
 ## Authentication
 All API endpoints (except login/registration) require authentication.
@@ -19,7 +17,7 @@ Include the following headers in your requests:
 - `X-Tenant-ID`: `1` (or your specific tenant ID)
 
 ### Obtaining a Token
-1. Send a POST request to `/api/auth/token` with your username and password.
+1. Send a POST request to `/api/auth/login` with your email and password.
 2. The response will contain an `access_token`.
 
 ## Key Endpoints

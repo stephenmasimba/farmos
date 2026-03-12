@@ -52,7 +52,7 @@ class SecurityTest extends BaseTestCase
         $this->assertNotEquals($password, $hashed);
         
         // Should be bcrypt format
-        $this->assertTrue(str_starts_with($hashed, '$2y$'));
+        $this->assertTrue(substr($hashed, 0, 4) === '$2y$');
     }
 
     /**
@@ -96,7 +96,7 @@ class SecurityTest extends BaseTestCase
     public function testExpiredToken()
     {
         // This would require mocking time or creating an actually expired token
-        $this->markTestToImplement('Test expired JWT');
+        $this->markTestIncomplete('Test expired JWT');
     }
 
     /**

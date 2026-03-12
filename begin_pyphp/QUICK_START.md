@@ -2,27 +2,25 @@
 
 Get the system running in 5 minutes!
 
-## Option 1: FastAPI + WAMP (Recommended)
+## Option 1: WAMP/XAMPP (Recommended)
 
 ```bash
-# Backend
-cd begin_pyphp/backend
-pip install -r requirements.txt
-uvicorn app:app --host 127.0.0.1 --port 8000 --reload
-
 # Frontend
 # Ensure WAMP/XAMPP is running
 # Visit: http://localhost/farmos/begin_pyphp/frontend/public/
+
+# Backend (served by WAMP/XAMPP)
+# Health: http://localhost/farmos/begin_pyphp/backend/health
 ```
 
 ## Option 2: Windows Batch Helper
 
 ### Step 1: Start Backend
 
-Use `begin_pyphp/start_backend.bat` to install deps and run uvicorn.
+Use `begin_pyphp/start_backend.bat` to run the PHP backend on port 8001.
 
 ### Step 2: Verify
-Health: http://127.0.0.1:8000/health
+Health: http://127.0.0.1:8001/health
 
 ### Step 3: Frontend
 
@@ -33,18 +31,18 @@ Visit: http://localhost/farmos/begin_pyphp/frontend/public/
 ### Step 4: Access the Application
 
 Open your browser:
-- **Frontend**: [http://localhost:5173](http://localhost:5173)
-- **Backend**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- **API Health**: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
+- **Frontend**: [http://localhost/farmos/begin_pyphp/frontend/public/](http://localhost/farmos/begin_pyphp/frontend/public/)
+- **Backend**: [http://127.0.0.1:8001](http://127.0.0.1:8001)
+- **API Health**: [http://127.0.0.1:8001/health](http://127.0.0.1:8001/health)
 
 ## Verify Everything is Working
 
 ### Backend Health Check
-`curl http://127.0.0.1:8000/health`
+`curl http://127.0.0.1:8001/health`
 
 ### Auth Test
 ```bash
-curl -X POST http://127.0.0.1:8000/api/auth/login \
+curl -X POST http://127.0.0.1:8001/api/auth/login \
   -H "Content-Type: application/json" \
   -H "X-API-Key: local-dev-key" \
   -d '{"email":"admin@example.com","password":"password123"}'
@@ -52,7 +50,7 @@ curl -X POST http://127.0.0.1:8000/api/auth/login \
 
 ### Frontend Loads
 
-Visit [http://localhost:5173](http://localhost:5173) and you should see a welcome page.
+Visit [http://localhost/farmos/begin_pyphp/frontend/public/](http://localhost/farmos/begin_pyphp/frontend/public/) and you should see the login page.
 
 ## Initial Setup (First Time Only)
 
@@ -63,7 +61,7 @@ Seeder creates admin, manager, worker accounts on startup.
 
 ```bash
 cd backend
-npm run db:seed
+php -r "echo 'Seed is handled by your database/schema setup.';"
 
 # This adds sample livestock batches, crops, inventory, etc.
 ```
@@ -72,14 +70,14 @@ npm run db:seed
 
 ### Making Backend Changes
 - Edit files in `begin_pyphp/backend`
-- uvicorn reload flag auto-restarts server
+- Restart the PHP built-in server (if using Option 2) to pick up changes
 
 ### Making Frontend Changes
 - Edit PHP files in `begin_pyphp/frontend/pages`
 - Refresh browser to see changes
 
 ### Database
-- MySQL configured via SQLAlchemy in backend/common/database.py
+- MySQL configured in `begin_pyphp/backend/config/env.php` and your `.env`
 
 ## Common Tasks
 
@@ -90,7 +88,7 @@ Use a MySQL client or phpMyAdmin via WAMP.
 
 ```bash
 cd backend
-npm run db:reset
+php -r "echo 'Use your MySQL tools to reset schema/data in development.';"
 
 # This drops all tables and rebuilds schema
 ```
@@ -105,10 +103,10 @@ Backend outputs to terminal; frontend logs in browser console (F12).
 
 ### "Cannot connect to database"
 1. Check MySQL/WAMP running
-2. Verify backend/common/database.py connection string
+2. Verify backend configuration in `begin_pyphp/backend/config/env.php` and your `.env`
 
-### "Port 8000 already in use"
-Use `netstat -ano | findstr :8000` then `taskkill /PID <PID> /F`.
+### "Port 8001 already in use"
+Use `netstat -ano | findstr :8001` then `taskkill /PID <PID> /F`.
 
 ### "CORS error in browser"
 
@@ -128,7 +126,7 @@ Use `netstat -ano | findstr :8000` then `taskkill /PID <PID> /F`.
 
 ```
 begin-masimba-farmos/
-├── backend/              # Python FastAPI
+├── backend/              # PHP backend
 ├── frontend/             # PHP frontend
 ├── database/             # Schema & migrations
 ├── docs/                 # Documentation
