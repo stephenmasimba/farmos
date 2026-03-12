@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /farmos/
+    
+    # Redirect root /farmos/ to the frontend
+    RewriteRule ^$ begin_pyphp/frontend/public/ [L]
+    
+    # Redirect /farmos/anything to frontend
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)$ begin_pyphp/frontend/public/$1 [L]
+</IfModule>

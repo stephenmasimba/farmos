@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS password_resets (
+  email VARCHAR(100) NOT NULL,
+  token VARCHAR(190) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP NOT NULL,
+  INDEX (email),
+  INDEX (token)
+);

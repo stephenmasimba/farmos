@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /farmos/begin_pyphp/
+    
+    # Redirect to frontend by default
+    RewriteRule ^$ frontend/public/ [L]
+    
+    # Handle API routes to backend
+    RewriteRule ^api/(.+)$ backend/api.php?endpoint=$1 [L,QSA]
+    
+    # Handle admin routes to backend
+    RewriteRule ^admin/(.+)$ backend/admin.php?page=$1 [L,QSA]
+    
+    # Redirect everything else to frontend
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)$ frontend/public/$1 [L]
+</IfModule>

@@ -1,0 +1,52 @@
+# FarmOS VirtualHost Configuration for Port 8081
+# Add this to your Apache httpd.conf or create a new conf file
+
+Listen 8081
+
+<VirtualHost *:8081>
+    ServerName localhost
+    DocumentRoot "c:/wamp64/www/farmos"
+    
+    # Directory configuration
+    <Directory "c:/wamp64/www/farmos">
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    # PHP configuration
+    <FilesMatch "\.php$">
+        SetHandler application/x-httpd-php
+    </FilesMatch>
+    
+    # Error and access logs
+    ErrorLog "logs/farmos-error.log"
+    CustomLog "logs/farmos-access.log" common
+    
+    # Security headers
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Enable CORS for API
+    <IfModule mod_headers.c>
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-API-Key, X-Tenant-ID"
+    </IfModule>
+    
+    # URL rewriting for clean URLs
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /index.php [L]
+</VirtualHost>
+
+# Alternative: Simple Alias configuration
+# Add this to your existing VirtualHost
+Alias "/farmos" "c:/wamp64/www/farmos"
+<Directory "c:/wamp64/www/farmos">
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>

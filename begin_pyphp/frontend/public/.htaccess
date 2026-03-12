@@ -1,0 +1,22 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /farmos/begin_pyphp/frontend/public/
+    
+    # Handle the main index route
+    RewriteRule ^index\.php$ - [L]
+    
+    # Route all requests to index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /farmos/begin_pyphp/frontend/public/index.php [L]
+    
+    # Handle clean URLs for pages
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([a-zA-Z0-9_-]+)$ index.php?page=$1 [L,QSA]
+    
+    # Handle subdirectory URLs
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)$ index.php?page=$1&subpage=$2 [L,QSA]
+</IfModule>
