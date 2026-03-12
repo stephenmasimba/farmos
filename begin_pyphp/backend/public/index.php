@@ -19,17 +19,6 @@ Logger::init(
 
 Security::init(getenv('JWT_SECRET'));
 
-try {
-    $db = Database::init(
-        getenv('DATABASE_URL'),
-        getenv('DB_USER') ?: 'farmos_user',
-        getenv('DB_PASSWORD')
-    );
-} catch (\Exception $e) {
-    Response::error('Database connection failed', 'DB_ERROR', 503)->send();
-    exit;
-}
-
 // Create request/response
 $request = new Request();
 $method = $request->getMethod();
@@ -47,6 +36,27 @@ if ($method === 'OPTIONS') {
 
 // Add CORS headers
 header('Access-Control-Allow-Origin: ' . getenv('CORS_ORIGIN'));
+
+// Health check without DB
+if ($path === '/health') {
+    if ($method !== 'GET') {
+        Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+    } else {
+        Response::success(['status' => 'ok'])->send();
+    }
+    exit;
+}
+
+try {
+    $db = Database::init(
+        getenv('DATABASE_URL'),
+        getenv('DB_USER') ?: 'farmos_user',
+        getenv('DB_PASSWORD')
+    );
+} catch (\Exception $e) {
+    Response::error('Database connection failed', 'DB_ERROR', 503)->send();
+    exit;
+}
 
 // Rate limiting
 $clientIP = $request->getIP();
