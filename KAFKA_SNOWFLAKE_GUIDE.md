@@ -169,11 +169,12 @@ Most production systems use either the Snowflake Kafka Connector or Snowpipe wit
 ## 8. Local Development Strategy
 
 - For local or test environments:
-  - Use a small Kafka cluster (e.g., Docker-based).
+  - Use a small Kafka cluster (local single-broker or managed dev cluster).
   - Connect to a Snowflake test account or dev environment with reduced privileges.
   - Use sample topics and narrow schemas to iterate quickly.
 
-- Automate environment setup as much as possible (e.g., docker-compose for Kafka, SQL scripts for Snowflake objects).
+- Automate environment setup as much as possible (scripts for Kafka setup, SQL scripts for Snowflake objects).
+ 
 
 ## 9. Checklist
 
@@ -185,4 +186,3 @@ Most production systems use either the Snowflake Kafka Connector or Snowpipe wit
   - [ ] Kafka consumer → cloud storage → Snowpipe.
 - [ ] Monitoring in place for both Kafka and Snowflake.
 - [ ] Security and compliance requirements documented and implemented.
-

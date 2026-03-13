@@ -28,7 +28,7 @@ This document summarizes the critical fixes applied to resolve disconnection and
 ### 3. Database Model Inconsistencies
 **Problem**: Models had conflicting field names (`count` vs `quantity`) and missing constraints.
 
-**Fix**: Updated `models.py` with:
+**Fix**: Updated PHP models with:
 - Standardized field naming (`quantity` as primary)
 - Added proper constraints and validation
 - Improved foreign key relationships
@@ -46,11 +46,9 @@ This document summarizes the critical fixes applied to resolve disconnection and
 ### 5. Backend Startup Issues
 **Problem**: No easy way to start the backend server with proper environment setup.
 
-**Fix**: Created startup scripts:
-- `start_backend.py` - Python startup script with environment checks
-- `start_backend.bat` - Windows batch file for easy execution
-- Automatic dependency installation
-- Database connection validation
+**Fix**: Standardized startup via Composer:
+- `composer run serve` for local development
+- Database connection validation handled by application startup
 
 ## System Architecture Improvements
 
@@ -75,11 +73,8 @@ This document summarizes the critical fixes applied to resolve disconnection and
 
 ### 1. Start Backend Server
 ```bash
-# Option 1: Use batch file (Windows)
-start_backend.bat
-
-# Option 2: Use Python script
-python start_backend.py
+cd begin_pyphp/backend
+composer run serve
 ```
 
 ### 2. Access Frontend
@@ -89,21 +84,21 @@ http://localhost/farmos/begin_pyphp/frontend/public/
 
 ### 3. API Documentation
 ```
-http://127.0.0.1:8000/docs
+http://127.0.0.1:8001/health
 ```
 
 ## Troubleshooting
 
 ### Backend Not Starting
-1. Check Python installation (3.8+ required)
+1. Check PHP installation (7.4+ required)
 2. Verify MySQL is running
-3. Check port 8000 availability
+3. Check port 8001 availability
 4. Review `.env` configuration
 
 ### Frontend API Errors
 1. Confirm backend server is running
 2. Check browser console for errors
-3. Verify API key in `.env`
+3. Verify JWT secret in `.env`
 4. Test API health endpoint
 
 ### Database Issues
@@ -116,16 +111,15 @@ http://127.0.0.1:8000/docs
 
 ### Core System Files
 - `.env` (new) - Environment configuration
-- `start_backend.py` (new) - Backend startup script
-- `start_backend.bat` (new) - Windows startup script
+- `begin_pyphp/backend/composer.json` - Backend scripts and dependencies
 
 ### Frontend Files
 - `begin_pyphp/frontend/lib/api_client.php` - Enhanced API client
 - `begin_pyphp/frontend/pages/dashboard.php` - Offline support
 
 ### Backend Files
-- `begin_pyphp/backend/common/models.py` - Fixed model inconsistencies
-- `begin_pyphp/backend/routers/dashboard.py` - Enhanced error handling
+- `begin_pyphp/backend/public/index.php` - Router + endpoint wiring
+- `begin_pyphp/backend/src/Controllers/` - API controllers
 
 ### Documentation
 - `comprehensive_system_design.md` - Updated with fixes and troubleshooting
@@ -142,7 +136,7 @@ http://127.0.0.1:8000/docs
 ### Error Scenarios
 - [ ] Backend unavailable → Offline mode
 - [ ] Database down → Safe defaults
-- [ ] Invalid API key → Proper error handling
+- [ ] Invalid token → Proper error handling
 - [ ] Network timeout → Retry logic
 
 ### Configuration

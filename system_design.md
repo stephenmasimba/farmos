@@ -433,11 +433,11 @@ Manure Collection → Processing Decision (Moisture Check)
 
 BMFMS uses a modular, microservices architecture with local deployment for reliability.
 
-- **Frontend**: React.js Progressive Web App (PWA) for cross-device access
-- **Backend**: Node.js/Express with RESTful APIs
-- **Database**: PostgreSQL for structured data (batches, inventory), Redis for caching
+- **Frontend**: PHP (WAMP) with progressive enhancement
+- **Backend**: Pure PHP API (REST) under `begin_pyphp/backend`
+- **Database**: MySQL for structured data (batches, inventory)
 - **IoT Layer**: MQTT sensors for temperature, pH, water level, weight monitoring
-- **Analytics**: Python (Pandas/Scikit-learn) for predictive modeling
+- **Analytics**: Optional separate service for predictive modeling (future)
 - **Integration**: APIs for AGRITEX, weather services, market price feeds, suppliers
 
 ### Deployment Model
@@ -695,10 +695,10 @@ BMFMS uses a modular, microservices architecture with local deployment for relia
 
 ## Technology Stack
 
-- **Frontend**: React.js PWA.
-- **Backend**: Node.js.
-- **Database**: PostgreSQL, Redis.
-- **IoT/Analytics**: MQTT, Python.
+- **Frontend**: PHP (WAMP).
+- **Backend**: Pure PHP API.
+- **Database**: MySQL.
+- **IoT/Analytics**: Optional integrations (future).
 
 ## Development Phases & Implementation Timeline
 
@@ -741,8 +741,8 @@ BMFMS uses a modular, microservices architecture with local deployment for relia
 - Waste processing area setup
 
 **Software Activities:**
-- Database setup: PostgreSQL installation and schema creation
-- Backend API development: Authentication, data models
+- Database setup: MySQL and schema creation
+- Backend API development: PHP controllers, authentication, data models
 - Frontend mobile app development: User interface, offline support
 - IoT integration: Sensor setup and MQTT configuration
 - Early testing and bug fixing

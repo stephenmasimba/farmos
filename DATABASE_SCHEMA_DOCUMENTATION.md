@@ -555,54 +555,17 @@ livestock (1) ───── (N) animal_events
 
 ### Migration Strategy
 
-Use Alembic for version-controlled migrations:
+Use the SQL schema file as the source of truth for database structure:
 
 ```bash
-# Install Alembic
-pip install alembic
+# Create database (example)
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS begin_masimba_farm;"
 
-# Initialize migrations
-alembic init migrations
-
-# Generate migration after model changes
-alembic revision --autogenerate -m "Add new column"
-
-# Apply migrations
-alembic upgrade head
-
-# Rollback to specific version
-alembic downgrade -1
+# Apply schema
+mysql -u root -p begin_masimba_farm < begin_pyphp/database/schema.sql
 ```
 
-### Example Migrations
-
-**Migration 1: Initial Schema**
-```python
-# migrations/versions/001_initial_schema.py
-
-def upgrade():
-    # Create all base tables
-    op.create_table('users', ...)
-    op.create_table('farms', ...)
-    # ... all other tables
-
-def downgrade():
-    op.drop_table('users')
-    op.drop_table('farms')
-    # ... drop all tables
-```
-
-**Migration 2: Add IoT Support**
-```python
-# migrations/versions/002_add_iot_support.py
-
-def upgrade():
-    op.create_table('iot_sensor_data', ...)
-    op.create_index('idx_farm_sensor_time', 'iot_sensor_data', ...)
-
-def downgrade():
-    op.drop_table('iot_sensor_data')
-```
+For incremental changes, apply a new SQL migration script (DDL) using `mysql` and track applied versions in a `schema_migrations` table.
 
 ---
 
@@ -690,20 +653,7 @@ AND created_at < '2024-01-01';
 
 ### Connection Pooling
 
-```python
-# backend/common/database.py
-from sqlalchemy import create_engine
-from sqlalchemy.pool import QueuePool
-
-engine = create_engine(
-    DATABASE_URL,
-    poolclass=QueuePool,
-    pool_size=20,
-    max_overflow=40,
-    pool_pre_ping=True,
-    pool_recycle=3600
-)
-```
+For the PHP backend, reuse a single PDO connection per request. Under PHP-FPM you can optionally use persistent connections to reduce connect overhead.
 
 ---
 

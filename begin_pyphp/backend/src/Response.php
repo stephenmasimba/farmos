@@ -16,6 +16,9 @@ class Response
         $this->statusCode = $statusCode;
         $this->headers = Security::getSecurityHeaders();
         $this->headers['Content-Type'] = 'application/json';
+        if (!empty($_SERVER['HTTP_X_REQUEST_ID'])) {
+            $this->headers['X-Request-Id'] = (string) $_SERVER['HTTP_X_REQUEST_ID'];
+        }
     }
 
     public static function json(array $data, int $statusCode = 200): self
@@ -37,6 +40,7 @@ class Response
                 'code' => $code,
                 'message' => $message,
                 'details' => $details,
+                'request_id' => (string) ($_SERVER['HTTP_X_REQUEST_ID'] ?? ''),
             ],
         ], $statusCode);
     }

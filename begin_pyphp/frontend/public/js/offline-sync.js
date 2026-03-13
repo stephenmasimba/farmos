@@ -61,7 +61,6 @@ async function syncOfflineActions() {
                     method: action.method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-API-Key': 'local-dev-key' // Or get from session
                     },
                     body: JSON.stringify(action.data)
                 });

@@ -11,6 +11,7 @@ class Logger
 {
     private static string $logDir = '/var/log/farmos';
     private static string $format = 'json'; // 'json' or 'text'
+    private static string $requestId = '';
 
     public static function init(string $logDir, string $format = 'json'): void
     {
@@ -25,6 +26,27 @@ class Logger
                 }
             }
         }
+    }
+
+    public static function setRequestId(string $requestId): void
+    {
+        self::$requestId = $requestId;
+    }
+
+    public static function getRequestId(): string
+    {
+        if (self::$requestId !== '') {
+            return self::$requestId;
+        }
+
+        $fromHeader = (string) ($_SERVER['HTTP_X_REQUEST_ID'] ?? '');
+        if ($fromHeader !== '') {
+            self::$requestId = $fromHeader;
+            return self::$requestId;
+        }
+
+        self::$requestId = bin2hex(random_bytes(8));
+        return self::$requestId;
     }
 
     public static function info(string $message, array $context = []): void
@@ -44,13 +66,15 @@ class Logger
 
     public static function debug(string $message, array $context = []): void
     {
-        if (getenv('LOG_LEVEL') === 'DEBUG') {
-            self::log('DEBUG', $message, $context);
-        }
+        self::log('DEBUG', $message, $context);
     }
 
     private static function log(string $level, string $message, array $context = []): void
     {
+        if (!self::shouldLog($level)) {
+            return;
+        }
+
         $timestamp = date('Y-m-d H:i:s');
         $logFile = rtrim(self::$logDir, '\\/') . DIRECTORY_SEPARATOR . ($level === 'ERROR' ? 'error' : 'farmos') . '.log';
         if (self::$format === 'json') {
@@ -59,7 +83,7 @@ class Logger
                 'level' => $level,
                 'message' => $message,
                 'context' => $context,
-                'request_id' => $_SERVER['HTTP_X_REQUEST_ID'] ?? uniqid(),
+                'request_id' => self::getRequestId(),
             ]) . PHP_EOL;
         } else {
             $logEntry = "[$timestamp] $level: $message";
@@ -70,6 +94,21 @@ class Logger
         }
 
         @error_log($logEntry, 3, $logFile);
+    }
+
+    private static function shouldLog(string $level): bool
+    {
+        $current = strtolower((string) (getenv('LOG_LEVEL') ?: 'info'));
+        $map = [
+            'debug' => 10,
+            'info' => 20,
+            'warning' => 30,
+            'error' => 40,
+        ];
+
+        $threshold = $map[$current] ?? 20;
+        $lvl = $map[strtolower($level)] ?? 20;
+        return $lvl >= $threshold;
     }
 
     /**

@@ -108,7 +108,6 @@ require __DIR__ . '/../components/header.php';
     const headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + '<?php echo $_SESSION['access_token'] ?? ''; ?>',
-        'x-api-key': 'begin-api-key',
         'X-Tenant-ID': '1'
     };
 

@@ -29,7 +29,7 @@
 **Solution**:
 - Ensure you are logged in and the token is valid.
 - Check `Authorization` header format: `Bearer <token>`.
-- Verify `X-API-Key` and `X-Tenant-ID` headers are present.
+- Verify `Authorization` and `X-Tenant-ID` headers are present.
 - Check user role permissions.
 
 ## Logs

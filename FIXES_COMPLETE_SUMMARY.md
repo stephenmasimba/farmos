@@ -25,95 +25,40 @@ FarmOS system has been completely hardened with enterprise-grade security fixes 
 
 ## 📁 FILES CREATED/MODIFIED
 
-### Core Security Modules (NEW)
-1. **`backend/common/logging_config.py`** (280 lines)
-   - Centralized logging framework
-   - JSON + text formatting
-   - Log rotation and retention
-   - Structured logging support
-
-2. **`backend/common/errors.py`** (320 lines)
-   - Standardized error responses
-   - Custom exception classes
-   - Error code enumeration
-   - Error logging utilities
-
-3. **`backend/common/validation.py`** (310 lines)
-   - Comprehensive validation functions
-   - Pydantic models with validation
-   - Input sanitization
-   - Field-level validators
-
-4. **`backend/middleware/rate_limiting.py`** (220 lines)
-   - In-memory rate limiter
-   - Anti-brute force protection
-   - Sliding window algorithm
-   - Cleanup utilities
-
-### Configuration & Environment (UPDATED)
-5. **`backend/.env.example`** (NEW - 200 lines)
-   - Complete configuration template
-   - All environment variables documented
-   - Comments explaining each setting
-   - Security best practices
-
-6. **`backend/.gitignore`** (NEW - 120 lines)
-   - Prevents committing secrets
-   - Ignores sensitive files
-   - Protects .env files
-
-### Dependencies & Setup (UPDATED)
-7. **`backend/requirements.txt`** (UPDATED - 100+ lines)
-   - All packages with pinned versions
-   - Organized by category
-   - Includes testing and linting tools
-   - 60+ dependencies fully specified
-
-### Authentication (SIGNIFICANTLY IMPROVED)
-8. **`backend/routers/auth.py`** (UPDATED - 350 lines)
-   - Comprehensive docstrings
-   - Full input validation
+### Backend (Pure PHP) (UPDATED)
+1. **`begin_pyphp/backend/public/index.php`**
+   - Routing + controller dispatch
+   - Auth endpoints (`/api/auth/*`)
    - Rate limiting integration
-   - Error handling
-   - New registration endpoint
-   - New profile endpoint
-   - New token refresh endpoint
-   - Detailed logging
 
-### Core Security
-9. **`backend/common/security.py`** (UPDATED - 350 lines)
-   - Environment variable validation
-   - Password hashing with bcrypt-12
-   - Password verification
-   - Password strength validation
-   - JWT encoding/decoding
-   - Token refresh mechanism
-   - Constant-time comparison
-   - Security headers
-   - Comprehensive documentation
+2. **`begin_pyphp/backend/src/Security.php`**
+   - JWT handling and password hashing
 
-### Testing (SIGNIFICANTLY EXPANDED)
-10. **`backend/tests/test_auth_security.py`** (NEW - 400+ lines)
-    - 40+ test cases
-    - Authentication tests
-    - Password security tests
-    - JWT token tests
-    - Input validation tests
-    - Rate limiting tests
-    - Proper fixtures and setup
+3. **`begin_pyphp/backend/src/Validation.php`**
+   - Input validation helpers
 
-### Documentation (NEW)
-11. **`SECURITY_FIXES_IMPLEMENTATION.md`** (NEW)
-    - Complete implementation guide
-    - All fixes documented
-    - Migration checklist
-    - Setup instructions
+4. **`begin_pyphp/backend/src/RateLimiter.php`**
+   - Sliding window rate limiting + test reset helper
 
-12. **`DATABASE_MIGRATION_GUIDE.md`** (NEW)
-    - Password migration strategies
-    - Testing procedures
-    - Troubleshooting guide
-    - Maintenance tasks
+5. **`begin_pyphp/backend/src/Logger.php`**
+   - Structured JSON logging
+
+6. **`begin_pyphp/backend/src/Response.php`**
+   - Standardized success/error response envelope
+
+### Tooling (UPDATED)
+7. **`begin_pyphp/backend/composer.json`**
+   - Dependency management
+   - Scripts for test/lint/type-check/serve
+
+### Tests (UPDATED)
+8. **`begin_pyphp/backend/tests/Feature/*`**
+   - Feature tests for auth, inventory, livestock, tasks, financials
+   - Isolated test database setup
+
+### Documentation (UPDATED)
+9. **`*.md` files in repo root**
+   - Updated to reflect the PHP backend stack (Composer + PHPUnit)
 
 ---
 
@@ -122,22 +67,13 @@ FarmOS system has been completely hardened with enterprise-grade security fixes 
 ### 1. Hardcoded Secrets ❌ → ✅ FIXED
 
 **Before**:
-```python
-JWT_SECRET = os.getenv("JWT_SECRET", "change_me")  # Dangerous default!
-API_KEY = os.getenv("API_KEY", "local-dev-key")   # Exposed!
+```text
+JWT secret used an insecure default or was not validated.
 ```
 
 **After**:
-```python
-def _validate_secret(secret, name, min_length=32):
-    if not secret or secret == "change_me":
-        raise ValueError(f"CRITICAL: {name} must be set via env...")
-    if len(secret) < min_length:
-        raise ValueError(f"CRITICAL: {name} must be {min_length}+ chars")
-    return secret
-
-JWT_SECRET = _validate_secret(os.getenv("JWT_SECRET"), "JWT_SECRET")
-API_KEY = _validate_secret(os.getenv("API_KEY"), "API_KEY", min_length=24)
+```php
+\FarmOS\Security::init(getenv('JWT_SECRET'));
 ```
 
 **Impact**: ✅ Prevents production deployment without proper secrets
@@ -157,22 +93,9 @@ API_KEY = _validate_secret(os.getenv("API_KEY"), "API_KEY", min_length=24)
 - Constant-time verification to prevent timing attacks
 
 **Code**:
-```python
-def hash_password(password: str) -> str:
-    if not password or len(password) < 8:
-        raise ValueError("Password must be at least 8 characters")
-    
-    salt = bcrypt.gensalt(rounds=12)  # Industry standard
-    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    try:
-        return bcrypt.checkpw(
-            plain_password.encode('utf-8'),
-            hashed_password.encode('utf-8')
-        )
-    except Exception:
-        return False
+```php
+$hash = \FarmOS\Security::hashPassword($password);
+$ok = \FarmOS\Security::verifyPassword($password, $hash);
 ```
 
 **Impact**: ✅ Protects against brute force and dictionary attacks
@@ -191,17 +114,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 - String sanitization (prevents injection)
 
 **Example**:
-```python
-class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
-    
-    @field_validator('password')
-    @classmethod
-    def validate_password_field(cls, v):
-        if not v or len(v) < 1:
-            raise ValueError('Password is required')
-        return v
+```php
+\FarmOS\Validation::validateEmail($email);
 ```
 
 **Impact**: ✅ Prevents injection attacks and malformed data
@@ -218,14 +132,10 @@ class LoginRequest(BaseModel):
 - Automatic cleanup of expired entries
 
 **Usage**:
-```python
-@router.post("/login")
-async def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
-    client_ip = request.client.host if request.client else "unknown"
-    is_allowed, _ = AUTH_LIMITER.is_allowed(f"login:{client_ip}")
-    
-    if not is_allowed:
-        raise HTTPException(status_code=429, detail="Too many attempts")
+```php
+if (!\FarmOS\RateLimiter::isAllowed($clientIP, 'auth')) {
+    \FarmOS\Response::rateLimited(60)->send();
+}
 ```
 
 **Impact**: ✅ Prevents brute force and DOS attacks
@@ -307,51 +217,11 @@ async def login(body: LoginRequest, request: Request, db: Session = Depends(get_
 - Proper error handling for expired tokens
 
 **Code**:
-```python
-def jwt_encode(payload, exp_seconds=None):
-    if exp_seconds is None:
-        exp_seconds = JWT_EXPIRATION_SECONDS
-    
-    to_encode = dict(payload)
-    to_encode["exp"] = int(time.time()) + exp_seconds
-    to_encode["iat"] = int(time.time())  # Issued at time
-    
-    return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALG)
+```php
+$token = \FarmOS\Security::encodeJWT(['user_id' => 1], 3600);
 ```
 
 **Impact**: ✅ Prevents token reuse, ensures expiration
-
----
-
-### 8. API Key Security ❌ → ✅ FIXED
-
-**Improvements**:
-- Keys must be set via environment (min 24 chars)
-- Constant-time comparison prevents timing attacks
-- Invalid key attempts are logged
-- Infrastructure for future key rotation
-
-**Code**:
-```python
-def _constant_time_compare(a: str, b: str) -> bool:
-    """Prevent timing attacks by comparing in constant time."""
-    if len(a) != len(b):
-        return False
-    
-    result = 0
-    for x, y in zip(a, b):
-        result |= ord(x) ^ ord(y)
-    
-    return result == 0
-
-def verify_api_key(key: Optional[str]) -> bool:
-    if not key:
-        return False
-    
-    return _constant_time_compare(key, API_KEY)
-```
-
-**Impact**: ✅ Prevents timing attacks and key exposure
 
 ---
 
@@ -360,15 +230,8 @@ def verify_api_key(key: Optional[str]) -> bool:
 **Before**: Hardcoded localhost  
 **After**: Environment-based configuration
 
-```python
-CORS_ORIGIN = os.getenv("CORS_ORIGIN", "http://localhost")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=CORS_ORIGIN.split(","),
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allow_headers=["Content-Type", "Authorization", "x-api-key"],
-)
+```php
+header('Access-Control-Allow-Origin: ' . getenv('CORS_ORIGIN'));
 ```
 
 **Impact**: ✅ Configurable for different environments
@@ -378,16 +241,8 @@ app.add_middleware(
 ### 10. Security Headers ❌ → ✅ FIXED
 
 **Implementation**:
-```python
-def get_security_headers() -> Dict[str, str]:
-    return {
-        "Content-Security-Policy": "default-src 'self'",
-        "X-Content-Type-Options": "nosniff",
-        "X-Frame-Options": "DENY",
-        "X-XSS-Protection": "1; mode=block",
-        "Strict-Transport-Security": "max-age=31536000",
-        "Referrer-Policy": "strict-origin-when-cross-origin",
-    }
+```text
+Security headers are configured in the PHP backend responses.
 ```
 
 **Impact**: ✅ Protects against various web attacks
@@ -453,17 +308,14 @@ Created comprehensive test suite with 40+ test cases:
 ## 📋 DEPLOYMENT CHECKLIST
 
 ### Pre-Deployment
-- [ ] Copy `.env.example` to `.env`
+- [ ] Copy `.env.example` to `begin_pyphp/backend/config/.env`
 - [ ] Generate strong JWT_SECRET
-- [ ] Generate strong API_KEY
-- [ ] Generate strong SECRET_KEY
 - [ ] Update DATABASE_URL
-- [ ] Set NODE_ENV=production
 - [ ] Configure CORS_ORIGIN
 - [ ] Review all .env values
 
 ### Testing
-- [ ] Run full test suite: `pytest tests/ -v`
+- [ ] Run full test suite: `cd begin_pyphp/backend && composer run test`
 - [ ] All 40+ tests pass ✅
 - [ ] No security warnings
 - [ ] Load testing completed
@@ -542,7 +394,7 @@ Created comprehensive test suite with 40+ test cases:
 - Verify database integrity
 
 ### Frontend Updates
-- Update API client with API_KEY header
+- Update API client to send the JWT `Authorization: Bearer <token>` header
 - Handle new error response format
 - Update error message display
 - Test authentication flow
@@ -584,7 +436,7 @@ Created comprehensive test suite with 40+ test cases:
 ## 📞 SUPPORT RESOURCES
 
 1. **Technical Documentation**: All .md files in project root
-2. **Code Documentation**: Extensive docstrings in Python files
+2. **Code Documentation**: PHP backend source in `begin_pyphp/backend/src/`
 3. **Configuration Guide**: `.env.example` with all options
 4. **Migration Guide**: `DATABASE_MIGRATION_GUIDE.md`
 5. **Implementation Details**: `SECURITY_FIXES_IMPLEMENTATION.md`
@@ -600,7 +452,7 @@ Created comprehensive test suite with 40+ test cases:
 - [ ] Production deployment
 
 ### Short Term (1-2 Months)
-- [ ] Implement Docker containerization
+- [ ] Finalize shared hosting deployment checklist
 - [ ] Set up CI/CD pipeline
 - [ ] Add comprehensive monitoring
 - [ ] Complete API documentation

@@ -39,14 +39,12 @@
 - **Coverage reporting** (clover format)
 - **Code quality tools** (PHPStan, PHPCS)
 
-#### Phase 10: Deployment (Docker) ✅
-- **Multi-stage Dockerfile** for PHP backend
-- **Docker Compose** orchestration
-- **MySQL 8.0 containerization**
-- **Redis caching layer**
-- **React frontend container**
-- **Development tools** (Adminer, PHPMyAdmin)
-- **Health checks** and monitoring
+#### Phase 10: Deployment (Shared Hosting / VM) ✅
+- **Shared hosting deployment** with standard PHP + MySQL
+- **Document root** set to `begin_pyphp/backend/public/`
+- **Environment configuration** via `begin_pyphp/backend/config/.env`
+- **Schema import** using `begin_pyphp/database/schema.sql`
+- **Health checks** and monitoring guidance
 
 ## Technical Inventory
 
@@ -246,7 +244,7 @@ weather
 | Models | 7 |
 | Tests | 7 |
 | Config | 3 |
-| Docker | 3 |
+| Deployment | 1 |
 | Documentation | 12 |
 | **Total** | **38** |
 
@@ -278,59 +276,36 @@ farmos/
 │       │   └── index.php (main router, 700+ lines)
 │       ├── config/
 │       │   ├── env.php
-│       │   ├── nginx/
-│       │   ├── php/
-│       │   └── supervisor/
+│       │   └── .env (created on server, not committed)
 │       ├── tests/
 │       │   ├── bootstrap.php
 │       │   ├── ApiTestCase.php
 │       │   ├── Feature/ (5 test files)
 │       │   └── Unit/
-│       ├── Dockerfile
 │       ├── composer.json
 │       ├── phpunit.xml
-│       ├── requirements.txt
 │       ├── TEST_SUITE.md
 │       └── ...
-│   └── frontend-react/
-│       ├── Dockerfile
-│       └── ...
-├── docker-compose.yml
 ├── .env.example
 ├── DOCKER_GUIDE.md
 ├── .github/
 │   └── workflows/
 │       └── test.yml (CI/CD)
-└── docs/
+└── *.md (project documentation)
 ```
 
 ## Deployment Architecture
 
-### Docker Stack
+### Shared Hosting / VM Layout
 
 ```
-Host (8000:80, 3000:3000, 3306:3306)
+Client (Browser / App)
     ↓
-Docker Compose Network (farmos-network)
-    ├── farmos-php (8002:80)
-    │   ├── PHP 8.2-FPM
-    │   ├── Nginx
-    │   ├── Supervisor
-    │   └── App Code
-    ├── farmos-mysql (3306:3306)
-    │   ├── MySQL 8.0
-    │   ├── Databases
-    │   └── Volumes
-    ├── farmos-redis (6379:6379)
-    │   ├── Redis 7
-    │   └── Cache/Sessions
-    ├── farmos-frontend (3000:3000)
-    │   ├── Node.js
-    │   ├── React App
-    │   └── Serve
-    └── Optional Dev Tools
-        ├── PHPMyAdmin (8081)
-        └── Adminer (8080)
+Web Server (Apache / Nginx)
+    ↓
+PHP (mod_php or PHP-FPM)
+    ↓
+MySQL (managed or local)
 ```
 
 ### CI/CD Pipeline (GitHub Actions)
@@ -385,9 +360,9 @@ Push/PR → Lint Check
 - Audit logging
 
 ✅ **Infrastructure Security**
-- Docker security
-- Network isolation
-- Volume permissions
+- Least-privilege database user
+- Environment secrets kept off git
+- Proper file permissions on `config/.env` and log directories
 - Secret management (.env)
 - Health monitoring
 - Backup procedures
@@ -430,8 +405,7 @@ Push/PR → Lint Check
 ### Local Development
 ```bash
 composer install          # Install PHP dependencies
-npm install              # Install frontend dependencies
-docker-compose up -d     # Start services
+composer run serve       # Start API (dev)
 vendor/bin/phpunit       # Run tests
 ```
 
@@ -443,9 +417,8 @@ composer test            # Run PHPUnit
 
 ### Deployment
 ```bash
-docker-compose build     # Build images
-docker-compose up -d     # Deploy
-docker-compose logs -f   # Monitor
+composer install --no-dev --optimize-autoloader
+php -S 0.0.0.0:8001 -t public/
 ```
 
 ## Team Guidelines
@@ -469,15 +442,13 @@ docker-compose logs -f   # Monitor
 1. Update version in `composer.json`
 2. Generate changelog
 3. Tag release in git
-4. Build Docker images
-5. Push to registry
-6. Deploy to production
+4. Deploy to production (shared hosting / VM)
 
 ## Support & Documentation
 
 - **API Reference**: See endpoint descriptions above
 - **Testing Guide**: [TEST_SUITE.md](TEST_SUITE.md)
-- **Docker Guide**: [DOCKER_GUIDE.md](DOCKER_GUIDE.md)
+- **Deployment Notes**: [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
 - **Architecture**: [system_design.md](system_design.md)
 - **Security**: [SYSTEM_FIXES.md](SYSTEM_FIXES.md)
 
@@ -487,7 +458,7 @@ The FarmOS backend is now **production-ready** with:
 
 ✅ **46 fully functional API endpoints**  
 ✅ **Comprehensive test suite (50+ tests)**  
-✅ **Docker containerization**  
+✅ **Shared hosting deployment**  
 ✅ **CI/CD automation**  
 ✅ **Security hardening**  
 ✅ **Detailed documentation**  

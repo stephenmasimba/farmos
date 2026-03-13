@@ -9,7 +9,7 @@ Use this checklist to verify everything is set up correctly before starting deve
 ## 📋 System Requirements
 
 ### Prerequisites
-- [ ] **PHP 8.0+** (`php -v`)
+- [ ] **PHP 7.4+** (`php -v`)
 - [ ] **WAMP/XAMPP** running (Apache + PHP)
 - [ ] **MySQL/MariaDB** running
 - [ ] **Git** (`git --version`)
@@ -52,7 +52,6 @@ After choosing your setup method above, complete these one-time tasks:
 ```bash
 curl -X POST http://localhost/farmos/begin_pyphp/backend/api/auth/login \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: local-dev-key" \
   -d '{"email": "admin@example.com", "password": "password123"}'
 ```
 
@@ -151,25 +150,22 @@ Verify your MySQL credentials and that the MySQL service is running.
 
 ### "Port Already in Use"
 
-**Port 3000 (Backend)**:
+If you're using the optional PHP built-in server (`composer run serve`), the default port is **8001**.
+
+**Port 8001 (Backend)**:
 ```bash
 # Find process
-lsof -i :3000                              # macOS/Linux
-netstat -ano | findstr :3000              # Windows
+lsof -i :8001                              # macOS/Linux
+netstat -ano | findstr :8001              # Windows
 
 # Kill process
 kill -9 <PID>                              # macOS/Linux
 taskkill /PID <PID> /F                    # Windows
 ```
 
-**Port 5173 (Frontend)**:
-```bash
-# Same as above but replace 3000 with 5173
-```
-
 ### "CORS Error in Browser"
 
-1. Verify backend is reachable: `curl http://localhost/farmos/begin_pyphp/backend/public/health`
+1. Verify backend is reachable: `curl http://localhost/farmos/begin_pyphp/backend/health`
 2. Check CORS_ORIGIN in backend config matches your frontend URL
 3. Clear browser cache: Ctrl+Shift+Delete
 4. Hard refresh: Ctrl+Shift+R
@@ -182,9 +178,9 @@ taskkill /PID <PID> /F                    # Windows
 |----------|---------|--------------|
 | **README.md** | Project overview | First - understand the big picture |
 | **QUICK_START.md** | Quick setup | Second - get it running fast |
-| **docs/SETUP.md** | Detailed installation | If you need detailed steps |
-| **docs/ARCHITECTURE.md** | System design | To understand how it works |
-| **database/schema.sql** | DB structure | To understand data model |
+| **backend/PHP_BACKEND_README.md** | Backend setup & scripts | When working on the API |
+| **docs/DEVELOPER_GUIDE.md** | Dev workflow & standards | When contributing |
+| **docs/USER_MANUAL.md** | End-user guide | When demoing |
 | **comprehensive_system_design.md** | Full specifications | To understand all features |
 
 ---
@@ -203,10 +199,10 @@ Once everything is verified working:
    - Review component architecture
    - Learn data flow
 
-3. **Start implementing Phase 1**
-   - Backend: Create `/api/auth` routes
-   - Frontend: Build login form
-   - See [PROJECT_LAUNCH.md](PROJECT_LAUNCH.md) for detailed roadmap
+3. **Start extending the system**
+   - Backend: Add/update endpoints in `backend/public/index.php` and `backend/src/Controllers/`
+   - Frontend: Add new pages in `frontend/pages/`
+   - See [PROJECT_LAUNCH.md](PROJECT_LAUNCH.md) for roadmap
 
 4. **Use [docs/API.md](docs/API.md)** (when ready)
    - Reference for API design
@@ -229,7 +225,7 @@ Once everything is verified working:
 ### API Testing
 ```bash
 # Use curl
-curl http://localhost/farmos/begin_pyphp/backend/public/health
+curl http://localhost/farmos/begin_pyphp/backend/health
 
 # Or use Thunder Client in VS Code
 # Or use Postman

@@ -22,12 +22,9 @@
 ## Pre-Deployment Checklist
 
 ### Code Quality
-- [ ] All tests pass: `pytest tests/ -v`
-- [ ] Coverage > 80%: `pytest --cov`
-- [ ] No security warnings: `bandit -r backend/`
-- [ ] Code formatted: `black --check backend/`
-- [ ] Type hints checked: `mypy backend/`
-- [ ] Linting passes: `pylint backend/`
+- [ ] Backend tests pass: `cd begin_pyphp/backend && composer run test`
+- [ ] Lint passes: `cd begin_pyphp/backend && composer run lint`
+- [ ] Static analysis passes: `cd begin_pyphp/backend && composer run type-check`
 
 ### Security
 - [ ] No hardcoded secrets
@@ -47,10 +44,9 @@
 - [ ] Troubleshooting guide created
 
 ### Dependencies
-- [ ] All packages in requirements.txt
-- [ ] No security vulnerabilities: `pip-audit`
-- [ ] Compatible versions tested
-- [ ] Production versions specified (no ~=)
+- [ ] Composer dependencies locked (`composer.lock`)
+- [ ] `begin_pyphp/backend/vendor/` not committed
+- [ ] PHP extensions available (pdo, mbstring, curl, json)
 
 ### Database
 - [ ] Migration scripts tested
@@ -71,68 +67,35 @@ git clone https://github.com/yourorg/farmos.git
 cd farmos/begin_pyphp
 ```
 
-### 2. Create Python Virtual Environment
+### 2. Install Backend Dependencies
 
 ```bash
-# On Windows
-python -m venv venv
-venv\Scripts\activate
-
-# On macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
+cd begin_pyphp/backend
+composer install
 ```
 
-### 3. Install Dependencies
+### 3. Configure Environment
+
+- Configure DB settings in `begin_pyphp/backend/config/env.php` (or create `begin_pyphp/backend/.env` from `.env.example`).
+- Ensure MySQL is running and the target database exists.
+
+### 4. Run Application
+
+In development, run under WAMP/Apache:
+- `http://localhost/farmos/begin_pyphp/backend/`
+
+Or use the PHP built-in server:
 
 ```bash
-cd backend
-pip install -r requirements.txt
+cd begin_pyphp/backend
+composer run serve
 ```
 
-### 4. Create Environment File
+### 5. Run Tests
 
 ```bash
-cp .env.example .env
-
-# Edit .env with development values:
-NODE_ENV=development
-JWT_SECRET=<development-secret>
-API_KEY=<development-key>
-SECRET_KEY=<development-secret>
-DATABASE_URL=mysql+pymysql://root:password@localhost:3306/farmos_dev
-```
-
-### 5. Initialize Database
-
-```bash
-# Create database
-mysql -u root -p -e "CREATE DATABASE farmos_dev;"
-
-# Create tables
-python -c "from common.database import Base, engine; Base.metadata.create_all(bind=engine)"
-
-# Create demo users (optional)
-python create_demo_users.py
-```
-
-### 6. Run Application
-
-```bash
-# Development with auto-reload
-uvicorn app:app --reload
-
-# The API is now at http://localhost:8000
-# API docs at http://localhost:8000/docs
-```
-
-### 7. Run Tests
-
-```bash
-pytest tests/ -v
-
-# With coverage
-pytest tests/ --cov=backend --cov-report=html
+cd begin_pyphp/backend
+composer run test
 ```
 
 ---
@@ -144,8 +107,8 @@ pytest tests/ --cov=backend --cov-report=html
 - ✅ All pre-deployment checks passed
 - ✅ Staging server available
 - ✅ MySQL 5.7+ installed
-- ✅ Python 3.10+ installed
-- ✅ Nginx installed
+- ✅ PHP 7.4+ installed
+- ✅ Web server installed (Apache or Nginx + PHP-FPM)
 
 ### 1. Server Setup
 
@@ -162,39 +125,24 @@ cd /srv/farmos
 git clone https://github.com/yourorg/farmos.git .
 ```
 
-### 2. Python Environment Setup
+### 2. Install Backend Dependencies
 
 ```bash
 cd /srv/farmos/begin_pyphp/backend
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Verify installation
-pip list | grep -E "fastapi|sqlalchemy|bcrypt"
+composer install --no-dev --optimize-autoloader
 ```
 
 ### 3. Environment Configuration
 
 ```bash
 # Copy environment template
-cp .env.example .env
+cp .env.example config/.env
 
 # Edit with staging values
-nano .env
+nano config/.env
 
-# Required settings:
-NODE_ENV=staging
-JWT_SECRET=<generate-new-secret>
-API_KEY=<generate-new-key>
-SECRET_KEY=<generate-new-secret>
-DATABASE_URL=mysql+pymysql://farmos_user:secure_password@localhost:3306/farmos_staging
-CORS_ORIGIN=https://staging.yourdomain.com
-LOG_DIR=/var/log/farmos
+# Configure DB settings in config/env.php or .env
+# Ensure JWT_SECRET is set to a strong value
 ```
 
 ### 4. Database Setup
@@ -208,8 +156,8 @@ GRANT ALL PRIVILEGES ON farmos_staging.* TO 'farmos_user'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
-# Create tables
-python -c "from common.database import Base, engine; Base.metadata.create_all(bind=engine)"
+# Create tables (apply schema)
+mysql -u farmos_user -p farmos_staging < /srv/farmos/begin_pyphp/database/schema.sql
 
 # Verify tables
 mysql -u farmos_user -p farmos_staging -e "SHOW TABLES;"
@@ -220,10 +168,6 @@ mysql -u farmos_user -p farmos_staging -e "SHOW TABLES;"
 Create `/etc/nginx/sites-available/farmos`:
 
 ```nginx
-upstream farmos_backend {
-    server 127.0.0.1:8000;
-}
-
 server {
     listen 80;
     server_name staging.yourdomain.com;
@@ -254,18 +198,21 @@ server {
     gzip_types application/json;
     gzip_min_length 1024;
     
-    # Proxy configuration
+    # Backend API (PHP)
     location /api/ {
-        proxy_pass http://farmos_backend;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # Timeouts
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
+        root /srv/farmos/begin_pyphp/backend/public;
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /health {
+        root /srv/farmos/begin_pyphp/backend/public;
+        try_files $uri /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_pass unix:/run/php/php-fpm.sock;
     }
     
     # Frontend
@@ -283,41 +230,16 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-### 6. Systemd Service Setup
+### 6. Services
 
-Create `/etc/systemd/system/farmos.service`:
+Ensure your services are enabled and running:
 
-```ini
-[Unit]
-Description=FarmOS FastAPI Backend
-After=network.target mysql.service
-
-[Service]
-Type=notify
-User=deploy
-WorkingDirectory=/srv/farmos/begin_pyphp/backend
-Environment="PATH=/srv/farmos/begin_pyphp/backend/venv/bin"
-EnvironmentFile=/srv/farmos/begin_pyphp/backend/.env
-ExecStart=/srv/farmos/begin_pyphp/backend/venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000 --workers 4
-
-# Restart policy
-Restart=on-failure
-RestartSec=10s
-
-# Logging
-StandardOutput=append:/var/log/farmos/uvicorn.log
-StandardError=append:/var/log/farmos/uvicorn-error.log
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Enable and start:
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl enable farmos
-sudo systemctl start farmos
-sudo systemctl status farmos
+sudo systemctl enable nginx
+sudo systemctl restart nginx
+
+sudo systemctl enable php-fpm
+sudo systemctl restart php-fpm
 ```
 
 ### 7. Test Deployment
@@ -380,72 +302,36 @@ aws elasticache create-cache-cluster \
 - Configure health checks
 - Set up auto-scaling group
 
-### 2. Docker Containerization (Recommended)
+### 2. Shared Hosting (Afrihost)
 
-Create `Dockerfile`:
-
-```dockerfile
-FROM python:3.10-slim
-
-WORKDIR /app
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy requirements
-COPY requirements.txt .
-
-# Install Python packages
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application
-COPY . .
-
-# Expose port
-EXPOSE 8000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
-
-# Run application
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
-```
-
-Build and push:
-```bash
-# Build image
-docker build -t your-registry/farmos:1.0.0 .
-
-# Push to registry
-docker push your-registry/farmos:1.0.0
-
-# Run container
-docker run -d \
-  --name farmos \
-  --env-file .env \
-  -p 8000:8000 \
-  your-registry/farmos:1.0.0
-```
+- Set the web root / document root to `begin_pyphp/backend/public/`.
+- Create `begin_pyphp/backend/config/.env` on the server (do not commit it).
+- Provision a MySQL database/user in the hosting control panel and import `begin_pyphp/database/schema.sql`.
+- If Composer is available on the server:
+  - Run `composer install --no-dev --optimize-autoloader` inside `begin_pyphp/backend/`.
+  - If Composer is not available, install dependencies locally and upload `vendor/`.
 
 ### 3. Environment Configuration
 
 ```bash
-# Production .env
-NODE_ENV=production
+# Production config/.env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://api.yourdomain.com
+
 JWT_SECRET=<very-long-random-string-64-chars>
-API_KEY=<very-long-random-string-64-chars>
-SECRET_KEY=<very-long-random-string-64-chars>
-DATABASE_URL=mysql+pymysql://user:pass@rds.amazonaws.com:3306/farmos
-REDIS_URL=redis://cache.amazonaws.com:6379/0
+
+DATABASE_HOST=rds.amazonaws.com
+DATABASE_PORT=3306
+DATABASE_NAME=farmos
+DB_USER=<db-user>
+DB_PASSWORD=<db-password>
+DATABASE_URL=mysql:host=rds.amazonaws.com;port=3306;dbname=farmos;charset=utf8mb4
+
 CORS_ORIGIN=https://yourdomain.com,https://www.yourdomain.com
-LOG_LEVEL=INFO
+LOG_LEVEL=info
 LOG_FORMAT=json
 LOG_DIR=/var/log/farmos
-LOG_RETENTION_DAYS=90
-NODE_ENV=production
 ```
 
 ### 4. Database Migration
@@ -454,11 +340,8 @@ NODE_ENV=production
 # Connect to production database
 mysql -h production-db.amazonaws.com -u admin -p farmos
 
-# Create tables
-python -c "from common.database import Base, engine; Base.metadata.create_all(bind=engine)"
-
-# Create admin user
-python create_demo_users.py --admin-password <secure-password>
+# Create tables (apply schema)
+mysql -h production-db.amazonaws.com -u admin -p farmos < /srv/farmos/begin_pyphp/database/schema.sql
 ```
 
 ### 5. Deployment
@@ -470,16 +353,15 @@ kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
 kubectl apply -f k8s/ingress.yaml
 
-# Or using Docker Compose on single server
-docker-compose up -d
-
 # Or manual deployment
 # SSH to prod server
 ssh deploy@prod.farmos.local
 cd /srv/farmos
 git pull origin main
-venv/bin/pip install -r requirements.txt
-sudo systemctl restart farmos
+cd begin_pyphp/backend
+composer install --no-dev --optimize-autoloader
+sudo systemctl restart nginx
+sudo systemctl restart php-fpm
 ```
 
 ### 6. Verification
@@ -525,8 +407,8 @@ openssl s_client -connect api.yourdomain.com:443
 # Response time
 time curl https://api.yourdomain.com/health
 
-# Load testing (using locust)
-locust -f tests/locustfile.py --host=https://api.yourdomain.com
+# Load testing (example with ApacheBench)
+ab -n 1000 -c 50 https://api.yourdomain.com/api/livestock
 
 # Expected results:
 # - p50: <100ms
@@ -603,15 +485,6 @@ mysql -u user -p farmos -e "SELECT COUNT(*) FROM users;"
 # If using blue-green deployment
 kubectl set image deployment/farmos-blue \
   farmos=your-registry/farmos:previous-version
-
-# If using containers
-docker ps  # Find running container
-docker stop <container-id>
-docker run -d \
-  --name farmos \
-  --env-file .env \
-  -p 8000:8000 \
-  your-registry/farmos:previous-version
 ```
 
 ### Database Rollback
@@ -714,10 +587,9 @@ Step 6: Keep old version for 1 week rollback
 
 ## References
 
-- [FastAPI Deployment](https://fastapi.tiangolo.com/deployment/)
+- [PHP Manual](https://www.php.net/manual/en/)
 - [Nginx Configuration](https://nginx.org/en/docs/)
 - [MySQL Backup & Recovery](https://dev.mysql.com/doc/)
-- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
 
 ---
 

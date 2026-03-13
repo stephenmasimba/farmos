@@ -13,7 +13,6 @@ All API endpoints (except login/registration) require authentication.
 ### Headers
 Include the following headers in your requests:
 - `Authorization`: `Bearer <your_access_token>`
-- `X-API-Key`: `local-dev-key` (or your production API key)
 - `X-Tenant-ID`: `1` (or your specific tenant ID)
 
 ### Obtaining a Token
@@ -39,7 +38,7 @@ Include the following headers in your requests:
 - `POST /api/financial/transactions`: Add a transaction.
 
 ### IoT
-- `POST /api/iot/ingest`: Ingest sensor data (requires API Key).
+- `POST /api/iot/ingest`: Ingest sensor data.
 
 ## Error Handling
 The API returns standard HTTP status codes:

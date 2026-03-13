@@ -34,12 +34,30 @@ abstract class Middleware
  */
 class AuthMiddleware extends Middleware
 {
+    private static bool $blacklistEnsured = false;
+
     public function handle()
     {
         $user = $this->request->getUser();
 
         if (!$user || empty($user['user_id'])) {
             return Response::unauthorized('Invalid or expired token')->setStatusCode(401);
+        }
+
+        if (!empty($user['jti'])) {
+            if (!self::$blacklistEnsured) {
+                $this->db->execute('CREATE TABLE IF NOT EXISTS jwt_blacklist (
+                    jti VARCHAR(64) PRIMARY KEY,
+                    user_id INT NOT NULL,
+                    expires_at DATETIME NOT NULL,
+                    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )');
+                self::$blacklistEnsured = true;
+            }
+            $row = $this->db->queryOne('SELECT jti FROM jwt_blacklist WHERE jti = ? AND expires_at > NOW()', [$user['jti']]);
+            if ($row) {
+                return Response::unauthorized('Token revoked')->setStatusCode(401);
+            }
         }
 
         // Optional: Verify user still exists in database

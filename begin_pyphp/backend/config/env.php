@@ -44,9 +44,11 @@ $defaults = [
     'DATABASE_URL' => 'mysql:host=localhost;port=3306;dbname=begin_masimba_farm;charset=utf8mb4',
     
     // JWT
-    'JWT_SECRET' => 'your-secret-key-here-change-in-production',
     'JWT_EXPIRY' => '3600', // 1 hour in seconds
     'JWT_REFRESH_EXPIRY' => '2592000', // 30 days in seconds
+    'JWT_ISS' => 'FarmOS',
+    'JWT_AUD' => 'FarmOS-API',
+    'JWT_LEEWAY' => '0',
     
     // Security
     'BCRYPT_COST' => '12',
@@ -54,6 +56,7 @@ $defaults = [
     'API_RATE_LIMIT_API' => '100', // per minute
     'API_RATE_LIMIT_UPLOAD' => '50', // per hour
     'SESSION_TIMEOUT' => '1800', // 30 minutes
+    'API_ANALYTICS_ENABLED' => 'true',
     
     // CORS
     'CORS_ORIGIN' => 'http://localhost',
@@ -92,6 +95,19 @@ foreach ($defaults as $key => $value) {
         putenv("$key=$value");
         $_ENV[$key] = $value;
     }
+}
+
+$jwtSecret = getenv('JWT_SECRET');
+if (!$jwtSecret) {
+    $jwtSecret = bin2hex(random_bytes(32));
+    $line = 'JWT_SECRET="' . $jwtSecret . '"' . PHP_EOL;
+    if (file_exists($envFile)) {
+        file_put_contents($envFile, PHP_EOL . $line, FILE_APPEND | LOCK_EX);
+    } else {
+        file_put_contents($envFile, $line, LOCK_EX);
+    }
+    putenv("JWT_SECRET=$jwtSecret");
+    $_ENV['JWT_SECRET'] = $jwtSecret;
 }
 
 // Create upload directory if it doesn't exist

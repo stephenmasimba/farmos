@@ -44,9 +44,8 @@ test_system.bat
 ```bash
 # 1. Start WAMP server (Apache + MySQL)
 
-# 2. Start FarmOS backend
-cd c:/wamp64/www/farmos
-python start_backend.py
+# 2. Backend runs under Apache (WAMP) automatically:
+#    http://localhost:8081/farmos/begin_pyphp/backend/
 
 # 3. Access the application
 http://localhost:8081/farmos/begin_pyphp/frontend/public/
@@ -59,8 +58,7 @@ http://localhost:8081/farmos/begin_pyphp/frontend/public/
 | **Main Application** | http://localhost:8081/farmos/begin_pyphp/frontend/public/ |
 | **Dashboard** | http://localhost:8081/farmos/begin_pyphp/frontend/public/index.php?page=dashboard |
 | **Login** | http://localhost:8081/farmos/begin_pyphp/frontend/public/index.php?page=login |
-| **API Documentation** | http://127.0.0.1:8000/docs |
-| **Backend Health** | http://127.0.0.1:8000/health |
+| **Backend Health** | http://localhost:8081/farmos/begin_pyphp/backend/health |
 
 ### 4. Default Login Credentials
 
@@ -98,11 +96,9 @@ Password: admin123
 
 #### **Backend Not Starting**
 ```bash
-# Check Python installation
-python --version
-
-# Install dependencies
-pip install fastapi uvicorn sqlalchemy pymysql pydantic-settings python-dotenv
+# Check PHP + Composer
+php -v
+composer -V
 
 # Check database connection
 mysql -u root -p -e "SHOW DATABASES;"
@@ -139,13 +135,14 @@ For development, you can access the system at:
 Test the backend API:
 ```bash
 # Health check
-curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8001/health
 
 # API version
-curl http://127.0.0.1:8000/api/version
+curl http://127.0.0.1:8001/api/version
 
 # Dashboard data (with auth)
-curl -H "X-API-Key: local-dev-key" http://127.0.0.1:8000/api/dashboard/summary
+TOKEN=$(curl -s -X POST http://127.0.0.1:8001/api/auth/login -H "Content-Type: application/json" -d "{\"email\":\"admin@example.com\",\"password\":\"password123\"}" | php -r '$j=json_decode(stream_get_contents(STDIN), true); echo $j["access_token"] ?? "";')
+curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8001/api/dashboard/summary
 ```
 
 ---

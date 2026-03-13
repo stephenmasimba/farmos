@@ -14,7 +14,7 @@ This project uses a pure PHP backend and a PHP frontend (WAMP).
 
 ## Prerequisites
 
-- **PHP 8.0+**: For the backend and frontend.
+- **PHP 7.4+**: For the backend and frontend.
 - **WAMP/XAMPP**: For the PHP frontend (Apache + PHP).
 - **MySQL/MariaDB**: Database.
 
@@ -48,7 +48,6 @@ Ensure WAMP is running. Access:
 - **System**: Export/import, health, configuration.
 
 ## Authentication Flow
-- Send `X-API-Key: local-dev-key` on requests (configurable via env).
 - Login: `POST /api/auth/login` returns `access_token`.
 - Use `Authorization: Bearer <token>` for protected endpoints.
 

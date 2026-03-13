@@ -23,6 +23,7 @@
   "scripts": {
     "test": "phpunit",
     "lint": "phpcs -n --standard=PSR12 --exclude=PSR1.Classes.ClassDeclaration src/",
+    "format": "phpcbf -n --standard=PSR12 --exclude=PSR1.Classes.ClassDeclaration src/",
     "type-check": "phpstan analyse src/ --memory-limit=1G",
     "serve": "php -S 127.0.0.1:8001 -t public/"
   },

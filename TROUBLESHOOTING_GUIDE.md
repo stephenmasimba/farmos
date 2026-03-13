@@ -33,14 +33,10 @@
 echo "=== FarmOS System Health Check ==="
 echo ""
 
-# Check if application is running
+# Check if application services are running
 echo "1. Application Status:"
-if systemctl is-active --quiet farmos; then
-    echo "   ✅ FastAPI backend is running"
-else
-    echo "   ❌ FastAPI backend is NOT running"
-    systemctl start farmos
-fi
+systemctl is-active --quiet nginx && echo "   ✅ Nginx is running" || echo "   ❌ Nginx is NOT running"
+systemctl is-active --quiet php-fpm && echo "   ✅ PHP-FPM is running" || echo "   ❌ PHP-FPM is NOT running"
 
 # Check database connectivity
 echo ""
@@ -59,9 +55,10 @@ redis-cli -h localhost -p 6379 PING 2>/dev/null && \
 # Check API health endpoint
 echo ""
 echo "4. API Health:"
-curl -s http://localhost:8000/health | grep -q "ok" && \
+curl -s http://127.0.0.1:8001/health | grep -q "ok" && \
     echo "   ✅ API is responding" || \
     echo "   ❌ API is not responding"
+ 
 
 # Check disk space
 echo ""
@@ -104,8 +101,9 @@ chmod +x scripts/health-check.sh
 # Check Nginx error log
 tail -f /var/log/nginx/error.log
 
-# Check if backend is running
-systemctl status farmos
+# Check web server / PHP runtime
+systemctl status nginx
+systemctl status php-fpm
 
 # Check backend logs
 tail -f /var/log/farmos/farmos.log
@@ -115,23 +113,26 @@ tail -f /var/log/farmos/farmos.log
 
 1. **Backend not running**:
    ```bash
-   # Restart backend
-   sudo systemctl restart farmos
+   # Restart services
+   sudo systemctl restart nginx
+   sudo systemctl restart php-fpm
    
    # Check service status
-   sudo systemctl status farmos
+   sudo systemctl status nginx
+   sudo systemctl status php-fpm
    
    # View service logs
-   sudo journalctl -u farmos -n 50
+   sudo journalctl -u nginx -n 50
+   sudo journalctl -u php-fpm -n 50
    ```
 
 2. **Port not bound**:
    ```bash
-   # Check if port 8000 is listening
-   sudo lsof -i :8000
+   # Check if port 8001 is listening (dev server)
+   sudo lsof -i :8001
    
    # Check for process using port
-   sudo netstat -tulpn | grep :8000
+   sudo netstat -tulpn | grep :8001
    ```
 
 3. **Database connection error**:
@@ -224,13 +225,13 @@ mysql -u farmos_user -p -h localhost -e "SELECT COUNT(*) FROM users;"
 **Diagnosis**:
 ```bash
 # Get a valid token
-curl -X POST http://localhost:8000/api/auth/login \
+curl -X POST http://127.0.0.1:8001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@example.com","password":"password"}'
 
 # Verify token
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-  http://localhost:8000/api/auth/me
+  http://127.0.0.1:8001/api/auth/me
 ```
 
 **Solutions**:
@@ -238,7 +239,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 1. **Token expired** (Normal behavior):
    ```bash
    # Use refresh endpoint
-   curl -X POST http://localhost:8000/api/auth/refresh-token \
+   curl -X POST http://127.0.0.1:8001/api/auth/refresh-token \
      -H "Authorization: Bearer YOUR_TOKEN"
    ```
 
@@ -246,7 +247,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
    ```bash
    # Correct format: "Bearer <token>"
    curl -H "Authorization: Bearer eyJhbGci..." \
-     http://localhost:8000/api/auth/me
+     http://127.0.0.1:8001/api/auth/me
    ```
 
 3. **JWT secret mismatch**:
@@ -285,7 +286,7 @@ Upload endpoints: 50 requests per hour per IP
    # Or implement exponential backoff in client
    
    # Check rate limit headers
-   curl -v http://localhost:8000/api/livestock 2>&1 | grep X-RateLimit
+   curl -v http://127.0.0.1:8001/api/livestock 2>&1 | grep X-RateLimit
    ```
 
 2. **Brute force attack suspected**:
@@ -498,13 +499,13 @@ EOF
 
 ```bash
 # Response time statistics
-curl -s http://localhost:8000/api/livestock 2>&1 | grep "X-Process-Time"
+curl -s http://127.0.0.1:8001/api/livestock 2>&1 | grep "X-Process-Time"
 
 # Load test with Apache Bench
-ab -n 1000 -c 50 http://localhost:8000/api/livestock
+ab -n 1000 -c 50 http://127.0.0.1:8001/api/livestock
 
 # Profile with timing
-time curl http://localhost:8000/api/livestock
+time curl http://127.0.0.1:8001/api/livestock
 
 # Monitor request processing time
 grep "X-Process-Time" /var/log/nginx/access.log | awk -F'=|ms' '{sum+=$2; count++} END {print "Avg: " sum/count "ms"}'
@@ -514,13 +515,13 @@ grep "X-Process-Time" /var/log/nginx/access.log | awk -F'=|ms' '{sum+=$2; count+
 
 ```bash
 # Monitor memory over time
-watch -n 1 'ps aux | grep uvicorn | grep -v grep | awk "{print \$6}"'
+watch -n 1 'ps aux | grep php-fpm | grep -v grep | awk "{print \$6}"'
 
 # Check process memory
-ps -aux | grep uvicorn | awk '{print $2, $6}'
+ps -aux | grep php-fpm | awk '{print $2, $6}'
 
 # Memory by application
-top -p $(pgrep -f uvicorn) -b -n 1
+top -p $(pgrep -f php-fpm) -b -n 1
 
 # If memory constantly increasing:
 # 1. Check for circular imports
@@ -599,21 +600,21 @@ mysql -u root -p -e "CHANGE MASTER TO MASTER_LOG_FILE='', MASTER_LOG_POS=0;"
 
 ```bash
 # Test basic endpoint
-curl -v http://localhost:8000/health
+curl -v http://127.0.0.1:8001/health
 
 # Test with auth
-TOKEN=$(curl -s -X POST http://localhost:8000/api/auth/login \
+TOKEN=$(curl -s -X POST http://127.0.0.1:8001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@example.com","password":"password"}' | jq -r '.access_token')
 
 curl -H "Authorization: Bearer $TOKEN" \
-  http://localhost:8000/api/livestock
+  http://127.0.0.1:8001/api/livestock
 
 # Check response headers
-curl -i http://localhost:8000/health | head -20
+curl -i http://127.0.0.1:8001/health | head -20
 
 # Test with custom headers
-curl -H "X-Real-IP: 192.168.1.1" http://localhost:8000/health
+curl -H "X-Real-IP: 192.168.1.1" http://127.0.0.1:8001/health
 ```
 
 ### Search Path Issues
@@ -622,7 +623,7 @@ curl -H "X-Real-IP: 192.168.1.1" http://localhost:8000/health
 # Test CORS
 curl -H "Origin: https://yourdomain.com" \
   -H "Access-Control-Request-Method: GET" \
-  -v http://localhost:8000/api/livestock 2>&1 | grep "Access-Control"
+  -v http://127.0.0.1:8001/api/livestock 2>&1 | grep "Access-Control"
 
 # Check CORS configuration
 echo $CORS_ORIGIN
@@ -635,10 +636,10 @@ echo $CORS_ORIGIN
 
 ```bash
 # Increase timeout
-curl --max-time 30 http://localhost:8000/api/livestock
+curl --max-time 30 http://127.0.0.1:8001/api/livestock
 
 # Check connection timeout
-curl --connect-timeout 10 http://localhost:8000/health
+curl --connect-timeout 10 http://127.0.0.1:8001/health
 
 # Server-side timeout check
 grep "timeout" /var/log/farmos/farmos.log
@@ -744,18 +745,6 @@ mysql -u root -p -e "SELECT * FROM mysql.general_log WHERE argument LIKE '%UNION
 ### Deployment Failed - Rollback
 
 ```bash
-# Using Docker (rollback to previous image)
-docker ps -a | head -5
-CONTAINER_ID=$(docker ps -l -q)
-docker stop $CONTAINER_ID
-
-# Run previous version
-docker run -d \
-  --name farmos \
-  --env-file .env \
-  -p 8000:8000 \
-  your-registry/farmos:previous-tag
-
 # Using Git rollback
 git log --oneline | head -5
 git revert HEAD  # Create inverse commit
@@ -766,40 +755,29 @@ git push origin main
 
 ```bash
 # Check service status
-systemctl status farmos
+systemctl status nginx
+systemctl status php-fpm
 
 # View detailed error
-journalctl -u farmos -n 100
+journalctl -u nginx -n 100
+journalctl -u php-fpm -n 100
 
 # Manual startup with debugging
 cd /srv/farmos/begin_pyphp/backend
-source venv/bin/activate
-python -m uvicorn app:app --host 0.0.0.0 --port 8000
+php -S 0.0.0.0:8001 -t public/
 
 # Common causes:
-# 1. Port already in use: lsof -i :8000
-# 2. Missing dependencies: pip install -r requirements.txt
-# 3. Bad environment: source .env
+# 1. Port already in use: lsof -i :8001
+# 2. Missing dependencies: composer install
+# 3. Bad environment: configure config/env.php or .env
 # 4. Permission issues: chown -R deploy:deploy /srv/farmos
 ```
 
 ### Database Migration Failed
 
 ```bash
-# Check migration status
-alembic current
-
-# View migration history
-alembic history
-
-# Rollback migration
-alembic downgrade -1
-
-# Downgrade to specific version
-alembic downgrade ae1027a6acf
-
-# Retry migration with verbose
-alembic upgrade head -v
+# Apply schema file
+mysql -u farmos_user -p farmos < /srv/farmos/begin_pyphp/database/schema.sql
 ```
 
 ---
@@ -813,7 +791,7 @@ alembic upgrade head -v
 # Comprehensive health check script
 
 check_api() {
-    curl -s http://localhost:8000/health | grep -q "ok" && echo "✅ API" || echo "❌ API"
+    curl -s http://127.0.0.1:8001/health | grep -q "ok" && echo "✅ API" || echo "❌ API"
 }
 
 check_database() {
@@ -844,31 +822,8 @@ check_memory
 
 ### Monitoring Stack Setup
 
-```yaml
-# docker-compose.yml (Prometheus + Grafana)
-version: '3'
-services:
-  prometheus:
-    image: prom/prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    ports:
-      - "9090:9090"
-  
-  grafana:
-    image: grafana/grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - grafana_data:/var/lib/grafana
-    ports:
-      - "3000:3000"
-
-volumes:
-  prometheus_data:
-  grafana_data:
-```
+- On shared hosting, use external monitoring (uptime checks + log shipping) or a separate VM for metrics.
+- On a VM, install Prometheus + Grafana using your OS packages, then configure Prometheus to scrape the `/health` endpoint and server metrics.
 
 ### Key Metrics to Monitor
 
@@ -968,7 +923,7 @@ Normal Issues:
 Documentation:
   Wiki: https://wiki.farmos.internal
   Runbooks: https://runbooks.farmos.internal
-  API Docs: https://api.farmos.internal/docs
+  API Docs: https://api.farmos.internal/api
 ```
 
 ---
@@ -1048,7 +1003,7 @@ Use this template when creating runbooks:
 
 - [Nginx Troubleshooting](https://nginx.org/en/docs/debugging_log.html)
 - [MySQL Troubleshooting](https://dev.mysql.com/doc/refman/5.7/en/troubleshooting.html)
-- [FastAPI Debugging](https://fastapi.tiangolo.com/advanced/extending-openapi/)
+- [PHP Manual](https://www.php.net/manual/en/)
 - [Redis Troubleshooting](https://redis.io/topics/problems)
 - [Systemd Troubleshooting](https://wiki.archlinux.org/title/Systemd)
 

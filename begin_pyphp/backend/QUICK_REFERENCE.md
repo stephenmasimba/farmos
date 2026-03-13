@@ -7,19 +7,19 @@ A quick lookup guide for common FarmOS PHP backend operations.
 ### PHP Built-in Server (Development)
 ```bash
 cd backend
-php -S localhost:8000 -t public/
+composer run serve
 ```
 
 ## Testing API
 
 ### Health Check
 ```bash
-curl http://localhost:8000/health
+curl http://127.0.0.1:8001/health
 ```
 
 ### Login (Get Token)
 ```bash
-curl -X POST http://localhost:8000/api/auth/login \
+curl -X POST http://127.0.0.1:8001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@example.com",
@@ -32,12 +32,12 @@ curl -X POST http://localhost:8000/api/auth/login \
 TOKEN="<your_jwt_token>"
 
 curl -H "Authorization: Bearer $TOKEN" \
-  http://localhost:8000/api/auth/me
+  http://127.0.0.1:8001/api/auth/me
 ```
 
 ### Register New User
 ```bash
-curl -X POST http://localhost:8000/api/auth/register \
+curl -X POST http://127.0.0.1:8001/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -133,14 +133,14 @@ class YourController
         
         // Validate
         if (empty($input['field1'])) {
-            return Response::validationError(['field1']);
+            return Response::validationError(['field1' => 'Required']);
         }
 
         // Save
         $model = new YourModel($this->db, $input);
         $id = $model->save();
 
-        return Response::success(['id' => $id], 'Created', 201);
+        return Response::json(['id' => $id], 201);
     }
 
     // Get one
@@ -520,16 +520,16 @@ composer install
 composer update
 
 # Start dev server
-php -S localhost:8000 -t public/
+composer run serve
 
 # Run tests
-composer test
+composer run test
 
 # Check code style
-composer lint
+composer run lint
 
 # Type checking
-composer type-check
+composer run type-check
 
 # View logs
 tail -f /var/log/farmos/*.json

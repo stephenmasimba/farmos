@@ -19,16 +19,16 @@ The Hybrid Begin Masimba Rural Home Farm Management System (H-BMFMS) combines th
 H-BMFMS uses a hybrid web architecture with edge computing for rural reliability.
 
 - **Frontend**: PHP (Server-side rendering) with JS for interactivity.
-- **Backend**: Python FastAPI microservices, Python for AI.
-- **Database**: In-Memory/SQLite for core data, potential for TimeScaleDB.
+- **Backend**: Pure PHP API (REST) for core farm modules.
+- **Database**: MySQL (PDO) for core data, optional time-series store for IoT later.
 - **IoT Layer**: MQTT sensors for temperature, pH, weight.
-- **AI/ML Engine**: Python ecosystem (TensorFlow/Scikit-learn) for predictions.
-- **Blockchain**: Python-based ledger for supply chain traceability.
+- **AI/ML Engine**: Optional separate service for predictions (future).
+- **Blockchain**: Optional ledger integration for traceability (future).
 
 ### Deployment Model
 
 - **Local-First**: Farm server with WAMP stack; offline capabilities via local caching.
-- **Security**: RBAC, JWT, API Key protection.
+- **Security**: RBAC and JWT authentication.
 
 ## Functional Requirements
 
@@ -99,10 +99,10 @@ H-BMFMS uses a hybrid web architecture with edge computing for rural reliability
 
 ## Technology Stack
 
-- **Frontend**: React.js PWA.
-- **Backend**: Node.js, Python.
-- **Database**: PostgreSQL, Redis.
-- **IoT/AI**: MQTT, TensorFlow.
+- **Frontend**: PHP (WAMP) with progressive enhancement.
+- **Backend**: Pure PHP API (`begin_pyphp/backend`).
+- **Database**: MySQL.
+- **IoT/AI**: Optional integrations (future).
 
 ## Development Phases
 

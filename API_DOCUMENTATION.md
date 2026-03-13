@@ -2,7 +2,7 @@
 
 **Version**: 1.0.0  
 **Last Updated**: March 12, 2026  
-**Base URL**: `http://localhost:8000/api` (Development) | `https://api.yourdomain.com/api` (Production)
+**Base URL**: `http://localhost/farmos/begin_pyphp/backend/api` (WAMP) | `http://127.0.0.1:8001/api` (Built-in) | `https://api.yourdomain.com/api` (Production)
 
 ---
 
@@ -81,27 +81,10 @@ JWT tokens contain:
 }
 ```
 
-### API Key Authentication
-
-#### How It Works
-
-1. API Key is set in `.env` file
-2. Client includes key in `X-API-Key` header
-3. Key is validated on every request
-4. Used for third-party integrations
-
-#### Headers
-
-```
-X-API-Key: <api_key>
-Content-Type: application/json
-```
-
-### Combined Headers (Recommended)
+### Request Headers (Recommended)
 
 ```
 Authorization: Bearer <jwt_token>
-X-API-Key: <api_key>
 Content-Type: application/json
 X-Tenant-ID: default
 ```
@@ -339,7 +322,7 @@ try {
 
 **Example**:
 ```bash
-curl -X POST http://localhost:8000/api/auth/login \
+curl -X POST http://127.0.0.1:8001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@example.com",
@@ -387,7 +370,7 @@ curl -X POST http://localhost:8000/api/auth/login \
 
 **Example**:
 ```bash
-curl -X POST http://localhost:8000/api/auth/register \
+curl -X POST http://127.0.0.1:8001/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe",
@@ -419,7 +402,7 @@ curl -X POST http://localhost:8000/api/auth/register \
 
 **Example**:
 ```bash
-curl -X GET http://localhost:8000/api/auth/me \
+curl -X GET http://127.0.0.1:8001/api/auth/me \
   -H "Authorization: Bearer eyJ0eXAi..."
 ```
 
@@ -441,7 +424,7 @@ curl -X GET http://localhost:8000/api/auth/me \
 
 **Example**:
 ```bash
-curl -X POST http://localhost:8000/api/auth/refresh-token \
+curl -X POST http://127.0.0.1:8001/api/auth/refresh-token \
   -H "Authorization: Bearer eyJ0eXAi..."
 ```
 
@@ -484,7 +467,7 @@ List all livestock batches
 
 **Example**:
 ```bash
-curl -X GET "http://localhost:8000/api/livestock?page=1&page_size=10" \
+curl -X GET "http://127.0.0.1:8001/api/livestock?page=1&page_size=10" \
   -H "Authorization: Bearer eyJ0eXAi..."
 ```
 
@@ -899,7 +882,7 @@ console.log('Livestock:', livestock.items);
 ### Example 2: Register New User
 
 ```bash
-curl -X POST http://localhost:8000/api/auth/register \
+curl -X POST http://127.0.0.1:8001/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Jane Smith",
@@ -915,7 +898,7 @@ curl -X POST http://localhost:8000/api/auth/register \
 ```bash
 TOKEN="your_jwt_token_here"
 
-curl -X POST http://localhost:8000/api/livestock \
+curl -X POST http://127.0.0.1:8001/api/livestock \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
@@ -975,8 +958,7 @@ async function apiCall(endpoint, options = {}) {
 Interactive API documentation is available at:
 
 ```
-http://localhost:8000/docs          # Swagger UI
-http://localhost:8000/redoc         # ReDoc documentation
+This backend does not expose Swagger/ReDoc routes.
 ```
 
 Use the Swagger interface to:

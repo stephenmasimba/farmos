@@ -11,8 +11,8 @@ This system is designed to be "Complete at Once," meaning it manages every aspec
 The software will create a "Digital Twin" of the physical farm. Every physical asset (Pond A, Barn B, Solar Array) has a digital counterpart in the system that reflects its real-time status.
 
 *   **Frontend**: PHP (Server-side Rendering) - Lightweight and compatible with WAMP.
-*   **Backend**: Python FastAPI - High performance, asynchronous, and auto-documented.
-*   **Database**: In-Memory (Prototype) / SQL Ready (SQLite/PostgreSQL).
+*   **Backend**: Pure PHP API (REST) under `begin_pyphp/backend`.
+*   **Database**: MySQL (PDO) for core farm data.
 *   **Edge Gateway**: A local Raspberry Pi controller that aggregates sensor data (from `analyse.md` specs) and syncs to the server.
 
 ---

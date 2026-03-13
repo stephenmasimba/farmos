@@ -202,21 +202,19 @@ print(f'Verification works: {verify_password(pwd, hashed)}')
 ### Test 3: Verify JWT Tokens
 
 ```bash
-python -c "
-from common.security import jwt_encode, jwt_decode
-token = jwt_encode({'user_id': 1, 'email': 'test@example.com'})
-decoded = jwt_decode(token)
-print(f'Token generated: {bool(token)}')
-print(f'Token decoded: {bool(decoded)}')
-print(f'User ID matches: {decoded[\"user_id\"] == 1}')
-"
+curl -X POST http://127.0.0.1:8001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@example.com",
+    "password": "AdminPass123!"
+  }'
 ```
 
 ### Test 4: Run Test Suite
 
 ```bash
-pip install pytest pytest-cov
-pytest tests/test_auth_security.py -v
+cd begin_pyphp/backend
+composer run test
 ```
 
 Expected output:
@@ -236,8 +234,8 @@ test_jwt_decode_valid PASSED
 ### Step 1: Install Dependencies
 
 ```bash
-cd backend
-pip install -r requirements.txt
+cd begin_pyphp/backend
+composer install
 ```
 
 ### Step 2: Create Database (if needed)
@@ -247,29 +245,21 @@ pip install -r requirements.txt
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS begin_masimba_farm;"
 
 # Create tables
-python -c "
-from common.database import Base, engine
-Base.metadata.create_all(bind=engine)
-print('Database tables created')
-"
+mysql -u root -p begin_masimba_farm < begin_pyphp/database/schema.sql
 ```
 
 ### Step 3: Start Backend
 
 ```bash
-# Development
-uvicorn app:app --reload
-
-# Or production
-uvicorn app:app --host 0.0.0.0 --port 8000
+cd begin_pyphp/backend
+composer run serve
 ```
 
 ### Step 4: Test Login
 
 ```bash
-curl -X POST http://localhost:8000/api/auth/login \
+curl -X POST http://127.0.0.1:8001/api/auth/login \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: $(grep '^API_KEY=' .env | cut -d'=' -f2)" \
   -d '{
     "email": "admin@example.com",
     "password": "AdminPass123!"
@@ -296,13 +286,12 @@ Expected response:
 
 ### For PHP Frontend
 
-Update your frontend to send the API Key:
+Update your frontend to send the JWT access token:
 
 ```php
 // In your API client
 $headers = array(
     'Content-Type: application/json',
-    'X-API-Key: ' . getenv('API_KEY'),
     'Authorization: Bearer ' . $_SESSION['access_token'] ?? ''
 );
 ```
@@ -311,11 +300,8 @@ $headers = array(
 
 ```javascript
 // api.js or similar
-const API_KEY = process.env.REACT_APP_API_KEY;
-
 const headers = {
     'Content-Type': 'application/json',
-    'X-API-Key': API_KEY,
     'Authorization': `Bearer ${localStorage.getItem('token')}`
 };
 ```
@@ -326,10 +312,7 @@ const headers = {
 
 - [ ] Created .env file from .env.example
 - [ ] Generated strong JWT_SECRET
-- [ ] Generated strong API_KEY
-- [ ] Generated strong SECRET_KEY
 - [ ] Updated DATABASE_URL in .env
-- [ ] Set NODE_ENV appropriately
 - [ ] Reset all user passwords to meet requirements
 - [ ] Verified password hashing working
 - [ ] Verified JWT tokens working
@@ -368,11 +351,12 @@ cp .env.example .env
 
 ### Issue: "bcrypt not available"
 
-**Cause**: Dependencies not installed
+**Cause**: Composer dependencies not installed
 
 **Solution**:
 ```bash
-pip install -r requirements.txt
+cd begin_pyphp/backend
+composer install
 ```
 
 ### Issue: Login fails with "Invalid credentials"
@@ -385,7 +369,14 @@ pip install -r requirements.txt
 mysql -u root -p begin_masimba_farm -e "SELECT id, email FROM users;"
 
 # Reset password if needed
-python create_demo_users.py
+curl -X POST http://127.0.0.1:8001/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@example.com",
+    "password": "AdminPass123!",
+    "first_name": "Admin",
+    "last_name": "User"
+  }'
 ```
 
 ### Issue: Rate limit exceeded on login
@@ -406,7 +397,7 @@ Wait 60 seconds before next attempt
 - [ ] **Monthly**: Review logs for suspicious activity
 - [ ] **Quarterly**: Update dependencies
 - [ ] **Quarterly**: Review access logs
-- [ ] **Annually**: Rotate API keys and secrets
+- [ ] **Annually**: Rotate JWT secrets
 
 ### Monitoring
 

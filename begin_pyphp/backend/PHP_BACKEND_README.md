@@ -210,16 +210,13 @@ Middleware classes:
 **Success Response:**
 ```json
 {
-  "success": true,
-  "data": { ... },
-  "message": "Operation successful"
+  "id": 123
 }
 ```
 
 **Error Response:**
 ```json
 {
-  "success": false,
   "error": {
     "code": "VALIDATION_ERROR",
     "message": "Validation failed",
@@ -232,7 +229,7 @@ Middleware classes:
 
 ### Using PHP Built-in Server
 ```bash
-php -S localhost:8000 -t public/
+composer run serve
 ```
 
 ### Using Apache with mod_php
@@ -275,13 +272,13 @@ server {
 
 Run tests with PHPUnit:
 ```bash
-composer test
+composer run test
 ```
 
 Run static analysis:
 ```bash
-composer lint      # PHPCS
-composer type-check # PHPStan
+composer run lint       # PHPCS
+composer run type-check # PHPStan
 ```
 
 ## Security

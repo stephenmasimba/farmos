@@ -39,38 +39,23 @@ ab -n 1000 -c 10 https://api.yourdomain.com/health
 
 ### Baseline Metrics Collection
 
-```python
-# backend/performance/baseline.py
-import time
-import requests
-from statistics import stdev, mean
+```powershell
+$url = "http://127.0.0.1:8001/health"
+$times = @()
 
-def test_baseline():
-    """Establish performance baseline"""
-    times = []
-    
-    for i in range(100):
-        start = time.time()
-        response = requests.get('http://localhost:8000/health')
-        elapsed = time.time() - start
-        times.append(elapsed * 1000)  # Convert to ms
-    
-    return {
-        'mean': mean(times),
-        'p95': sorted(times)[95],
-        'p99': sorted(times)[99],
-        'stdev': stdev(times),
-        'min': min(times),
-        'max': max(times),
-        'requests_per_sec': 1000 / sum(times)
-    }
+1..100 | ForEach-Object {
+  $ms = (Measure-Command { Invoke-WebRequest -UseBasicParsing $url | Out-Null }).TotalMilliseconds
+  $times += [math]::Round($ms, 2)
+}
 
-if __name__ == '__main__':
-    metrics = test_baseline()
-    print(f"Mean: {metrics['mean']:.2f}ms")
-    print(f"P95: {metrics['p95']:.2f}ms")
-    print(f"P99: {metrics['p99']:.2f}ms")
-    print(f"RPS: {metrics['requests_per_sec']:.0f}")
+$sorted = $times | Sort-Object
+$mean = [math]::Round(($times | Measure-Object -Average).Average, 2)
+$p95 = $sorted[[math]::Floor(0.95 * ($sorted.Count - 1))]
+$p99 = $sorted[[math]::Floor(0.99 * ($sorted.Count - 1))]
+
+"Mean: $mean ms"
+"P95:  $p95 ms"
+"P99:  $p99 ms"
 ```
 
 ### Goal Metrics (After Optimization)
@@ -140,144 +125,51 @@ ALTER TABLE financial_records ADD INDEX idx_farm_type_date (farm_id, type, date)
 
 ### 3. Query Optimization
 
-**Before**:
-```python
-# N+1 query problem
-def get_livestock_with_events(farm_id):
-    livestock = db.query(Livestock).filter(Livestock.farm_id == farm_id).all()
-    
-    result = []
-    for animal in livestock:
-        events = db.query(AnimalEvent).filter(
-            AnimalEvent.animal_id == animal.id
-        ).limit(5).all()  # This runs N times!
-        result.append({
-            'animal': animal,
-            'recent_events': events
-        })
-    return result
-```
+Avoid N+1 queries by fetching related data efficiently (JOINs, aggregation queries, or batched lookups), and keep payloads small.
 
-**After** (with eager loading):
-```python
-from sqlalchemy.orm import joinedload, selectinload
-
-def get_livestock_with_events(farm_id):
-    livestock = db.query(Livestock).filter(
-        Livestock.farm_id == farm_id
-    ).options(
-        selectinload(Livestock.events).limit(5)  # Single query!
-    ).all()
-    
-    return livestock
+**Example** (join livestock with recent events):
+```sql
+SELECT l.*, e.*
+FROM livestock l
+LEFT JOIN animal_events e ON e.animal_id = l.id
+WHERE l.farm_id = ?
+ORDER BY e.timestamp DESC;
 ```
 
 ### 4. Query Optimization Examples
 
 **Example 1: Pagination**
 
-```python
-# Without pagination (slow)
-def get_all_livestock(farm_id):
-    return db.query(Livestock).filter(
-        Livestock.farm_id == farm_id
-    ).all()  # Loads entire table into memory!
-
-# With pagination (fast)
-def get_livestock_paginated(farm_id, page: int = 1, per_page: int = 20):
-    offset = (page - 1) * per_page
-    return db.query(Livestock).filter(
-        Livestock.farm_id == farm_id
-    ).offset(offset).limit(per_page).all()
+Use `LIMIT`/`OFFSET` to keep responses bounded:
+```sql
+SELECT * FROM livestock WHERE farm_id = ? ORDER BY id DESC LIMIT ? OFFSET ?;
 ```
 
 **Example 2: Selective Column Loading**
 
-```python
-# Without columns selection (slow)
-def get_livestock_summary(farm_id):
-    return db.query(Livestock).filter(
-        Livestock.farm_id == farm_id
-    ).all()  # Loads all columns!
-
-# With column selection (fast)
-def get_livestock_summary(farm_id):
-    return db.query(
-        Livestock.id,
-        Livestock.name,
-        Livestock.status,
-        Livestock.created_at
-    ).filter(
-        Livestock.farm_id == farm_id
-    ).all()
+Select only the columns needed for list views:
+```sql
+SELECT id, name, status, created_at FROM livestock WHERE farm_id = ? ORDER BY created_at DESC;
 ```
 
 **Example 3: Aggregation**
 
-```python
-# Without aggregation (slow)
-def get_livestock_count(farm_id):
-    livestock = db.query(Livestock).filter(
-        Livestock.farm_id == farm_id
-    ).all()
-    return len(livestock)  # Loads all rows!
-
-# With aggregation (fast)
-from sqlalchemy import func
-
-def get_livestock_count(farm_id):
-    return db.query(func.count(Livestock.id)).filter(
-        Livestock.farm_id == farm_id
-    ).scalar()
+Use aggregation in SQL instead of loading rows into memory:
+```sql
+SELECT COUNT(*) AS total FROM livestock WHERE farm_id = ?;
 ```
 
 ### 5. Database Connection Pooling
 
-```python
-# backend/common/database.py
-from sqlalchemy import create_engine
-from sqlalchemy.pool import QueuePool
-
-engine = create_engine(
-    DATABASE_URL,
-    poolclass=QueuePool,
-    pool_size=20,           # Number of connections to keep in pool
-    max_overflow=40,        # Maximum overflow connections
-    pool_pre_ping=True,     # Verify connections before using
-    pool_recycle=3600,      # Recycle connections after 1 hour
-    echo=False,
-    connect_args={
-        'read_timeout': 30,
-        'write_timeout': 30
-    }
-)
-```
+Reuse a single PDO connection per request. Under PHP-FPM you can optionally use persistent connections for reduced connect overhead.
 
 ### 6. Query Monitoring
 
-```python
-# backend/common/query_monitor.py
-import time
-from sqlalchemy import event
-from sqlalchemy.engine import Engine
-import logging
+Use MySQL slow query logging and application-level timing around database calls:
 
-logger = logging.getLogger(__name__)
-
-@event.listens_for(Engine, "before_cursor_execute")
-def receive_before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-    conn.info.setdefault('query_start_time', []).append(time.time())
-
-@event.listens_for(Engine, "after_cursor_execute")
-def receive_after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-    total_time = time.time() - conn.info['query_start_time'].pop(-1)
-    
-    if total_time > 0.5:  # Log queries slower than 500ms
-        logger.warning(
-            f"Slow query ({total_time:.3f}s): {statement}",
-            extra={'duration_ms': total_time * 1000}
-        )
-```
+- Enable MySQL slow query log (500ms threshold)
+- Add duration logging around `Database::query()` calls
+- Track endpoints producing the largest query counts and durations
 
 ---
 
@@ -285,190 +177,25 @@ def receive_after_cursor_execute(conn, cursor, statement, parameters, context, e
 
 ### 1. Multi-Level Caching
 
-```python
-# backend/common/caching.py
-import redis
-import json
-from typing import Any, Callable
-from functools import wraps
-from datetime import timedelta
+For the PHP backend, start with HTTP caching for safe GET endpoints, and add a shared cache later if needed.
 
-class CacheManager:
-    def __init__(self, redis_url: str):
-        self.client = redis.from_url(redis_url)
-    
-    def get(self, key: str) -> Any:
-        """Get value from cache"""
-        try:
-            value = self.client.get(key)
-            return json.loads(value) if value else None
-        except Exception as e:
-            logger.error(f"Cache get error: {e}")
-            return None
-    
-    def set(self, key: str, value: Any, ttl: int = 3600) -> bool:
-        """Set value in cache with TTL"""
-        try:
-            self.client.setex(
-                key, 
-                ttl, 
-                json.dumps(value)
-            )
-            return True
-        except Exception as e:
-            logger.error(f"Cache set error: {e}")
-            return False
-    
-    def delete(self, key: str) -> bool:
-        """Delete key from cache"""
-        try:
-            self.client.delete(key)
-            return True
-        except Exception as e:
-            logger.error(f"Cache delete error: {e}")
-            return False
-    
-    def invalidate_pattern(self, pattern: str) -> int:
-        """Invalidate all keys matching pattern"""
-        try:
-            keys = self.client.keys(pattern)
-            if keys:
-                return self.client.delete(*keys)
-            return 0
-        except Exception as e:
-            logger.error(f"Cache invalidate error: {e}")
-            return 0
-
-# Decorator for caching function results
-def cache_result(ttl: int = 3600, key_prefix: str = ""):
-    def decorator(func: Callable) -> Callable:
-        @wraps(func)
-        async def async_wrapper(*args, **kwargs):
-            cache_key = f"{key_prefix}:{func.__name__}:{args}:{kwargs}"
-            
-            # Try cache first
-            cached = cache.get(cache_key)
-            if cached is not None:
-                logger.debug(f"Cache hit: {cache_key}")
-                return cached
-            
-            # Cache miss, compute result
-            result = await func(*args, **kwargs)
-            cache.set(cache_key, result, ttl)
-            return result
-        
-        @wraps(func)
-        def sync_wrapper(*args, **kwargs):
-            cache_key = f"{key_prefix}:{func.__name__}:{args}:{kwargs}"
-            
-            # Try cache first
-            cached = cache.get(cache_key)
-            if cached is not None:
-                logger.debug(f"Cache hit: {cache_key}")
-                return cached
-            
-            # Cache miss, compute result
-            result = func(*args, **kwargs)
-            cache.set(cache_key, result, ttl)
-            return result
-        
-        return async_wrapper if asyncio.iscoroutinefunction(func) else sync_wrapper
-    
-    return decorator
-
-# Initialize cache
-cache = CacheManager(os.getenv('REDIS_URL', 'redis://localhost:6379/0'))
+Example (cache a GET response for 5 minutes):
+```php
+return \FarmOS\Response::success($data)
+    ->setHeader('Cache-Control', 'public, max-age=300');
 ```
 
 ### 2. Cache Invalidation Strategy
 
-```python
-# backend/routers/livestock.py
-from common.caching import cache
-
-@router.post("/api/livestock")
-async def create_livestock(livestock: LivestockCreate, db: Session):
-    """Create livestock and invalidate cache"""
-    
-    # Create livestock
-    db_livestock = Livestock(**livestock.dict())
-    db.add(db_livestock)
-    db.commit()
-    
-    # Invalidate cache for this farm
-    cache.invalidate_pattern(f"farm:{livestock.farm_id}:livestock:*")
-    
-    return db_livestock
-
-@router.put("/api/livestock/{livestock_id}")
-async def update_livestock(livestock_id: int, updates: LivestockUpdate, db: Session):
-    """Update livestock and invalidate cache"""
-    
-    livestock = db.query(Livestock).filter(Livestock.id == livestock_id).first()
-    for key, value in updates.dict(exclude_unset=True).items():
-        setattr(livestock, key, value)
-    
-    db.commit()
-    
-    # Invalidate cache
-    cache.invalidate_pattern(f"farm:{livestock.farm_id}:livestock:*")
-    
-    return livestock
-```
+When adding a shared cache, invalidate by farm and resource type whenever a write happens (create/update/delete).
 
 ### 3. HTTP Caching Headers
 
-```python
-# backend/routers/livestock.py
-from fastapi.responses import Response
-
-@router.get("/api/livestock/{livestock_id}")
-async def get_livestock(livestock_id: int, db: Session):
-    """Get livestock with HTTP cache headers"""
-    
-    livestock = db.query(Livestock).filter(Livestock.id == livestock_id).first()
-    
-    if not livestock:
-        raise HTTPException(status_code=404, detail="Not found")
-    
-    # Return with cache headers
-    return JSONResponse(
-        content=jsonable_encoder(livestock),
-        headers={
-            "Cache-Control": "public, max-age=300",  # 5 minutes
-            "ETag": hashlib.md5(str(livestock.updated_at).encode()).hexdigest(),
-            "Last-Modified": livestock.updated_at.strftime('%a, %d %b %Y %H:%M:%S GMT')
-        }
-    )
-```
+Use `Cache-Control` and optionally `ETag`/`Last-Modified` headers for list/detail GET endpoints when responses are stable.
 
 ### 4. Cache Warm-up
 
-```python
-# backend/tasks/cache_warmup.py
-import asyncio
-from apscheduler.schedulers.background import BackgroundScheduler
-from common.caching import cache
-
-scheduler = BackgroundScheduler()
-
-@scheduler.scheduled_job('cron', hour='0,6,12,18', minute='0')
-def warm_up_cache():
-    """Warm up cache every 6 hours"""
-    
-    # Cache popular livestock queries
-    farms = db.query(Farm).limit(100).all()
-    for farm in farms:
-        livestock = db.query(Livestock).filter(
-            Livestock.farm_id == farm.id
-        ).limit(50).all()
-        cache.set(f"farm:{farm.id}:livestock", livestock, ttl=3600)
-    
-    logger.info(f"Cache warm-up completed for {len(farms)} farms")
-
-def start_warmup():
-    scheduler.start()
-```
+If you introduce caching, warm it up via a scheduled job or cron by calling the most-used endpoints on a cadence.
 
 ---
 
@@ -476,148 +203,38 @@ def start_warmup():
 
 ### 1. Response Compression
 
-```python
-# backend/app.py
-from fastapi.middleware.gzip import GZIPMiddleware
-
-app.add_middleware(GZIPMiddleware, minimum_size=1000)
-
-# Result: Reduce response size by 80%+
-# Before: 100KB JSON response
-# After: ~20KB gzipped response
-```
+Enable gzip/brotli compression at the web server layer (Apache/Nginx). For local development, focus on smaller payloads (pagination, selective columns).
 
 ### 2. Async Database Operations
 
-```python
-# Before: Blocking operations
-def get_livestock(farm_id: int):
-    return db.query(Livestock).filter(
-        Livestock.farm_id == farm_id
-    ).all()
-
-# After: Non-blocking
-import asyncpg
-
-async def get_livestock_async(farm_id: int):
-    rows = await pool.fetch(
-        "SELECT * FROM livestock WHERE farm_id = $1",
-        farm_id
-    )
-    return rows
-```
+Keep database work fast and predictable: avoid unbounded queries, use indexes, and aggregate in SQL.
 
 ### 3. Connection Pooling
 
-```python
-# backend/common/database.py (Already configured above)
-
-# Test connection pool health
-def test_pool_health():
-    engine = get_engine()
-    
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT 1"))
-        print(f"Connection pool: {engine.pool}")
-        print(f"Checked out: {engine.pool.checkedout()}")
-        print(f"Pool size: {engine.pool.size()}")
-```
+Under PHP-FPM, connection pooling is handled by the process model. Keep one PDO instance per request and consider persistent connections if appropriate.
 
 ### 4. Request/Response Optimization
 
-```python
-# Optimize request payload
-@router.post("/api/livestock/bulk")
-async def bulk_create_livestock(
-    items: List[LivestockCreate],
-    background_tasks: BackgroundTasks,
-    db: Session
-):
-    """Bulk operation with background processing"""
-    
-    # Process immediately
-    livestock_ids = []
-    for item in items:
-        db_livestock = Livestock(**item.dict())
-        db.add(db_livestock)
-        livestock_ids.append(db_livestock.id)
-    
-    db.commit()
-    
-    # Heavy processing in background
-    background_tasks.add_task(rebuild_cache, farm_id=items[0].farm_id)
-    
-    return {"created": len(livestock_ids), "ids": livestock_ids}
-```
+Prefer bulk endpoints for high-volume writes, and keep responses minimal (IDs + counts) where possible.
 
 ---
 
 ## Load Testing
 
-### 1. Setup Locust
+### 1. Load Test Setup
 
-```python
-# backend/tests/locustfile.py
-from locust import HttpUser, task, between
-import random
-
-class FarmOSUser(HttpUser):
-    wait_time = between(1, 3)
-    
-    def on_start(self):
-        """Login before starting tasks"""
-        response = self.client.post("/api/auth/login", json={
-            "email": "admin@example.com",
-            "password": "AdminPass123!"
-        })
-        self.token = response.json()["access_token"]
-        self.headers = {"Authorization": f"Bearer {self.token}"}
-    
-    @task(3)
-    def get_livestock(self):
-        """Get livestock list - frequently accessed"""
-        self.client.get("/api/livestock", headers=self.headers)
-    
-    @task(2)
-    def get_dashboard(self):
-        """Get dashboard - moderately accessed"""
-        self.client.get("/api/dashboard/summary", headers=self.headers)
-    
-    @task(1)
-    def create_livestock(self):
-        """Create livestock - rarely accessed"""
-        self.client.post("/api/livestock", json={
-            "farm_id": random.randint(1, 10),
-            "name": f"Cow-{random.randint(1000, 9999)}",
-            "status": "active"
-        }, headers=self.headers)
-
-class WebsiteUser(HttpUser):
-    tasks = [FarmOSUser]
-    wait_time = between(5, 9)
-```
+Use a simple HTTP load test tool (e.g. ApacheBench) against low-cost endpoints first, then expand to representative authenticated flows.
 
 Run test:
 ```bash
-locust -f tests/locustfile.py --host=http://localhost:8000 --users 100 --spawn-rate 10
+ab -n 5000 -c 50 http://127.0.0.1:8001/health
 ```
 
 ### 2. Load Testing Reports
 
 ```bash
-# Run non-interactive test
-locust -f tests/locustfile.py \
-  --host=http://localhost:8000 \
-  --users 500 \
-  --spawn-rate 50 \
-  --run-time 5m \
-  --headless \
-  --csv=load_test_results
-
-# Analyze results
-# load_test_results_stats.csv - Overall statistics
-# load_test_results_stats_history.csv - Statistics over time
-# load_test_results_failures.csv - Failed requests
+# Capture output to a file for review
+ab -n 50000 -c 200 http://127.0.0.1:8001/health > load_test_results.txt
 ```
 
 ---
@@ -720,91 +337,21 @@ aws autoscaling put-scaling-policy \
 
 ### 1. Performance Monitoring
 
-```python
-# backend/middleware/performance.py
-from starlette.middleware.base import BaseHTTPMiddleware
-from time import time
-import logging
+Measure request latency at the entry point and log slow requests with method/path and duration.
 
-logger = logging.getLogger(__name__)
-
-class PerformanceMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        start_time = time()
-        response = await call_next(request)
-        process_time = time() - start_time
-        
-        # Log slow requests
-        if process_time > 1.0:
-            logger.warning(
-                f"Slow request: {request.method} {request.url.path}",
-                extra={
-                    'method': request.method,
-                    'path': request.url.path,
-                    'duration_ms': process_time * 1000,
-                    'status_code': response.status_code
-                }
-            )
-        
-        response.headers["X-Process-Time"] = str(process_time)
-        return response
-
-# Usage in app.py
-app.add_middleware(PerformanceMiddleware)
-```
+Example:
+- Capture start time at request start
+- Compute duration at response end
+- Log if duration exceeds a threshold (e.g., 1000ms)
+- Optionally set an `X-Process-Time` response header
 
 ### 2. Request Profiling
 
-```python
-# backend/utils/profiler.py
-import cProfile
-import pstats
-from io import StringIO
-from functools import wraps
-
-def profile_request(func):
-    @wraps(func)
-    async def async_wrapper(*args, **kwargs):
-        profiler = cProfile.Profile()
-        profiler.enable()
-        
-        result = await func(*args, **kwargs)
-        
-        profiler.disable()
-        s = StringIO()
-        ps = pstats.Stats(profiler, stream=s).sort_stats('cumulative')
-        ps.print_stats(10)  # Top 10 functions
-        
-        logger.debug(f"Profile for {func.__name__}:\n{s.getvalue()}")
-        return result
-    
-    return async_wrapper
-```
+For PHP, use a profiler like Xdebug profiling (dev) or Blackfire (staging/prod) to capture hotspots and wall-clock time per function.
 
 ### 3. Memory Profiling
 
-```python
-# backend/utils/memory_profiler.py
-from memory_profiler import profile
-import tracemalloc
-
-@profile
-def get_large_dataset(farm_id: int):
-    """Track memory usage"""
-    tracemalloc.start()
-    
-    # Your code
-    livestock = db.query(Livestock).filter(
-        Livestock.farm_id == farm_id
-    ).all()
-    
-    current, peak = tracemalloc.get_traced_memory()
-    logger.info(f"Current memory: {current / 1024 / 1024:.2f}MB")
-    logger.info(f"Peak memory: {peak / 1024 / 1024:.2f}MB")
-    
-    tracemalloc.stop()
-    return livestock
-```
+Track peak memory with PHP runtime metrics (e.g., `memory_get_peak_usage(true)`), and reduce memory by paginating large queries and selecting only required columns.
 
 ---
 
@@ -819,20 +366,17 @@ def get_large_dataset(farm_id: int):
 - [ ] Database connection pool tested
 
 ### Caching
-- [ ] Redis cache deployed
-- [ ] Cache strategy implemented for key queries
+- [ ] Cache strategy implemented for key queries (optional)
 - [ ] Cache invalidation logic added
 - [ ] HTTP cache headers configured
-- [ ] Cache hit rate > 80%
-- [ ] Cache warm-up jobs configured
+- [ ] Cache hit rate tracked
+- [ ] Cache warm-up jobs configured (optional)
 
 ### API
 - [ ] Response compression enabled (gzip)
-- [ ] Async operations implemented
 - [ ] Request/response payloads optimized
 - [ ] Bulk endpoints created
 - [ ] Background task processing configured
-- [ ] Connection pooling verified
 
 ### Testing
 - [ ] Load test baseline established

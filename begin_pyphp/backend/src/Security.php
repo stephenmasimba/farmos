@@ -8,12 +8,19 @@ namespace FarmOS;
 class Security
 {
     private static string $secret;
+    private static ?string $issuer = null;
+    private static ?string $audience = null;
+    private static int $leeway = 0;
     public static function init(string $jwtSecret): void
     {
         if (strlen($jwtSecret) < 32) {
             throw new \Exception('JWT_SECRET must be at least 32 characters');
         }
         self::$secret = $jwtSecret;
+        self::$issuer = getenv('JWT_ISS') ?: (getenv('APP_NAME') ?: 'FarmOS');
+        self::$audience = getenv('JWT_AUD') ?: 'FarmOS-API';
+        $leeway = getenv('JWT_LEEWAY') ?: '0';
+        self::$leeway = is_numeric($leeway) ? (int) $leeway : 0;
     }
 
     /**
@@ -53,21 +60,31 @@ class Security
      */
     public static function encodeJWT(array $payload, int $expiresIn = 3600): string
     {
-        $payload['iat'] = time();
-        $payload['exp'] = time() + $expiresIn;
+        $now = time();
+        $payload['iat'] = $payload['iat'] ?? $now;
+        $payload['nbf'] = $payload['nbf'] ?? $now;
+        $payload['exp'] = $payload['exp'] ?? ($now + (int) ($expiresIn ?: (int) (getenv('JWT_EXPIRY') ?: 3600)));
+        if (isset($payload['user_id']) && !isset($payload['sub'])) {
+            $payload['sub'] = (string) $payload['user_id'];
+        }
+        if (self::$issuer && !isset($payload['iss'])) {
+            $payload['iss'] = self::$issuer;
+        }
+        if (self::$audience && !isset($payload['aud'])) {
+            $payload['aud'] = self::$audience;
+        }
+        if (!isset($payload['jti'])) {
+            $payload['jti'] = self::generateToken(16);
+        }
 
-        $header = base64_encode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
-        $payload = base64_encode(json_encode($payload));
+        $headerArr = ['alg' => 'HS256', 'typ' => 'JWT'];
+        $header = self::base64UrlEncode(json_encode($headerArr));
+        $payloadStr = self::base64UrlEncode(json_encode($payload));
 
-        $signature = hash_hmac(
-            'sha256',
-            "$header.$payload",
-            self::$secret,
-            true
-        );
-        $signature = base64_encode($signature);
+        $signature = hash_hmac('sha256', "$header.$payloadStr", self::$secret, true);
+        $signature = self::base64UrlEncode($signature);
 
-        return "$header.$payload.$signature";
+        return "$header.$payloadStr.$signature";
     }
 
     /**
@@ -80,30 +97,43 @@ class Security
             throw new \Exception('Invalid token format');
         }
 
-        list($header, $payload, $signature) = $parts;
+        list($headerB64, $payloadB64, $signatureB64) = $parts;
+
+        // Decode and validate header
+        $headerJson = self::base64UrlDecode($headerB64);
+        $header = json_decode($headerJson, true);
+        if (!$header || ($header['typ'] ?? '') !== 'JWT' || ($header['alg'] ?? '') !== 'HS256') {
+            throw new \Exception('Invalid token header');
+        }
 
         // Verify signature
-        $expectedSignature = hash_hmac(
-            'sha256',
-            "$header.$payload",
-            self::$secret,
-            true
-        );
-        $expectedSignature = base64_encode($expectedSignature);
+        $expectedSignature = hash_hmac('sha256', "$headerB64.$payloadB64", self::$secret, true);
+        $expectedSignatureB64 = self::base64UrlEncode($expectedSignature);
 
-        if (!self::constantTimeCompare($signature, $expectedSignature)) {
+        if (!self::constantTimeCompare($signatureB64, $expectedSignatureB64)) {
             throw new \Exception('Invalid token signature');
         }
 
         // Decode payload
-        $decoded = json_decode(base64_decode($payload), true);
+        $payloadJson = self::base64UrlDecode($payloadB64);
+        $decoded = json_decode($payloadJson, true);
         if (!$decoded) {
             throw new \Exception('Invalid token payload');
         }
 
         // Check expiration
-        if (isset($decoded['exp']) && $decoded['exp'] < time()) {
+        $now = time();
+        if (isset($decoded['nbf']) && ($decoded['nbf'] - self::$leeway) > $now) {
+            throw new \Exception('Token not yet valid');
+        }
+        if (isset($decoded['exp']) && ($decoded['exp'] + self::$leeway) < $now) {
             throw new \Exception('Token expired');
+        }
+        if (self::$issuer && isset($decoded['iss']) && $decoded['iss'] !== self::$issuer) {
+            throw new \Exception('Invalid token issuer');
+        }
+        if (self::$audience && isset($decoded['aud']) && $decoded['aud'] !== self::$audience) {
+            throw new \Exception('Invalid token audience');
         }
 
         return $decoded;
@@ -126,6 +156,22 @@ class Security
     private static function constantTimeCompare(string $a, string $b): bool
     {
         return hash_equals($a, $b);
+    }
+
+    private static function base64UrlEncode(string $data): string
+    {
+        $b64 = base64_encode($data);
+        return rtrim(strtr($b64, '+/', '-_'), '=');
+    }
+
+    private static function base64UrlDecode(string $data): string
+    {
+        $b64 = strtr($data, '-_', '+/');
+        $pad = strlen($b64) % 4;
+        if ($pad > 0) {
+            $b64 .= str_repeat('=', 4 - $pad);
+        }
+        return base64_decode($b64) ?: '';
     }
 
     /**

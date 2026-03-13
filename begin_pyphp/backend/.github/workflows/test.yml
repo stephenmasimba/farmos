@@ -16,23 +16,6 @@ jobs:
       fail-fast: false
       matrix:
         php-version: ['8.0', '8.1', '8.2']
-        mysql-version: ['5.7', '8.0']
-
-    services:
-      mysql:
-        image: mysql:${{ matrix.mysql-version }}
-        env:
-          MYSQL_ROOT_PASSWORD: root_password
-          MYSQL_DATABASE: farmos_test
-          MYSQL_USER: farmos_test
-          MYSQL_PASSWORD: test_password
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-        ports:
-          - 3306:3306
 
     steps:
     - uses: actions/checkout@v3
@@ -44,6 +27,16 @@ jobs:
         extensions: json, pdo, pdo_mysql, mbstring, curl, redis
         tools: composer
         coverage: xdebug
+
+    - name: Set up MySQL
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mysql-server
+        sudo systemctl start mysql
+        sudo mysql -e "CREATE DATABASE IF NOT EXISTS farmos_test;"
+        sudo mysql -e "CREATE USER IF NOT EXISTS 'farmos_test'@'127.0.0.1' IDENTIFIED BY 'test_password';"
+        sudo mysql -e "GRANT ALL PRIVILEGES ON farmos_test.* TO 'farmos_test'@'127.0.0.1';"
+        sudo mysql -e "FLUSH PRIVILEGES;"
 
     - name: Validate composer.json
       run: composer validate --strict
@@ -67,16 +60,6 @@ jobs:
         sed -i 's/DB_PORT=.*/DB_PORT=3306/' .env.testing
         sed -i 's/DB_USER=.*/DB_USER=farmos_test/' .env.testing
         sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=test_password/' .env.testing
-
-    - name: Wait for MySQL
-      run: |
-        while ! mysqladmin ping -h "127.0.0.1" -u "farmos_test" -p"test_password" --silent; do
-          sleep 1
-        done
-
-    - name: Create test database
-      run: |
-        mysql -h 127.0.0.1 -u farmos_test -p"test_password" -e "CREATE DATABASE IF NOT EXISTS farmos_test;"
 
     - name: Run PHP Lint
       run: find src tests -name "*.php" -exec php -l {} \;
@@ -102,7 +85,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v3
       with:
-        name: test-reports-php${{ matrix.php-version }}-mysql${{ matrix.mysql-version }}
+        name: test-reports-php${{ matrix.php-version }}
         path: build/
 
   code-quality:

@@ -11,39 +11,29 @@
 
 ```bash
 cd c:\wamp64\www\farmos\begin_pyphp\backend
-
-# Copy the example .env file
-copy .env.example .env
-
-# Edit .env and update these critical values:
 ```
 
-Edit the `.env` file with your favorite editor:
+Create `config\.env` (the backend reads `begin_pyphp/backend/config/.env`):
 
 ```env
-# Generate these values (one time)
-JWT_SECRET=<run-this-in-python: import secrets; print(secrets.token_hex(32))>
-API_KEY=<run-this-in-python: import secrets; print(secrets.token_urlsafe(32))>
-SECRET_KEY=<run-this-in-python: import secrets; print(secrets.token_hex(32))>
+JWT_SECRET=<generate-32-bytes-hex>
 
-# Update database (use your actual credentials)
-DATABASE_URL=mysql+pymysql://root:password@localhost:3306/begin_masimba_farm
+APP_ENV=development
+APP_URL=http://127.0.0.1:8001
 
-# Set environment
-NODE_ENV=development
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+DATABASE_NAME=begin_masimba_farm
+DB_USER=root
+DB_PASSWORD=
+DATABASE_URL=mysql:host=localhost;port=3306;dbname=begin_masimba_farm;charset=utf8mb4
 
-# Set CORS for your domain
-CORS_ORIGIN=http://localhost:3000,http://localhost:8080
+CORS_ORIGIN=http://localhost,http://localhost:3000,http://localhost:8080
 ```
 
-To generate secrets in Python:
+To generate a JWT secret:
 ```powershell
-# Open PowerShell and run:
-python -c "import secrets; print('JWT_SECRET=' + secrets.token_hex(32))"
-python -c "import secrets; print('API_KEY=' + secrets.token_urlsafe(32))"
-python -c "import secrets; print('SECRET_KEY=' + secrets.token_hex(32))"
-
-# Copy the output lines into your .env file
+php -r "echo 'JWT_SECRET=' . bin2hex(random_bytes(32)) . PHP_EOL;"
 ```
 
 ### Step 2: Install Dependencies (10 min)
@@ -51,79 +41,30 @@ python -c "import secrets; print('SECRET_KEY=' + secrets.token_hex(32))"
 ```powershell
 cd c:\wamp64\www\farmos\begin_pyphp\backend
 
-# Upgrade pip
-python -m pip install --upgrade pip setuptools wheel
-
-# Install all requirements
-pip install -r requirements.txt
-
-# Verify installation
-pip list | findstr fastapi
-pip list | findstr sqlalchemy
-pip list | findstr bcrypt
-pip list | findstr pytest
+composer install
 ```
 
 ### Step 3: Test Security Implementation (10 min)
 
 ```powershell
-# Run the comprehensive test suite
-pytest tests/test_auth_security.py -v
-
-# Expected output:
-# ===================== XX passed in Xs =======================
-
-# If all tests pass, your setup is correct!
+composer run test
 ```
 
 ### Step 4: Reset Database & Create Demo Users (10 min)
 
 ```powershell
-# Start Python in the backend directory
-python
+# Create database (if needed)
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS begin_masimba_farm;"
 
-# Then in Python shell:
-from backend.common.database import SessionLocal
-from backend.common import models
-from backend.common.security import hash_password
-
-db = SessionLocal()
-
-# Create demo users
-demo_users = [
-    ("Admin User", "admin@example.com", "AdminPass123!", "admin"),
-    ("Manager User", "manager@example.com", "ManagerPass123!", "manager"),
-    ("Worker User", "worker@example.com", "WorkerPass123!", "worker"),
-]
-
-for name, email, password, role in demo_users:
-    user = models.User(
-        name=name,
-        email=email,
-        hashed_password=hash_password(password),
-        role=role
-    )
-    db.add(user)
-    print(f"Created: {email}")
-
-db.commit()
-print("Demo users created successfully!")
-
-# Exit Python
-exit()
+# Apply schema
+Get-Content ..\database\schema.sql | mysql -u root -p begin_masimba_farm
 ```
 
 ### Step 5: Start the Application (5 min)
 
 ```powershell
 # In the backend directory
-uvicorn app:app --reload
-
-# You should see:
-# INFO:     Application startup complete [uvicorn] 
-# Uvicorn running on http://127.0.0.1:8000
-
-# The API is now running!
+composer run serve
 ```
 
 ---
@@ -136,7 +77,7 @@ Test that everything is working:
 # In another PowerShell window, test the API:
 
 # 1. Check health endpoint
-curl http://localhost:8000/health
+curl http://127.0.0.1:8001/health
 
 # Expected response:
 # {"status":"OK","timestamp":"...","environment":"development","uptime":...}
@@ -148,7 +89,7 @@ $body = @{
 } | ConvertTo-Json
 
 curl -Method Post `
-  -Uri http://localhost:8000/api/auth/login `
+  -Uri http://127.0.0.1:8001/api/auth/login `
   -Headers @{"Content-Type"="application/json"} `
   -Body $body
 
@@ -157,7 +98,7 @@ curl -Method Post `
 
 # 3. Get profile (replace TOKEN with actual token)
 $token = "YOUR_TOKEN_HERE"
-curl http://localhost:8000/api/auth/me `
+curl http://127.0.0.1:8001/api/auth/me `
   -Headers @{"Authorization"="Bearer $token"}
 
 # Should return user profile
@@ -198,54 +139,19 @@ curl http://localhost:8000/api/auth/me `
 |------|---------|
 | `.env.example` | Configuration template |
 | `.env` | Your actual configuration (DO NOT COMMIT) |
-| `requirements.txt` | All dependencies with versions |
-| `common/security.py` | Security functions |
-| `common/errors.py` | Error handling |
-| `common/validation.py` | Input validation |
-| `routers/auth.py` | Authentication endpoints |
-| `tests/test_auth_security.py` | Security tests |
+| `composer.json` | Dependencies + scripts (test/lint/type-check/serve) |
+| `public/index.php` | Routing + request handling |
+| `src/Auth.php` | Authentication logic |
+| `tests/Feature/` | Feature tests (PHPUnit) |
 
 ---
 
 ## 🔍 TESTING THE IMPROVEMENTS
 
-### Test 1: Environment Validation
+### Backend Test Suite
 ```powershell
-python -c "
-from backend.common.security import JWT_SECRET
-print(f'JWT_SECRET configured: {bool(JWT_SECRET)}')
-"
-# Should show: JWT_SECRET configured: True
-```
-
-### Test 2: Password Hashing
-```powershell
-python -c "
-from backend.common.security import hash_password, verify_password
-pwd = 'TestPass123!'
-hashed = hash_password(pwd)
-print(f'Password hashed: {bool(hashed)}')
-print(f'Verification: {verify_password(pwd, hashed)}')
-"
-# Should show both: True
-```
-
-### Test 3: Input Validation
-```powershell
-python -c "
-from backend.common.validation import validate_email, validate_password
-print(f'Email validation: {validate_email(\"user@example.com\")}')
-is_valid, msg = validate_password('weak')
-print(f'Password validation: {is_valid}')
-"
-# Should show: Email validation: True, Password validation: False
-```
-
-### Test 4: Full Test Suite
-```powershell
-pytest tests/test_auth_security.py -v --tb=short
-
-# Look for: "XX passed" at the end
+cd c:\wamp64\www\farmos\begin_pyphp\backend
+composer run test
 ```
 
 ---
@@ -254,19 +160,19 @@ pytest tests/test_auth_security.py -v --tb=short
 
 ### Issue: "JWT_SECRET must be set via environment variable"
 
-**Cause**: .env file not created or JWT_SECRET not set  
+**Cause**: `config/.env` not created or `JWT_SECRET` not set  
 **Fix**:
 ```powershell
-cp .env.example .env
-# Edit .env and add: JWT_SECRET=<generated-value>
+copy .env.example config\.env
+# Edit config\.env and add: JWT_SECRET=<generated-value>
 ```
 
-### Issue: "ModuleNotFoundError: No module named 'backend'"
+### Issue: "Composer dependencies missing"
 
-**Cause**: Dependencies not installed  
+**Cause**: `composer install` not run (or failed)  
 **Fix**:
 ```powershell
-pip install -r requirements.txt
+composer install
 ```
 
 ### Issue: "Database connection failed"
@@ -274,8 +180,8 @@ pip install -r requirements.txt
 **Cause**: MySQL not running or DATABASE_URL wrong  
 **Fix**:
 ```powershell
-# Check .env DATABASE_URL
-cat .env | findstr DATABASE_URL
+# Check config\.env DATABASE_URL
+cat config\.env | findstr DATABASE_URL
 
 # Create database if needed
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS begin_masimba_farm;"
@@ -283,8 +189,8 @@ mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS begin_masimba_farm;"
 
 ### Issue: Tests fail with "SECURITYERROR"
 
-**Cause**: .env not set to test values  
-**Fix**: Tests use sqlite automatically, no need to modify
+**Cause**: Missing MySQL access for test database creation  
+**Fix**: Ensure MySQL is running and DB credentials are set in `.env`
 
 ### Issue: Login fails with "Invalid credentials"
 
@@ -320,15 +226,10 @@ When token expires:
 - Or use the /refresh-token endpoint
 ```
 
-### API Keys Must Be Set
+### JWT Secret Must Be Set
 ```
-Old: Default key in code (DANGEROUS!)
-New: Must be set via .env
-
-How it works:
-1. Set API_KEY in .env
-2. Pass as X-API-Key header
-3. Rate limited to prevent abuse
+Old: Secret could be missing or weak
+New: JWT_SECRET must be set via .env and be at least 32 characters
 ```
 
 ### All Input Is Validated
@@ -370,24 +271,23 @@ Prevents: Brute force attacks
 
 ### After Getting It Running
 1. Test all endpoints in Postman or curl
-2. Review the test suite: `tests/test_auth_security.py`
+2. Review the test suite: `begin_pyphp/backend/tests/Feature/`
 3. Read the security documentation
 4. Update your frontend to use new API format
 
 ### For Production
 1. Read: `SECURITY_FIXES_IMPLEMENTATION.md`
 2. Increase JWT_SECRET complexity
-3. Set NODE_ENV=production
-4. Configure for your domain
+3. Set APP_ENV=production and APP_URL to your domain
+4. Configure CORS_ORIGIN for your domain
 5. Set up automated backups
 6. Set up error monitoring
 
 ### Future Improvements
-1. Docker containerization
-2. CI/CD pipeline setup
-3. Monitoring & alerting
-4. Performance optimization
-5. Database optimization
+1. CI checks on every push (tests/lint/type-check)
+2. Monitoring & alerting
+3. Performance optimization
+4. Database optimization
 
 ---
 
@@ -405,7 +305,7 @@ copy .env .env.backup-2026-03-12
 ### Tip 2: Generate Strong Secrets
 ```powershell
 # For production, use longer secrets
-python -c "import secrets; print(secrets.token_hex(64))"  # 128 characters
+php -r "echo bin2hex(random_bytes(64)) . PHP_EOL;"  # 128 characters
 ```
 
 ### Tip 3: Monitor Logs
@@ -417,11 +317,8 @@ tail -f /var/log/farmos/farmos.log  # On Linux/Mac
 Get-Content app.log -Wait
 ```
 
-### Tip 4: Use Test Database
-Development uses sqlite automatically, so existing MySQL is unaffected.
-
 ### Tip 5: Rotate Your Secrets
-In production, change API_KEY and JWT_SECRET every 90 days.
+In production, rotate your JWT secret on a regular schedule.
 
 ---
 
@@ -443,7 +340,7 @@ If you get stuck:
 1. Check the troubleshooting section above
 2. Read the relevant .md file
 3. Check the code comments
-4. Run the test suite: `pytest tests/test_auth_security.py -vv`
+4. Run the test suite: `cd begin_pyphp/backend && composer run test`
 5. Review the error logs
 
 ---

@@ -18,12 +18,18 @@ Logger::init(
     getenv('LOG_FORMAT') ?: 'json'
 );
 
+if (empty($_SERVER['HTTP_X_REQUEST_ID'])) {
+    $_SERVER['HTTP_X_REQUEST_ID'] = bin2hex(random_bytes(16));
+}
+Logger::setRequestId((string) $_SERVER['HTTP_X_REQUEST_ID']);
+
 Security::init(getenv('JWT_SECRET'));
 
 // Create request/response
 $request = new Request();
 $method = $request->getMethod();
 $path = $request->getPath();
+$requestStartedAt = microtime(true);
 
 // CORS handling
 if ($method === 'OPTIONS') {
@@ -52,6 +58,28 @@ if ($path === '/health') {
     exit;
 }
 
+$stateChanging = in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'], true);
+if ($stateChanging) {
+    if ($request->isJsonInvalid()) {
+        Response::error('Invalid JSON', 'INVALID_JSON', 400)->send();
+        exit;
+    }
+
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    $corsOriginRaw = (string) (getenv('CORS_ORIGIN') ?: '');
+    $appUrl = (string) (getenv('APP_URL') ?: '');
+    if ($origin !== '' && $corsOriginRaw !== '*') {
+        $allowedOrigins = array_values(array_unique(array_filter(array_map(
+            'trim',
+            array_merge(explode(',', $corsOriginRaw), [$appUrl])
+        ))));
+        if (!in_array($origin, $allowedOrigins, true)) {
+            Response::error('Forbidden', 'FORBIDDEN', 403)->send();
+            exit;
+        }
+    }
+}
+
 try {
     $db = Database::init(
         getenv('DATABASE_URL'),
@@ -65,6 +93,46 @@ try {
 
 // Rate limiting
 $clientIP = $request->getIP();
+
+if (!isset($GLOBALS['__FARMOS_TEST_RAW_BODY']) && (getenv('API_ANALYTICS_ENABLED') ?: 'false') === 'true') {
+    register_shutdown_function(static function () use ($requestStartedAt, $request, $db, $method, $path, $clientIP): void {
+        try {
+            static $ensured = false;
+            if (!$ensured) {
+                $db->execute(
+                    'CREATE TABLE IF NOT EXISTS api_request_logs (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        method VARCHAR(10) NOT NULL,
+                        path VARCHAR(255) NOT NULL,
+                        status_code INT NOT NULL,
+                        duration_ms INT NOT NULL,
+                        ip VARCHAR(64) NULL,
+                        user_id INT NULL,
+                        user_agent VARCHAR(255) NULL,
+                        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        INDEX idx_created_at (created_at),
+                        INDEX idx_path (path),
+                        INDEX idx_status_code (status_code),
+                        INDEX idx_user_id (user_id)
+                    )'
+                );
+                $ensured = true;
+            }
+
+            $durationMs = (int) round((microtime(true) - $requestStartedAt) * 1000);
+            $status = (int) http_response_code();
+            $user = $request->getUser();
+            $userId = $user['user_id'] ?? null;
+            $ua = $_SERVER['HTTP_USER_AGENT'] ?? null;
+
+            $db->execute(
+                'INSERT INTO api_request_logs (method, path, status_code, duration_ms, ip, user_id, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [$method, $path, $status, $durationMs, $clientIP, $userId, $ua]
+            );
+        } catch (\Throwable $e) {
+        }
+    });
+}
 
 // Initialize controllers
 use FarmOS\Controllers\{LivestockController, InventoryController, FinancialController, TaskController, DashboardController, WeatherController, IoTController};
@@ -202,6 +270,11 @@ try {
                 break;
             }
 
+            if (!RateLimiter::isAllowed($clientIP, 'auth')) {
+                Response::rateLimited(60)->send();
+                break;
+            }
+
             $user = $request->getUser();
             
             if (!$user) {
@@ -211,11 +284,65 @@ try {
 
             $auth = new Auth($db);
             $newToken = $auth->refreshToken($user);
+            $expSecs = (int) (getenv('JWT_EXPIRY') ?: 3600);
             Response::success([
                 'access_token' => $newToken,
                 'token_type' => 'Bearer',
-                'expires_in' => 3600,
+                'expires_in' => $expSecs,
             ])->send();
+            break;
+
+        case '/api/auth/refresh':
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            if (!RateLimiter::isAllowed($clientIP, 'auth')) {
+                Response::rateLimited(60)->send();
+                break;
+            }
+
+            $payload = $request->getBody();
+            if (empty($payload['refresh_token'])) {
+                Response::validationError(['refresh_token' => 'Required'])->send();
+                break;
+            }
+            if (!is_string($payload['refresh_token']) || strlen($payload['refresh_token']) < 20) {
+                Response::validationError(['refresh_token' => 'Invalid'])->send();
+                break;
+            }
+            $auth = new Auth($db);
+            try {
+                $tokens = $auth->exchangeRefreshToken($payload['refresh_token']);
+                Response::success($tokens)->send();
+            } catch (\Exception $e) {
+                Response::unauthorized($e->getMessage())->send();
+            }
+            break;
+
+        case '/api/auth/logout':
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            if (!RateLimiter::isAllowed($clientIP, 'auth')) {
+                Response::rateLimited(60)->send();
+                break;
+            }
+            $user = $request->getUser();
+            if (!$user) {
+                Response::unauthorized()->send();
+                break;
+            }
+            $auth = new Auth($db);
+            $body = $request->getBody();
+            if (!empty($body['refresh_token'])) {
+                $auth->revokeRefreshToken($body['refresh_token']);
+            }
+            $auth->logout($user);
+            Response::success(['message' => 'Logged out'])->send();
             break;
 
         // Livestock endpoints
@@ -767,6 +894,21 @@ try {
             }
             break;
 
+        case (preg_match('/^\/api\/iot\/sensors$/', $path) ? true : false):
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $iotController->ingestSensor()->send();
+            break;
+
         case (preg_match('/^\/api\/iot\/sensors\/latest$/', $path) ? true : false):
             if ($method !== 'GET') {
                 Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
@@ -816,6 +958,76 @@ try {
             }
             break;
 
+        case (preg_match('/^\/api\/reports\/types$/', $path) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $dashboardController->reportTypes()->send();
+            break;
+
+        case (preg_match('/^\/api\/reports\/generate$/', $path) ? true : false):
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $dashboardController->generateReport()->send();
+            break;
+
+        case (preg_match('/^\/api\/reports\/download$/', $path) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $token = (string) ($_GET['token'] ?? '');
+            $export = $dashboardController->getReportExportByToken($token);
+            if (!$export) {
+                Response::notFound('Report not found')->send();
+                break;
+            }
+
+            http_response_code(200);
+            if (!headers_sent()) {
+                foreach (Security::getSecurityHeaders() as $name => $value) {
+                    header("$name: $value");
+                }
+                header('Content-Type: ' . $export['content_type']);
+                $disposition = stripos((string) $export['content_type'], 'text/html') !== false ? 'inline' : 'attachment';
+                header('Content-Disposition: ' . $disposition . '; filename="' . str_replace('"', '', (string) $export['filename']) . '"');
+            }
+            echo $export['body'];
+            break;
+
+        case (preg_match('/^\/api\/analytics\/dashboard$/', $path) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $dashboardController->analyticsDashboard()->send();
+            break;
+
         // Default 404
         default:
             Response::notFound('Endpoint not found')->send();
@@ -828,5 +1040,9 @@ try {
         'error' => $e->getMessage(),
     ]);
     
-    Response::error($e->getMessage(), 'INTERNAL_ERROR', 500)->send();
+    $debug = (string) (getenv('APP_DEBUG') ?: 'false');
+    $isDebug = strtolower($debug) === 'true' || $debug === '1';
+    $message = $isDebug ? $e->getMessage() : 'Internal server error';
+    $details = $isDebug ? ['exception' => get_class($e)] : [];
+    Response::error($message, 'INTERNAL_ERROR', 500, $details)->send();
 }

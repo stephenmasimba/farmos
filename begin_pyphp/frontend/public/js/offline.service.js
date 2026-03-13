@@ -104,7 +104,6 @@
     const token = localStorage.getItem('token');
     const headers = {
       'Content-Type': 'application/json',
-      'x-api-key': 'begin-api-key'
     };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
@@ -182,7 +181,7 @@
       return { data: cached, fromCache: true };
     }
     if (isOnline) {
-      const headers = { 'x-api-key': 'begin-api-key' };
+      const headers = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
       const resp = await fetch(`/api${endpoint}`, { headers });
       if (resp.ok) {

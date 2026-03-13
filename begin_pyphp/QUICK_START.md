@@ -17,7 +17,13 @@ Get the system running in 5 minutes!
 
 ### Step 1: Start Backend
 
-Use `begin_pyphp/start_backend.bat` to run the PHP backend on port 8001.
+Use `begin_pyphp/LAUNCH_FARMOS.bat` to start the system.
+
+Or run the backend with the PHP built-in server:
+```bash
+cd begin_pyphp/backend
+composer run serve
+```
 
 ### Step 2: Verify
 Health: http://127.0.0.1:8001/health
@@ -44,7 +50,6 @@ Open your browser:
 ```bash
 curl -X POST http://127.0.0.1:8001/api/auth/login \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: local-dev-key" \
   -d '{"email":"admin@example.com","password":"password123"}'
 ```
 
@@ -55,7 +60,7 @@ Visit [http://localhost/farmos/begin_pyphp/frontend/public/](http://localhost/fa
 ## Initial Setup (First Time Only)
 
 ### Sample Data
-Seeder creates admin, manager, worker accounts on startup.
+Sample users are created on first run (admin/manager/worker).
 
 ### Seed Sample Data (Optional)
 
@@ -116,11 +121,11 @@ Use `netstat -ano | findstr :8001` then `taskkill /PID <PID> /F`.
 
 ## Next Steps
 
-1. **Read Full Setup Guide**: [docs/SETUP.md](docs/SETUP.md)
-2. **Learn Architecture**: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-3. **API Reference**: [docs/API.md](docs/API.md)
-4. **Deployment Guide**: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
-5. **System Design**: [../comprehensive_system_design.md](../comprehensive_system_design.md)
+1. **Backend setup**: [backend/PHP_BACKEND_README.md](backend/PHP_BACKEND_README.md)
+2. **Test suite**: [backend/TEST_SUITE.md](backend/TEST_SUITE.md)
+3. **Developer guide**: [../docs/DEVELOPER_GUIDE.md](../docs/DEVELOPER_GUIDE.md)
+4. **User manual**: [../docs/USER_MANUAL.md](../docs/USER_MANUAL.md)
+5. **System design (spec)**: [../comprehensive_system_design.md](../comprehensive_system_design.md)
 
 ## Project Structure
 
@@ -138,6 +143,8 @@ begin-masimba-farmos/
 ### Authentication
 - `POST /api/auth/login` - User login
 - `POST /api/auth/register` - Create user
+- `GET /api/auth/me` - Current user
+- `POST /api/auth/refresh-token` - Refresh token
 
 ### Dashboard
 - `GET /api/dashboard/kpis` - Key performance indicators
@@ -145,16 +152,37 @@ begin-masimba-farmos/
 
 ### Inventory
 - `GET /api/inventory` - List items
-- `POST /api/inventory/items` - Add item
-- `POST /api/inventory/transactions` - Record usage
+- `POST /api/inventory` - Add item
+- `GET /api/inventory/{id}` - Get item
+- `PUT /api/inventory/{id}` - Update item
+- `DELETE /api/inventory/{id}` - Delete item
+- `POST /api/inventory/{id}/adjust` - Adjust quantity
+- `GET /api/inventory/stats` - Inventory stats
 
 ### Financial
-- `POST /api/financial/transactions` - Log expense/income
-- `GET /api/financial/daily-summary` - Daily P&L
+- `GET /api/financial` - List records
+- `POST /api/financial` - Create record
+- `GET /api/financial/{id}` - Get record
+- `PUT /api/financial/{id}` - Update record
+- `DELETE /api/financial/{id}` - Delete record
+- `GET /api/financial/summary` - Summary
 
 ### Livestock
-- `GET /api/livestock/batches` - Active batches
-- `POST /api/livestock/:id/events` - Record event (feeding, mortality, etc.)
+- `GET /api/livestock` - List livestock
+- `POST /api/livestock` - Create livestock
+- `GET /api/livestock/{id}` - Get livestock
+- `PUT /api/livestock/{id}` - Update livestock
+- `DELETE /api/livestock/{id}` - Delete livestock
+- `GET /api/livestock/{id}/events` - List events
+- `POST /api/livestock/{id}/events` - Add event
+- `GET /api/livestock/stats` - Livestock stats
+
+### Tasks
+- `GET /api/tasks` - List tasks
+- `POST /api/tasks` - Create task
+- `GET /api/tasks/{id}` - Get task
+- `PUT /api/tasks/{id}` - Update task
+- `DELETE /api/tasks/{id}` - Delete task
 
 ### Health
 - `GET /health` - Backend health check
@@ -163,7 +191,6 @@ begin-masimba-farmos/
 ## IDE Setup (Recommended)
 
 ### VS Code Extensions
-- ES7+ React/Redux/React-Native snippets
 - Prettier - Code formatter
 - ESLint
 - MySQL
@@ -174,7 +201,6 @@ begin-masimba-farmos/
 ### Backend
 - API response target: <2 seconds
 - Monitor with: `curl -w "@curl-format.txt"` 
-- Database queries logged in `backend/logs/`
 
 ### Frontend
 - Check Network tab (F12)

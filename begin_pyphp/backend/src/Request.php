@@ -12,6 +12,7 @@ class Request
     private string $method;
     private string $path;
     private array $query;
+    private bool $jsonInvalid = false;
 
     public function __construct()
     {
@@ -88,6 +89,10 @@ class Request
             $raw = isset($GLOBALS['__FARMOS_TEST_RAW_BODY']) ? (string) $GLOBALS['__FARMOS_TEST_RAW_BODY'] : file_get_contents('php://input');
             $decoded = json_decode($raw, true);
             $body = $decoded ?: [];
+            if (trim($raw) !== '' && $decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+                $this->jsonInvalid = true;
+                $body = [];
+            }
         } elseif (!empty($_POST)) {
             $body = $_POST;
         } else {
@@ -102,6 +107,11 @@ class Request
         }
 
         return $body;
+    }
+
+    public function isJsonInvalid(): bool
+    {
+        return $this->jsonInvalid;
     }
 
     public function getQuery(?string $key = null, $default = null)

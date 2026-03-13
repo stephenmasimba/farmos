@@ -27,8 +27,8 @@ The software creates a **Digital Twin** of the physical farm. Every physical ass
 
 **Technical Stack:**
 - **Frontend**: PHP (Server-side Rendering) - Lightweight, responsive, and compatible with WAMP
-- **Backend**: Python FastAPI - High performance, asynchronous, and auto-documented
-- **Database**: In-Memory (Prototype) / SQL Ready (SQLite/PostgreSQL)
+- **Backend**: Pure PHP API (Composer + PHPUnit) - Simple, deployable, WAMP-friendly
+- **Database**: MySQL (PDO) - Relational storage for core farm data
 - **Edge Gateway**: Local Raspberry Pi/NUC controller aggregating sensor data and syncing to server
 - **Offline-First**: Local caching strategies with sync capabilities
 - **Security**: Role-Based Access Control (RBAC), JWT authentication, secure headers
@@ -49,8 +49,8 @@ The software creates a **Digital Twin** of the physical farm. Every physical ass
 └──────────────────────────┬──────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────────┐
-│            BACKEND SERVER (Python/FastAPI)                  │
-│  • API Layer (RESTful endpoints, Auto-docs)                 │
+│                 BACKEND SERVER (PHP)                        │
+│  • API Layer (RESTful endpoints)                             │
 │  • Business Logic (Feed Formulation, Financial Calc)        │
 │  • Database Synchronization                                 │
 │  • Cloud Sync (Optional, when online)                       │
@@ -410,14 +410,14 @@ Weight: [50kg]
 ### 7.1 Critical Integration Points
 
 **Frontend-Backend Connection:**
-- PHP Frontend → Python FastAPI Backend (REST API)
+- PHP Frontend → PHP Backend API (REST API)
 - Enhanced API client with retry logic and offline fallback
 - Environment-based configuration for flexible deployment
 
 **Database Layer:**
-- MySQL/PostgreSQL as primary data store
-- SQLAlchemy ORM with proper relationships and constraints
-- Automatic table creation and migration support
+- MySQL as primary data store
+- PDO + models/query builder with proper relationships and constraints
+- Schema applied from `begin_pyphp/database/schema.sql`
 
 **Authentication Flow:**
 - JWT-based authentication with role-based access control
@@ -446,14 +446,14 @@ Weight: [50kg]
 **Quick Start:**
 ```bash
 # 1. Start backend server
-cd /c/wamp64/www/farmos
-start_backend.bat
+cd begin_pyphp/backend
+composer run serve
 
 # 2. Access frontend
 http://localhost/farmos/begin_pyphp/frontend/public/
 
-# 3. API Documentation
-http://127.0.0.1:8000/docs
+# 3. Health check
+http://127.0.0.1:8001/health
 ```
 
 **Environment Configuration:**
@@ -487,13 +487,12 @@ http://127.0.0.1:8000/docs
 ### 11.1 Common Issues
 
 **Backend Not Starting:**
-- Check Python installation and dependencies
+- Check PHP installation and Composer dependencies
 - Verify database connection in `.env`
-- Ensure port 8000 is not in use
+- Ensure port 8001 is not in use
 
 **Frontend API Errors:**
-- Verify backend server is running at `127.0.0.1:8000`
-- Check API key configuration
+- Verify backend server is running at `127.0.0.1:8001`
 - Review browser console for detailed errors
 
 **Database Connection Issues:**
@@ -515,7 +514,7 @@ LOG_LEVEL=DEBUG
 **Check System Health:**
 ```bash
 # Backend health check
-curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8001/health
 
 # Frontend API availability
 # Check browser network tab for API calls

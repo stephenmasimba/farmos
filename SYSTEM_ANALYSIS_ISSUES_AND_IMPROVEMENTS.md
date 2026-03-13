@@ -8,7 +8,7 @@
 
 ## 📊 Executive Summary
 
-FarmOS is a feature-rich farm management system with a FastAPI backend and PHP frontend. The system has strong foundational architecture but requires improvements in security, code quality, testing, and documentation. This document identifies critical issues, medium-priority improvements, and low-priority enhancements.
+FarmOS is a feature-rich farm management system with a pure PHP backend and PHP frontend. The system has strong foundational architecture but requires improvements in security, code quality, testing, and documentation. This document identifies critical issues, medium-priority improvements, and low-priority enhancements.
 
 ---
 
@@ -17,50 +17,37 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 ### 1. **Security Vulnerabilities**
 
 #### 1.1 Hardcoded Secrets
-- **Issue**: JWT_SECRET and API_KEY are hardcoded in `common/security.py` with default values
+- **Issue**: JWT secret must not fall back to insecure defaults
 - **Risk**: HIGH - Anyone can decode JWTs and spoof API access
 - **Impact**: Complete authentication bypass possible
-- **File**: `backend/common/security.py`
+- **File**: `begin_pyphp/backend/config/env.php`, `begin_pyphp/backend/src/Security.php`
 - **Fix Priority**: CRITICAL
 - **Solution**:
-  ```python
-  # Use environment variables with validation
-  JWT_SECRET = os.getenv("JWT_SECRET")
-  if not JWT_SECRET:
-      raise ValueError("JWT_SECRET is required")
-  # At least 32 characters
-  if len(JWT_SECRET) < 32:
-      raise ValueError("JWT_SECRET must be at least 32 characters")
-  ```
+  - Require `JWT_SECRET` from environment and reject missing/weak values at startup.
 
 #### 1.2 No Input Validation
 - **Issue**: Many endpoints accept user input without validation
 - **Risk**: HIGH - SQL Injection, XSS, NoSQL Injection possible
-- **File**: `routers/livestock.py`, `routers/inventory.py`, and others
+- **File**: `begin_pyphp/backend/src/Controllers/*`
 - **Fix Priority**: CRITICAL
-- **Solution**: Use Pydantic models with strict validation on all endpoints
+- **Solution**: Validate all request bodies and query params via `begin_pyphp/backend/src/Validation.php`.
 
 #### 1.3 Missing Rate Limiting
 - **Issue**: No rate limiting on authentication endpoints
 - **Risk**: HIGH - Brute force attacks on login
-- **File**: `routers/auth.py`
+- **File**: `begin_pyphp/backend/src/RateLimiter.php`, `begin_pyphp/backend/public/index.php`
 - **Fix Priority**: CRITICAL
 - **Solution**: Implement rate limiting middleware with Redis or in-memory store
 
 #### 1.4 CORS Configuration Issues
 - **Issue**: CORS origin is configurable but defaults to localhost only
 - **Risk**: MEDIUM - Potential for CORS bypass if misconfigured in production
-- **File**: `app.py` (lines 55-60)
+- **File**: `begin_pyphp/backend/public/index.php`
 - **Fix Priority**: HIGH
-- **Solution**:
-  ```python
-  ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "").split(",")
-  if not ALLOWED_ORIGINS or ALLOWED_ORIGINS == ["http://localhost"]:
-      LOGGER.warning("CORS_ORIGIN not properly configured for production")
-  ```
+- **Solution**: Validate `CORS_ORIGIN` for production and avoid wildcard origins.
 
 #### 1.5 No HTTPS/TLS Configuration
-- **Issue**: No HTTPS enforcement or TLS setup in FastAPI app
+- **Issue**: No HTTPS enforcement or TLS setup at the reverse proxy/web server
 - **Risk**: HIGH - All communications transmitted in plain text in production
 - **File**: All network communications
 - **Fix Priority**: CRITICAL
@@ -69,9 +56,9 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 #### 1.6 Missing Authentication on Protected Routes
 - **Issue**: Some protected routes may not validate authentication properly
 - **Risk**: HIGH - Unauthorized access to sensitive operations
-- **File**: Multiple routers
+- **File**: `begin_pyphp/backend/public/index.php`, `begin_pyphp/backend/src/Middleware/*`
 - **Fix Priority**: CRITICAL
-- **Solution**: Add dependency injection with `Depends(get_current_user)` to all protected routes
+- **Solution**: Enforce JWT auth middleware for all protected routes.
 
 #### 1.7 No CSRF Protection
 - **Issue**: PHP frontend lacks CSRF token generation and validation
@@ -86,7 +73,7 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 #### 1.8 Password Storage Concerns
 - **Issue**: Password hashing implementation not verified
 - **Risk**: MEDIUM - Weak password hashing vulnerable to attacks
-- **File**: `routers/auth.py`
+- **File**: `begin_pyphp/backend/src/Auth.php`
 - **Fix Priority**: HIGH
 - **Requirement**: 
   - Use bcrypt with appropriate cost factor (10-12)
@@ -101,36 +88,25 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 - **Solution**: Use prepared statements for all database queries
 
 #### 1.10 No API Key Rotation Mechanism
-- **Issue**: API keys hardcoded, no way to rotate without code change
+- **Issue**: If API keys are introduced, they must be rotatable and revocable
 - **Risk**: HIGH - Compromised keys cannot be quickly deactivated
-- **File**: `common/security.py`
 - **Fix Priority**: HIGH
-- **Solution**: Store API keys in database with creation/expiration dates
+- **Solution**: Store API keys in the database with creation/expiration dates and audit logs.
 
 ---
 
 ### 2. **Critical Dependency Issues**
 
 #### 2.1 Missing Critical Dependencies
-- **Issue**: `requirements.txt` is incomplete
-- **Current**: Only 8 packages listed
-- **Missing**: 
-  - `sqlalchemy` - ORM not explicitly listed
-  - `cryptography` - For encryption
-  - `python-dotenv` - Environment variables
-  - `redis` - For caching/rate limiting
-  - `pytest` - Testing framework
-  - `black` - Code formatting
-  - `pylint` - Code linting
-  
-- **File**: `backend/requirements.txt`
+- **Issue**: Dependency manifest must be complete and reproducible
+- **File**: `begin_pyphp/backend/composer.json`, `begin_pyphp/backend/composer.lock`
 - **Fix Priority**: CRITICAL
-- **Solution**: Create comprehensive requirements.txt with all dependencies
+- **Solution**: Use Composer for dependency management and lock versions via `composer.lock`.
 
 #### 2.2 No Version Pinning
-- **Issue**: Requirements.txt has no version specifications
+- **Issue**: Dependencies must be pinned for reproducible builds
 - **Risk**: MEDIUM - Dependency conflicts in production
-- **Solution**: Pin all dependency versions (e.g., `fastapi==0.104.1`)
+- **Solution**: Commit `composer.lock` and install using `composer install`.
 
 ---
 
@@ -139,9 +115,9 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 #### 3.1 No Database Migrations Strategy
 - **Issue**: Schema changes made directly, no version control for migrations
 - **Risk**: CRITICAL - Cannot rollback changes, difficult to replicate environments
-- **File**: Multiple `*_migration.py` files exist but no organized migration system
+- **File**: Database schema and deployment scripts
 - **Fix Priority**: CRITICAL
-- **Solution**: Implement Alembic for database migrations
+- **Solution**: Track schema via `begin_pyphp/database/schema.sql` and apply incremental SQL migrations with a `schema_migrations` table.
 
 #### 3.2 Missing Foreign Key Constraints
 - **Issue**: Relationships between tables not enforced at database level
@@ -174,27 +150,27 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 - **File**: All routers
 - **Fix Priority**: HIGH
 - **Solution**: Create standardized error response format
-  ```python
+  ```json
   {
-      "error": {
-          "code": "VALIDATION_ERROR",
-          "message": "User-friendly message",
-          "details": {...}
-      }
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "User-friendly message",
+      "details": {}
+    }
   }
   ```
 
 #### 4.2 No Logging Framework
 - **Issue**: No centralized logging, only print statements
 - **Risk**: MEDIUM - Difficult to debug production issues
-- **File**: All Python files
+- **File**: All PHP backend code paths
 - **Fix Priority**: HIGH
-- **Solution**: Implement Python logging module with log levels and rotation
+- **Solution**: Use centralized JSON logging with configurable log levels and rotation
 
 #### 4.3 Missing Environment Variable Validation
 - **Issue**: Environment variables not validated on startup
 - **Risk**: MEDIUM - Missing configuration causes runtime errors
-- **File**: `app.py`
+- **File**: `begin_pyphp/backend/config/env.php`
 - **Fix Priority**: MEDIUM
 - **Solution**: Create startup validation function checking all required env vars
 
@@ -203,7 +179,7 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 - **Risk**: LOW - Reduced IDE support and harder maintenance
 - **File**: Legacy modules
 - **Fix Priority**: MEDIUM
-- **Solution**: Add mypy type checking to CI/CD
+- **Solution**: Enforce static analysis in CI/CD (PHPStan) and add strict types where appropriate
 
 ---
 
@@ -218,21 +194,21 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
   - Target 80%+ code coverage
   - Unit tests for all functions
   - Integration tests for API endpoints
-  - Use pytest with fixtures
+  - Use PHPUnit with shared test helpers
 
 #### 5.2 No Test Database Configuration
 - **Issue**: Tests may run against production database
 - **Risk**: CRITICAL - Data corruption in production
 - **File**: All test files
 - **Fix Priority**: CRITICAL
-- **Solution**: Use SQLite for tests with fixtures
+- **Solution**: Use an isolated test database created/dropped by the test suite
 
 #### 5.3 No Performance/Load Testing
 - **Issue**: No load testing defined or configured
 - **Risk**: MEDIUM - Unknown capacity limits
 - **File**: Missing entirely
 - **Fix Priority**: MEDIUM
-- **Solution**: Create load tests with locust or k6
+- **Solution**: Create load tests with ApacheBench (`ab`) or k6
 
 ---
 
@@ -362,7 +338,7 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 #### 3.2 Connection Pooling
 - **Issue**: Database connections may not be pooled
 - **Improvement**: Implement connection pooling
-- **Solution**: Use SQLAlchemy pool configuration with min/max connections
+- **Solution**: Use persistent connections and tune the MySQL server and PHP-FPM/web server pools
 
 #### 3.3 Data Archival Strategy
 - **Issue**: No strategy for old data removal
@@ -435,12 +411,12 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 ### 6. **DevOps and Deployment**
 
 #### 6.1 No Containerization
-- **Issue**: Application not containerized
-- **Improvement**: Create Docker setup
+- **Issue**: Deployment not standardized for shared hosting
+- **Improvement**: Document shared hosting deployment setup
 - **Solution**:
-  - Dockerfile for Python backend
-  - docker-compose for full stack
-  - Multi-stage builds for optimization
+  - Document web root (`begin_pyphp/backend/public/`)
+  - Document environment file (`begin_pyphp/backend/config/.env`)
+  - Document schema import (`begin_pyphp/database/schema.sql`)
 
 #### 6.2 No CI/CD Pipeline
 - **Issue**: No automated testing or deployment
@@ -491,7 +467,7 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 - **Issue**: No N+1 query prevention
 - **Improvement**: Optimize queries
 - **Solution**:
-  - Use SQLAlchemy eager loading
+  - Use JOINs and select only required columns
   - Batch similar queries
   - Use query pagination
 
@@ -595,14 +571,12 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 #### 3.1 Code Formatting
 - **Enhancement**: Consistent code style
 - **Solution**:
-  - Python: Black formatter + isort
-  - PHP: PHP-CS-Fixer
+  - PHP: PHPCS (PSR-12)
   - Pre-commit hooks
 
 #### 3.2 Linting
 - **Enhancement**: Catch code issues automatically
 - **Solution**:
-  - Python: Pylint, Flake8
   - PHP: PHPStan
   - JavaScript: ESLint
 
@@ -634,8 +608,8 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 #### 4.3 Async Processing
 - **Enhancement**: Background job queue
 - **Solution**:
-  - Task queue (Celery + Redis)
-  - Scheduled jobs (APScheduler)
+  - Queue worker (Redis-backed) for background tasks
+  - Scheduled jobs via OS scheduler or a cron-like runner
 
 ---
 
@@ -697,15 +671,14 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 - [ ] Implement logging framework
 - [ ] Add error handling standards
 - [ ] Refactor into service/repository layers
-- [ ] Add type checking with mypy
-- [ ] Set up code formatting with Black
+- [ ] Add type checking with PHPStan
+- [ ] Set up code formatting with PHPCBF
 
 ### Phase 4: Infrastructure (Weeks 7-8)
-- [ ] Containerize application (Docker)
-- [ ] Create docker-compose setup
 - [ ] Set up environment management
 - [ ] Implement backup procedures
 - [ ] Set up monitoring (metrics, logs)
+- [ ] Document shared hosting deployment steps
 
 ### Phase 5: Documentation (Weeks 9-10)
 - [ ] Complete API documentation
@@ -745,8 +718,8 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
 
 ## 💡 Quick Wins (High Value, Low Effort)
 
-1. **Add comprehensive requirements.txt** (30 min)
-   - List all dependencies with versions
+1. **Use Composer lockfile** (30 min)
+   - Pin all dependencies with `composer.lock`
    - Huge improvement in deployability
 
 2. **Create .env.example file** (15 min)
@@ -754,7 +727,7 @@ FarmOS is a feature-rich farm management system with a FastAPI backend and PHP f
    - Reduces setup errors
 
 3. **Add logging throughout codebase** (4 hours)
-   - Use Python logging module
+   - Use structured JSON logging
    - Easy debugging in production
 
 4. **Standardize error responses** (2 hours)

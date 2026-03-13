@@ -70,15 +70,15 @@ async function generateReport(type, format) {
     }
 
     const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
+    const API_BASE_URL = '<?php echo api_base_url(); ?>';
     const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
-        'X-API-Key': 'local-dev-key',
         'X-Tenant-ID': '1'
     };
 
     try {
-        const response = await fetch('/api/reports/generate', {
+        const response = await fetch(`${API_BASE_URL}/api/reports/generate`, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify({ type, format }),
@@ -87,7 +87,8 @@ async function generateReport(type, format) {
         if (response.ok) {
             const data = await response.json();
             if (data.url) {
-                 window.open(data.url, '_blank');
+                 const url = (data.url.startsWith('http://') || data.url.startsWith('https://')) ? data.url : `${API_BASE_URL}${data.url}`;
+                 window.open(url, '_blank');
             } else {
                 alert(data.message || 'Report generated');
             }

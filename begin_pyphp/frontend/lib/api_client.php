@@ -31,7 +31,6 @@ function api_base_url() {
 function api_headers() {
     $headers = [
         'Content-Type: application/json',
-        'X-API-Key: ' . (getenv('API_KEY') ?: 'local-dev-key'),
         'X-Tenant-ID: ' . (getenv('TENANT_ID') ?: '1')
     ];
     if (!empty($_SESSION['access_token'])) {

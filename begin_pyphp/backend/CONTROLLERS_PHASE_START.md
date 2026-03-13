@@ -89,10 +89,10 @@ To test the livestock endpoints:
 ```bash
 # List livestock
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-  "http://localhost:8000/api/livestock?farm_id=1"
+  "http://127.0.0.1:8001/api/livestock?farm_id=1"
 
 # Create livestock
-curl -X POST http://localhost:8000/api/livestock \
+curl -X POST http://127.0.0.1:8001/api/livestock \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -d '{
@@ -107,14 +107,14 @@ curl -X POST http://localhost:8000/api/livestock \
 
 # Get animal details
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-  "http://localhost:8000/api/livestock/1"
+  "http://127.0.0.1:8001/api/livestock/1"
 
 # Get statistics
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-  "http://localhost:8000/api/livestock/stats?farm_id=1"
+  "http://127.0.0.1:8001/api/livestock/stats?farm_id=1"
 
 # Add event
-curl -X POST http://localhost:8000/api/livestock/1/events \
+curl -X POST http://127.0.0.1:8001/api/livestock/1/events \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -d '{
@@ -218,10 +218,10 @@ Features:
 ```bash
 # List inventory
 curl -H "Authorization: Bearer TOKEN" \
-  "http://localhost:8000/api/inventory?farm_id=1"
+  "http://127.0.0.1:8001/api/inventory?farm_id=1"
 
 # Create inventory item
-curl -X POST http://localhost:8000/api/inventory \
+curl -X POST http://127.0.0.1:8001/api/inventory \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer TOKEN" \
   -d '{
@@ -235,7 +235,7 @@ curl -X POST http://localhost:8000/api/inventory \
   }'
 
 # Adjust quantity
-curl -X POST http://localhost:8000/api/inventory/1/adjust \
+curl -X POST http://127.0.0.1:8001/api/inventory/1/adjust \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer TOKEN" \
   -d '{
@@ -245,11 +245,11 @@ curl -X POST http://localhost:8000/api/inventory/1/adjust \
 
 # Get alerts
 curl -H "Authorization: Bearer TOKEN" \
-  "http://localhost:8000/api/inventory/alerts?farm_id=1"
+  "http://127.0.0.1:8001/api/inventory/alerts?farm_id=1"
 
 # Get statistics
 curl -H "Authorization: Bearer TOKEN" \
-  "http://localhost:8000/api/inventory/stats?farm_id=1"
+  "http://127.0.0.1:8001/api/inventory/stats?farm_id=1"
 ```
 
 ## Deployment Notes

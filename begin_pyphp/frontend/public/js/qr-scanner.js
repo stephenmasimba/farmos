@@ -417,7 +417,6 @@ class FarmOSQRScanner {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-API-Key': localStorage.getItem('api_key') || 'local-dev-key',
                     'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                 },
                 body: JSON.stringify(scanData)

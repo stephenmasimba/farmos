@@ -16,9 +16,8 @@
 ## 📦 Tech Stack
 
 ### Backend
-- **Language**: Python 3.10+
-- **Framework**: FastAPI
-- **ORM**: SQLAlchemy
+- **Language**: PHP 7.4+
+- **Framework**: Pure PHP (custom router/controllers/models)
 - **Database**: MySQL
 - **Authentication**: JWT, API Keys
 
@@ -32,19 +31,17 @@
 ```
 FarmOS/
 ├── begin_pyphp/
-│   ├── backend/           # FastAPI Python backend
-│   │   ├── app.py         # Main application
-│   │   ├── routers/       # API endpoints
-│   │   ├── models/        # Database models
-│   │   ├── database/      # DB configuration
-│   │   └── requirements.txt
+│   ├── backend/           # Pure PHP backend API
+│   │   ├── public/        # Web root (index.php)
+│   │   ├── src/           # Controllers, models, core classes
+│   │   └── tests/         # PHPUnit tests
 │   ├── frontend/          # PHP web application
 │   │   ├── public/        # Web root
 │   │   ├── pages/         # Template pages
 │   │   └── components/    # Reusable components
 │   └── database/          # Schema and migrations
 ├── backend/
-│   └── iot_simulations/   # IoT sensor simulators
+│   └── iot_simulations/   # IoT sensor simulators (Python)
 ├── docs/                  # Documentation
 └── [configuration files]
 ```
@@ -52,33 +49,32 @@ FarmOS/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.10+
+- PHP 7.4+
+- Composer
 - WAMP/XAMPP (Apache + PHP + MySQL)
-- pip package manager
 - MySQL 5.7 or higher
 
-### 1. Clone and Setup Backend
+### 1. Install Backend Dependencies
 
 ```bash
 cd begin_pyphp/backend
-pip install -r requirements.txt
+composer install
 ```
 
 ### 2. Configure Database
 
-Update database credentials in `backend/app.py` or `.env`:
-```
-DATABASE_URL=mysql://root:password@localhost:3306/farmos
-```
+Update credentials in `begin_pyphp/backend/config/env.php` (or create `begin_pyphp/backend/.env` from `.env.example`).
 
-### 3. Start Backend Server
+### 3. Start Backend
 
+The backend runs under Apache (WAMP) at:
+- `http://localhost/farmos/begin_pyphp/backend/`
+
+Or, for local development without Apache:
 ```bash
 cd begin_pyphp/backend
-uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+composer run serve
 ```
-
-Backend will be available at: `http://127.0.0.1:8000`
 
 ### 4. Start Frontend (WAMP)
 
@@ -89,10 +85,10 @@ Backend will be available at: `http://127.0.0.1:8000`
 
 ```bash
 # Check backend health
-curl http://127.0.0.1:8000/health
+curl http://localhost/farmos/begin_pyphp/backend/health
 
 # Check API version
-curl http://127.0.0.1:8000/api/version
+curl http://localhost/farmos/begin_pyphp/backend/api/version
 ```
 
 ## 📖 Documentation
@@ -141,12 +137,12 @@ Password: password123
 
 ## 🔌 API Endpoints
 
-Base URL: `http://127.0.0.1:8000/api`
+Base URL (WAMP): `http://localhost/farmos/begin_pyphp/backend/api`
 
 ### Authentication
 - `POST /auth/login` - User login
 - `POST /auth/register` - User registration
-- `GET /auth/profile` - Get user profile
+- `GET /auth/me` - Get current user
 
 ### Livestock
 - `GET /livestock` - List all livestock batches
@@ -171,9 +167,12 @@ See [full API documentation](./docs/DEVELOPER_GUIDE.md) for complete endpoint li
 ### Running in Development Mode
 
 ```bash
-# Backend with auto-reload
+# Backend under Apache (WAMP)
+# http://localhost/farmos/begin_pyphp/backend/
+
+# Or start the PHP built-in server
 cd begin_pyphp/backend
-uvicorn app:app --reload
+composer run serve
 
 # Frontend (WAMP auto-reloads PHP)
 # Just edit files and refresh the browser
@@ -183,28 +182,22 @@ uvicorn app:app --reload
 
 ```bash
 cd begin_pyphp/backend
-pytest
-
-# Or with coverage
-pytest --cov=.
+composer run test
 ```
 
 ### Database Migrations
 
 ```bash
-# Check current schema
-python begin_pyphp/backend/database_verification_report.py
-
-# Apply migrations
-python begin_pyphp/backend/database_migration.py
+# Database schema files
+dir begin_pyphp\database\*.sql
 ```
 
 ## 🐛 Troubleshooting
 
 ### Backend Won't Start
-- Verify Python 3.10+ is installed: `python --version`
-- Check dependencies: `pip install -r requirements.txt`
-- Ensure port 8000 is available
+- Verify PHP and Composer are installed: `php -v` and `composer -V`
+- Check backend dependencies: `cd begin_pyphp/backend && composer install`
+- If using the built-in server, ensure the port is available (default: 8001)
 
 ### Database Connection Errors
 - Verify MySQL is running
@@ -223,8 +216,8 @@ python begin_pyphp/backend/database_migration.py
 ## 📝 Configuration
 
 Key configuration files:
-- `begin_pyphp/backend/app.py` - Backend configuration
-- `.env` - Environment variables (create if needed)
+- `begin_pyphp/backend/config/env.php` - Backend configuration defaults
+- `begin_pyphp/backend/.env` - Environment variables (optional; overrides defaults)
 - `begin_pyphp/frontend/config.php` - Frontend configuration
 
 ## 🤝 Contributing

@@ -2,262 +2,77 @@
 
 ## Overview
 
-The FarmOS backend includes a comprehensive PHPUnit test suite covering:
-- **Feature Tests**: API endpoint testing (46+ endpoints)
-- **Unit Tests**: Core class and model testing
-- **Integration Tests**: Database transactions and cross-model operations
-- **Authentication Tests**: User registration, login, and token validation
+The backend includes a PHPUnit suite focused on feature tests for the HTTP API:
+- Authentication
+- Financial records
+- Inventory
+- Livestock (including events)
+- Tasks
 
-**Target Coverage**: 80%+ code coverage
+## Requirements
+
+- PHP 7.4+ and Composer
+- MySQL running locally
+- A MySQL user that can create/drop databases (tests create `farmos_test`)
 
 ## Running Tests
 
-### Prerequisites
+From `begin_pyphp/backend`:
 
 ```bash
-# Install Composer dependencies (includes PHPUnit)
 composer install
-
-# Set up test database
-mysql -u root -p < tests/fixtures/test_database.sql
+composer run test
 ```
 
-### Run All Tests
+Run a single test file:
 
 ```bash
-# Run all test suites
-composer test
-
-# With output
-phpunit --verbose
-
-# With coverage report
-composer test:coverage
+vendor/bin/phpunit tests/Feature/LivestockTest.php
 ```
 
-### Run Specific Test Suite
+Run a single test method:
 
 ```bash
-# Feature tests only
-composer test:feature
-
-# Unit tests only
-composer test:unit
-
-# Specific test file
-phpunit tests/Feature/LivestockTest.php
-
-# Specific test method
-phpunit --filter testCreateLivestock
+vendor/bin/phpunit --filter testCreateLivestock tests/Feature/LivestockTest.php
 ```
 
 ## Test Structure
 
-### Base Test Case
+- `tests/ApiTestCase.php` creates and migrates the `farmos_test` database, and creates a test user with an auth token.
+- `tests/Feature/*.php` contains the endpoint-level tests:
+  - `AuthenticationTest.php`
+  - `FinancialTest.php`
+  - `InventoryTest.php`
+  - `LivestockTest.php`
+  - `TaskTest.php`
 
-**File**: `tests/ApiTestCase.php`
+## API Response Shape
 
-Provides common functionality for all tests:
-- Database setup/teardown
-- Test user creation and authentication
-- API request helper methods
-- Authentication token management
-
-### Feature Tests
-
-Located in `tests/Feature/`, these test complete API workflows:
-
-#### LivestockTest.php (11 tests)
-- List livestock with pagination
-- Create livestock record
-- Get, update, delete operations
-- Add and retrieve events
-- Statistics aggregation
-- Validation and error handling
-
-#### InventoryTest.php (11 tests)
-- List inventory items
-- CRUD operations
-- Quantity adjustments with logging
-- Low stock alerts
-- Category filtering
-- Statistics and value calculations
-- Expiry date tracking
-
-#### FinancialTest.php (11 tests)
-- Record income/expense transactions
-- Get, update, delete records
-- Monthly and yearly reporting
-- Summary and forecasts
-- Category filtering
-- Profit margin calculations
-- Type validation
-
-#### TaskTest.php (10 tests)
-- Create and manage tasks
-- Status transitions (pending → in_progress → completed)
-- Task assignment
-- Priority filtering
-- Statistics
-- Overdue and due-soon tracking
-- Batch operations
-
-#### AuthenticationTest.php (8 tests)
-- User registration
-- Login and token generation
-- Token refresh
-- Current user retrieval
-- Invalid credentials handling
-- Rate limiting on auth endpoints
-- Token validation
-
-### Unit Tests
-
-Located in `tests/Unit/`, these test individual classes:
-
-```
-tests/Unit/
-├── ModelsTest.php
-├── ValidationTest.php
-├── SecurityTest.php
-├── DatabaseTest.php
-└── QueryBuilderTest.php
-```
-
-## Test Data & Fixtures
-
-### Test User
-- Email: `test@example.com`
-- Password: `TestPassword123!`
-- Created in `setUpBeforeClass()`
-
-### Test Farm
-- Created automatically for each test
-- Linked to test user
-- Used as parent for all operations
-
-### Test Database
-- Separate test database: `farmos_test`
-- Created fresh before each test run
-- Destroyed after tests complete
-- Uses MySQL 8.0+
-
-## Coverage Report
-
-Generate and view HTML coverage report:
-
-```bash
-composer test:coverage
-open build/coverage/index.html
-```
-
-Coverage metrics per component:
-
-| Component | Target | Current |
-|-----------|--------|---------|
-| Controllers | 85% | - |
-| Models | 90% | - |
-| Middleware | 80% | - |
-| Validation | 85% | - |
-| Database | 75% | - |
-| Security | 95% | - |
-| **Overall** | **80%** | - |
-
-## Continuous Integration
-
-### GitHub Actions Workflow
-
-File: `.github/workflows/test.yml`
-
-Runs on:
-- Every push to main/develop
-- Every pull request
-- Scheduled daily at 2 AM UTC
-
-Test matrix:
-- PHP 8.0, 8.1, 8.2
-- MySQL 5.7, 8.0, 8.1
-
-## Mock Objects
-
-Using Mockery for unit tests:
-
-```php
-// Mock a Database instance
-$db = Mockery::mock(Database::class);
-$db->shouldReceive('query')
-    ->andReturn([['id' => 1, 'name' => 'Test']]);
-
-// Mock HTTP requests
-$request = Mockery::mock(Request::class);
-$request->shouldReceive('getBody')
-    ->andReturn(['name' => 'Bessie']);
-```
-
-## API Response Format
-
-All endpoints return standardized JSON:
+Success responses return the payload directly (no wrapper key). Error responses follow:
 
 ```json
 {
-  "success": true,
-  "message": "Operation successful",
-  "data": { /* response data */ },
-  "errors": null
-}
-```
-
-Error response:
-
-```json
-{
-  "success": false,
-  "message": "Validation failed",
-  "data": null,
-  "errors": {
-    "field_name": "Error message"
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable message",
+    "details": {}
   }
 }
 ```
 
-## Best Practices
+## Common Issues
 
-### Writing Tests
+### Database Setup Fails
 
-1. **Use descriptive names**: `testCreateLivestockWithValidData()`
-2. **Test one assertion per test** when possible
-3. **Use `setUp()`** for test initialization
-4. **Clean up in `tearDown()`** if needed
-5. **Test both success and failure cases**
+The suite reads DB connection settings from environment variables (with sensible defaults). If your MySQL setup differs, set:
+- `DB_HOST`
+- `DB_PORT`
+- `DB_USER`
+- `DB_PASSWORD`
 
-### Test Organization
+### Permission Errors Creating `farmos_test`
 
-```php
-public function testOperationSuccess(): void
-{
-    // Arrange - Set up test data
-    $data = [...];
-    
-    // Act - Perform operation
-    $response = $this->apiCall('POST', '/api/endpoint', $data);
-    
-    // Assert - Verify results
-    $this->assertEquals(201, $response['status']);
-}
-```
-
-### Assertions
-
-Common assertions:
-
-```php
-$this->assertEquals($expected, $actual);
-$this->assertArrayHasKey('key', $array);
-$this->assertNotNull($value);
-$this->assertTrue($condition);
-$this->assertCount(3, $array);
-$this->assertStringContains('substring', $string);
-```
+Grant your MySQL user permission to create/drop databases for local testing, or run the suite with a MySQL user that already has these permissions.
 
 ## Troubleshooting
 

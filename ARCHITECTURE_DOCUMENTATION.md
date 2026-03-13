@@ -1,7 +1,7 @@
 # FarmOS Architecture Documentation
 
-**Version**: 1.0.0  
-**Date**: March 12, 2026  
+**Version**: 1.0.0
+**Date**: March 12, 2026
 **Status**: Complete
 
 ---
@@ -17,7 +17,7 @@ This document describes the complete system architecture of FarmOS including com
 ### System Components Diagram
 
 ```
-┌──────────────────────────────────────────────────────────────┐
+ ┌──────────────────────────────────────────────────────────────┐
 │                        CLIENT APPLICATIONS                   │
 ├─────────────────┬─────────────────┬──────────────────────────┤
 │                 │                 │                          │
@@ -39,7 +39,7 @@ This document describes the complete system architecture of FarmOS including com
          └────────────┬────────────┘
                       │
    ┌──────────────────▼──────────────────┐
-   │        FASTAPI BACKEND (Python)     │
+   │       PHP BACKEND (Pure PHP)       │
    │                                     │
    │  ┌──────────────────────────────┐   │
    │  │    Routers/Controllers       │   │
@@ -57,9 +57,9 @@ This document describes the complete system architecture of FarmOS including com
    │  └──────────────────────────────┘   │
    │                                      │
    │  ┌──────────────────────────────┐   │
-   │  │   Data Access (SQLAlchemy)   │   │
-   │  │ • ORM Queries                │   │
-   │  │ • Relationships              │   │
+   │  │  Data Access (PDO/Models)    │   │
+   │  │ • QueryBuilder               │   │
+   │  │ • Models & Controllers       │   │
    │  │ • Transaction Management     │   │
    │  └──────────────────────────────┘   │
    └──────────────────┬───────────────────┘
@@ -89,44 +89,28 @@ This document describes the complete system architecture of FarmOS including com
 ### Backend Module Organization
 
 ```
-backend/
+begin_pyphp/backend/
 │
-├── common/               # Shared utilities
-│   ├── security.py       # JWT, API keys, password hashing
-│   ├── errors.py         # Error handling & responses
-│   ├── validation.py     # Input validation & sanitization
-│   ├── logging_config.py # Structured logging
-│   ├── config.py         # Configuration management
-│   ├── database.py       # Database connection & ORM
-│   ├── dependencies.py   # FastAPI dependencies
-│   └── models.py         # SQLAlchemy ORM models
-│
-├── middleware/           # Middleware components
-│   └── rate_limiting.py  # Anti-brute force protection
-│
-├── routers/              # API route handlers (30+ files)
-│   ├── auth.py           # Authentication
-│   ├── livestock.py      # Livestock management
-│   ├── inventory.py      # Inventory tracking
-│   ├── dashboard.py      # Dashboard & analytics
-│   ├── financial.py      # Financial operations
-│   ├── iot.py            # IoT sensor data
-│   └── [20+ more...]
-│
-├── services/             # Business logic layer (future)
-│   └── [service classes]
-│
-├── repositories/         # Data access layer (future)
-│   └── [repository classes]
-│
-├── tests/                # Test suite
-│   ├── conftest.py       # Test configuration
-│   └── test_*.py         # Test modules
-│
-├── app.py                # FastAPI application instance
-├── requirements.txt      # Python dependencies
-├── .env.example          # Environment template
-└── .gitignore            # Git configuration
+├── public/
+│   └── index.php              # Entry point + routing
+├── src/
+│   ├── Controllers/           # Endpoint handlers
+│   ├── Models/                # Models + QueryBuilder
+│   ├── Middleware/            # Middleware
+│   ├── Auth.php               # JWT auth helpers
+│   ├── Database.php           # PDO wrapper
+│   ├── Request.php            # HTTP request parsing
+│   ├── Response.php           # JSON responses
+│   ├── RateLimiter.php        # Rate limiting
+│   ├── Security.php           # Password hashing, headers
+│   └── Validation.php         # Input validation
+├── config/
+│   └── env.php                # Environment/config loader
+├── tests/
+│   ├── Feature/               # Endpoint tests (PHPUnit)
+│   └── ApiTestCase.php        # DB setup + helpers
+├── composer.json
+└── .env.example
 ```
 
 ---
@@ -145,10 +129,10 @@ backend/
        │ (auth, livestock, etc.)
        ▼
 ┌─────────────────────────┐
-│  NGINX Reverse Proxy    │
-│ • SSL/TLS               │
-│ • Compression           │
-│ • Rate Limiting         │
+│    Web Server (WAMP)    │
+│ • Apache + PHP          │
+│ • TLS via server config │
+│ • Compression/headers   │
 └──────┬──────────────────┘
        │
        │ 2. Forward to API
@@ -163,7 +147,7 @@ backend/
        │ 3. Route Request
        ▼
 ┌────────────────────────────┐
-│   FastAPI Router           │
+│   Router (index.php)       │
 │ • URL pattern matching     │
 │ • HTTP method routing      │
 │ • Parameter extraction     │
@@ -182,7 +166,7 @@ backend/
        ▼
 ┌────────────────────────────┐
 │   Validation Layer         │
-│ • Pydantic validation      │
+│ • Validation helpers       │
 │ • Custom validators        │
 │ • Input sanitization       │
 └──────┬─────────────────────┘
@@ -199,7 +183,7 @@ backend/
        │ 7. Access Database
        ▼
 ┌────────────────────────────┐
-│   SQLAlchemy ORM           │
+│   QueryBuilder + PDO       │
 │ • Build SQL queries        │
 │ • Manage relationships      │
 │ • Handle transactions       │
@@ -226,7 +210,7 @@ backend/
        │ 10. JSON Serialization
        ▼
 ┌────────────────────────────┐
-│   FastAPI Response         │
+│   Response (JSON)          │
 │ • JSON conversion          │
 │ • Status code setting      │
 │ • Header inclusion         │
@@ -465,14 +449,15 @@ Local Machine
 ├── Frontend (PHP)
 │   └── http://localhost/farmos
 │
-├── Backend (FastAPI)
-│   └── http://localhost:8000
+├── Backend (PHP API)
+│   └── http://localhost/farmos/begin_pyphp/backend
+│      (or http://127.0.0.1:8001 with `composer run serve`)
 │
 ├── Database (MySQL)
 │   └── localhost:3306
 │
-└── Cache (Redis optional)
-    └── localhost:6379
+└── Optional Cache
+    └── Use external cache if you add one
 ```
 
 ### Staging Environment
@@ -484,18 +469,14 @@ Staging Server
 │   ├── HTTP → HTTPS redirect
 │   └── Load balancer
 │
-├── Docker Container (FastAPI)
-│   ├── Python 3.10
-│   ├── uvicorn server
+├── Application Runtime (PHP)
+│   ├── Apache + mod_php or PHP-FPM
 │   └── Mounted volumes
 │
 ├── MySQL (Managed Service)
 │   ├── Automated backups
 │   ├── Replication
 │   └── Multi-AZ
-│
-├── Redis (Cache Layer)
-│   └── Session storage
 │
 └── Monitoring
     ├── Logs (ELK or CloudWatch)
@@ -516,9 +497,9 @@ Production Infrastructure
 │   └── Health checks
 │
 ├── Auto-Scaling Group
-│   ├── Container 1 (FastAPI)
-│   ├── Container 2 (FastAPI)
-│   ├── Container 3 (FastAPI)
+│   ├── Instance 1 (PHP)
+│   ├── Instance 2 (PHP)
+│   ├── Instance 3 (PHP)
 │   └── Auto-scale 2-10
 │
 ├── Database Cluster
@@ -526,10 +507,6 @@ Production Infrastructure
 │   ├── Read Replicas (2)
 │   ├── Automated backups
 │   └── Point-in-time recovery
-│
-├── Cache Cluster
-│   ├── Redis Primary
-│   └── Redis Backup
 │
 ├── Message Queue (Future)
 │   └── Background jobs
@@ -580,7 +557,7 @@ Production Infrastructure
                  ▼
     ┌────────────────────────────┐
     │   Private Subnet           │
-    │   (FastAPI Containers)     │
+    │   (Application Instances)  │
     │   • Security groups        │
     │   • Network policies       │
     │   • Internal IPs only      │
@@ -590,7 +567,7 @@ Production Infrastructure
            │            │
     ┌──────▼─────┐  ┌────▼──────┐
     │ Database   │  │ Cache     │
-    │ (RDS)      │  │ (Redis)   │
+    │ (RDS)      │  │ (Optional)│
     │            │  │           │
     │ Encrypted  │  │ Encrypted │
     │ Backups    │  │ Access    │
@@ -663,7 +640,7 @@ Benefits:
 
 ```
 ┌─────────────────────────────────────┐
-│   Application (FastAPI)             │
+│   Application (PHP)                │
 │ • Structured logging                │
 │ • Prometheus metrics                │
 │ • Distributed tracing               │
@@ -706,37 +683,37 @@ Benefits:
     ┌────────────▼────────────┐
     │   Authentication        │
     │   & Authorization       │
-    │   (security.py)         │
+    │   (src/Auth.php)        │
     └────────────┬────────────┘
                  │
     ┌────────────▼────────────┐
     │   Input Validation      │
-    │   (validation.py)       │
+    │   (src/Validation.php)  │
     └────────────┬────────────┘
                  │
     ┌────────────▼────────────┐
     │   Business Logic        │
-    │   (Handler functions)   │
+    │   (Controllers)         │
     └────────────┬────────────┘
                  │
     ┌────────────▼────────────┐
     │   Data Access           │
-    │   (SQLAlchemy ORM)      │
+    │   (Models/QueryBuilder) │
     └────────────┬────────────┘
                  │
     ┌────────────▼────────────┐
     │   Error Handling        │
-    │   (errors.py)           │
+    │   (Response/Exception)  │
     └────────────┬────────────┘
                  │
     ┌────────────▼────────────┐
     │   Logging               │
-    │   (logging_config.py)   │
+    │   (src/Logger.php)      │
     └────────────┬────────────┘
                  │
     ┌────────────▼────────────┐
     │   Response Building     │
-    │   (JSON serialization)  │
+    │   (src/Response.php)    │
     └────────────────────────┘
 ```
 
@@ -744,34 +721,31 @@ Benefits:
 
 ## Technology Stack
 
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| **Web Server** | Nginx | 1.24+ |
-| **Application Server** | FastAPI | 0.104+ |
-| **Python** | Python | 3.10+ |
-| **Database** | MySQL | 5.7+ or 8.0+ |
-| **ORM** | SQLAlchemy | 2.0+ |
-| **Cache** | Redis | 6.0+ |
-| **Authentication** | JWT | PyJWT 2.8+ |
-| **Password Hashing** | bcrypt | 4.1+ |
-| **Logging** | structlog | 23.2+ |
-| **Testing** | pytest | 7.4+ |
-| **Code Quality** | Black, Pylint, mypy | Latest |
-| **Monitoring** | Prometheus, ELK | Latest |
+| Layer                        | Technology                       | Version      |
+| ---------------------------- | -------------------------------- | ------------ |
+| **Web Server**         | Apache (WAMP)                    | -            |
+| **Application Server** | PHP (mod_php or built-in)        | 7.4+         |
+| **Database**           | MySQL                            | 5.7+ or 8.0+ |
+| **Data Access**        | PDO + custom Models/QueryBuilder | -            |
+| **Authentication**     | JWT                              | HMAC-SHA256  |
+| **Password Hashing**   | bcrypt                           | -            |
+| **Logging**            | Custom JSON logger               | -            |
+| **Testing**            | PHPUnit                          | 9.5+         |
+| **Code Quality**       | PHPCS, PHPStan                   | -            |
 
 ---
 
 ## Design Patterns Used
 
-| Pattern | Usage | Benefit |
-|---------|-------|---------|
-| **MVC** | Routers → Logic → DB | Separation of concerns |
-| **Dependency Injection** | FastAPI `Depends()` | Testability, reusability |
-| **Middleware** | Rate limiting, logging | Cross-cutting concerns |
-| **Repository** | Data access layer | Data access abstraction |
-| **Factory** | Object creation | Flexible instantiation |
-| **Singleton** | Database connection | Resource efficiency |
-| **Strategy** | Validation, logging | Flexible algorithms |
+| Pattern                        | Usage                        | Benefit                  |
+| ------------------------------ | ---------------------------- | ------------------------ |
+| **MVC**                  | Routers → Logic → DB       | Separation of concerns   |
+| **Dependency Injection** | Manual constructor injection | Testability, reusability |
+| **Middleware**           | Rate limiting, logging       | Cross-cutting concerns   |
+| **Repository**           | Data access layer            | Data access abstraction  |
+| **Factory**              | Object creation              | Flexible instantiation   |
+| **Singleton**            | Database connection          | Resource efficiency      |
+| **Strategy**             | Validation, logging          | Flexible algorithms      |
 
 ---
 
@@ -795,18 +769,18 @@ Benefits:
 
 ## Security Best Practices
 
-✅ Defense in depth (multiple layers)  
-✅ Principle of least privilege  
-✅ Secure by default  
-✅ Regular security audits  
-✅ Dependency scanning  
-✅ Secret management  
-✅ Encryption at rest & in transit  
-✅ Comprehensive logging  
-✅ Incident response plan  
+✅ Defense in depth (multiple layers)
+✅ Principle of least privilege
+✅ Secure by default
+✅ Regular security audits
+✅ Dependency scanning
+✅ Secret management
+✅ Encryption at rest & in transit
+✅ Comprehensive logging
+✅ Incident response plan
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: March 12, 2026  
+**Document Version**: 1.0
+**Last Updated**: March 12, 2026
 **Status**: Complete ✅
