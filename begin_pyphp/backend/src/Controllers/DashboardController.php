@@ -195,7 +195,7 @@ class DashboardController
             );
 
             $livestockStatus = $livestockStatusResult[0] ?? ['total' => 0, 'healthy' => 0, 'quarantined' => 0];
-            
+
             if ($livestockStatus['total'] > 0) {
                 $livestockScore = ($livestockStatus['healthy'] / $livestockStatus['total']) * 100;
                 $scores['livestock_health'] = round($livestockScore, 2);
@@ -224,7 +224,7 @@ class DashboardController
 
             // Task completion rate
             $taskStats = Task::getStats($farmId, $this->db);
-            
+
             if ($taskStats['total'] > 0) {
                 $taskScore = ($taskStats['completed'] / $taskStats['total']) * 100;
                 $scores['task_completion_rate'] = round($taskScore, 2);

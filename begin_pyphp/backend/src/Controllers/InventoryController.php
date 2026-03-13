@@ -349,7 +349,8 @@ class InventoryController
             $reason = isset($input['reason']) ? Validation::sanitizeString($input['reason']) : null;
 
             // Check if adjustment would make quantity negative
-            $newQuantity = ($inventory->attributes['quantity'] ?? 0) + $amount;
+            $currentQuantity = (float) ($inventory->quantity ?? 0);
+            $newQuantity = $currentQuantity + $amount;
             if ($newQuantity < 0) {
                 return Response::validationError(['amount' => 'Adjustment would result in negative quantity']);
             }

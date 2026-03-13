@@ -10,7 +10,7 @@ use FarmOS\Database;
 class Farm extends Model
 {
     protected static string $table = 'farms';
-    
+
     protected static array $fillable = [
         'owner_id',
         'name',
@@ -103,7 +103,7 @@ class Farm extends Model
         $profile = $this->toArray();
         $profile['livestock_count'] = $this->livestockCount($db);
         $profile['livestock_active'] = Livestock::countByStatus($this->attributes['id'], 'active', $db);
-        
+
         return $profile;
     }
 }

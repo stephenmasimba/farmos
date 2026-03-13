@@ -83,9 +83,11 @@ class Response
     public function send(): void
     {
         http_response_code($this->statusCode);
-        
-        foreach ($this->headers as $name => $value) {
-            header("$name: $value");
+
+        if (!headers_sent()) {
+            foreach ($this->headers as $name => $value) {
+                header("$name: $value");
+            }
         }
 
         echo json_encode($this->data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

@@ -95,7 +95,7 @@ class Task extends Model
     public static function dueWithin(int $farmId, int $days, Database $db): array
     {
         $futureDate = date('Y-m-d', strtotime("+$days days"));
-        
+
         return static::query($db)
             ->where('farm_id', $farmId)
             ->where('status !=', 'completed')

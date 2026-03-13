@@ -53,6 +53,11 @@ class RateLimiter
         return true;
     }
 
+    public static function reset(): void
+    {
+        self::$storage = [];
+    }
+
     /**
      * Get remaining requests
      */

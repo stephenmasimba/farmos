@@ -5,6 +5,7 @@ require_once __DIR__ . '/../config/env.php';
 
 // Autoload classes
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/Middleware/Middleware.php';
 
 use FarmOS\{Request, Response, Logger, Security, Database, RateLimiter, Validation, Auth};
 
@@ -26,16 +27,20 @@ $path = $request->getPath();
 
 // CORS handling
 if ($method === 'OPTIONS') {
-    header('Access-Control-Allow-Origin: ' . getenv('CORS_ORIGIN'));
-    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization');
-    header('Access-Control-Max-Age: 3600');
+    if (!headers_sent()) {
+        header('Access-Control-Allow-Origin: ' . getenv('CORS_ORIGIN'));
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization');
+        header('Access-Control-Max-Age: 3600');
+    }
     Response::success()->send();
     exit;
 }
 
 // Add CORS headers
-header('Access-Control-Allow-Origin: ' . getenv('CORS_ORIGIN'));
+if (!headers_sent()) {
+    header('Access-Control-Allow-Origin: ' . getenv('CORS_ORIGIN'));
+}
 
 // Health check without DB
 if ($path === '/health') {
@@ -105,8 +110,28 @@ try {
             }
 
             $auth = new Auth($db);
-            $result = $auth->login($input['email'], $input['password']);
-            Response::success($result, 'Login successful')->send();
+            try {
+                $result = $auth->login($input['email'], $input['password']);
+                Response::success($result, 'Login successful')->send();
+            } catch (\Exception $e) {
+                if ($e->getMessage() === 'Invalid credentials') {
+                    Response::unauthorized('Invalid credentials')->send();
+                    break;
+                }
+                if ($e->getMessage() === 'Invalid email format') {
+                    Response::validationError(['email' => 'Invalid email format'])->send();
+                    break;
+                }
+                if ($e->getMessage() === 'Invalid password format') {
+                    Response::validationError(['password' => 'Invalid password format'])->send();
+                    break;
+                }
+                if ($e->getMessage() === 'User account is not active') {
+                    Response::unauthorized('User account is not active')->send();
+                    break;
+                }
+                throw $e;
+            }
             break;
 
         case '/api/auth/register':
@@ -128,13 +153,29 @@ try {
             }
 
             $auth = new Auth($db);
-            $result = $auth->register(
-                $input['email'],
-                $input['password'],
-                $input['first_name'] ?? null,
-                $input['last_name'] ?? null
-            );
-            Response::success($result, 'Registration successful', 201)->send();
+            try {
+                $result = $auth->register(
+                    $input['email'],
+                    $input['password'],
+                    $input['first_name'] ?? null,
+                    $input['last_name'] ?? null
+                );
+                Response::success($result, 'Registration successful', 201)->send();
+            } catch (\Exception $e) {
+                if ($e->getMessage() === 'Email already registered') {
+                    Response::validationError(['email' => 'Email already registered'])->send();
+                    break;
+                }
+                if ($e->getMessage() === 'Invalid email format') {
+                    Response::validationError(['email' => 'Invalid email format'])->send();
+                    break;
+                }
+                if (strpos($e->getMessage(), 'Password') === 0) {
+                    Response::validationError(['password' => $e->getMessage()])->send();
+                    break;
+                }
+                throw $e;
+            }
             break;
 
         case '/api/auth/me':

@@ -12,7 +12,7 @@ class QueryBuilder
     protected string $model;
     protected string $table;
     protected Database $db;
-    
+
     protected array $select = ['*'];
     protected array $wheres = [];
     protected array $params = [];
@@ -164,7 +164,7 @@ class QueryBuilder
         $offset = ($page - 1) * $perPage;
 
         $this->offset($offset)->limit($perPage);
-        
+
         $results = $this->get();
         $total = $this->count();
 
@@ -197,7 +197,7 @@ class QueryBuilder
 
             foreach ($this->wheres as $where) {
                 $boolean = $where['boolean'] ?? 'and';
-                
+
                 if (!empty($whereParts) && $boolean === 'or') {
                     $currentBoolean = 'OR';
                 }
@@ -267,7 +267,7 @@ class QueryBuilder
     public function count(): int
     {
         [$sql, $params] = $this->buildSql();
-        
+
         // Replace SELECT clause with COUNT(*)
         $sql = preg_replace('/^SELECT .+ FROM/', 'SELECT COUNT(*) as count FROM', $sql);
         // Remove LIMIT and OFFSET for count
@@ -293,7 +293,7 @@ class QueryBuilder
     {
         $this->select = [$column];
         $results = $this->get();
-        
+
         return array_map(fn($model) => $model->{$column}, $results);
     }
 

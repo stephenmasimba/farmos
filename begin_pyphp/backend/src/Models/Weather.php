@@ -12,7 +12,7 @@ class Weather extends Model
     protected static string $table = 'weather';
     protected static array $fillable = [
         'farm_id', 'observation_date', 'temperature', 'temperature_min', 'temperature_max',
-        'humidity', 'pressure', 'wind_speed', 'wind_direction', 'precipitation', 
+        'humidity', 'pressure', 'wind_speed', 'wind_direction', 'precipitation',
         'condition', 'visibility', 'uv_index', 'source', 'notes'
     ];
 
@@ -65,7 +65,7 @@ class Weather extends Model
     public static function today(int $farmId, Database $db): array
     {
         $today = date('Y-m-d');
-        
+
         return static::query($db)
             ->where('farm_id', $farmId)
             ->where('observation_date >=', $today . ' 00:00:00')

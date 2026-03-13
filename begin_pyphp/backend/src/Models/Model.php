@@ -125,12 +125,12 @@ abstract class Model
     public function toArray(): array
     {
         $array = $this->attributes;
-        
+
         // Apply type casting
         foreach ($array as $key => $value) {
             $array[$key] = $this->castAttribute($key, $value);
         }
-        
+
         // Remove hidden fields
         foreach (static::$hidden as $field) {
             unset($array[$field]);
@@ -158,7 +158,8 @@ abstract class Model
         );
 
         if ($result) {
-            return new static($db, $result);
+            $class = static::class;
+            return new $class($db, $result);
         }
 
         return null;
@@ -186,7 +187,8 @@ abstract class Model
             [$limit, $offset]
         );
 
-        return array_map(fn($row) => new static($db, $row), $results);
+        $class = static::class;
+        return array_map(fn($row) => new $class($db, $row), $results);
     }
 
     /**
@@ -208,7 +210,8 @@ abstract class Model
         );
 
         if ($result) {
-            return new static($db, $result);
+            $class = static::class;
+            return new $class($db, $result);
         }
 
         return null;
@@ -248,7 +251,7 @@ abstract class Model
         }
 
         $sql = 'INSERT INTO ' . static::table() . ' (' . implode(', ', $fields) . ') VALUES (' . implode(', ', $values) . ')';
-        
+
         $this->db->execute($sql, $params);
         $this->attributes[static::$primaryKey] = $this->db->lastInsertId();
 
@@ -261,7 +264,7 @@ abstract class Model
     protected function update(): int
     {
         $id = $this->attributes[static::$primaryKey] ?? null;
-        
+
         if (!$id) {
             throw new ValidationException('No primary key for update', [static::class]);
         }
@@ -282,7 +285,7 @@ abstract class Model
 
         $params[] = $id;
         $sql = 'UPDATE ' . static::table() . ' SET ' . implode(', ', $sets) . ' WHERE ' . static::$primaryKey . ' = ?';
-        
+
         return $this->db->execute($sql, $params);
     }
 
@@ -292,7 +295,7 @@ abstract class Model
     public function delete(): int
     {
         $id = $this->attributes[static::$primaryKey] ?? null;
-        
+
         if (!$id) {
             throw new ValidationException('No primary key for delete', [static::class]);
         }
@@ -327,8 +330,8 @@ abstract class Model
     public function isDirty(string $field = null): bool
     {
         if ($field) {
-            return isset($this->attributes[$field]) && 
-                   isset($this->original[$field]) && 
+            return isset($this->attributes[$field]) &&
+                   isset($this->original[$field]) &&
                    $this->attributes[$field] !== $this->original[$field];
         }
 

@@ -46,7 +46,7 @@ class TaskTest extends ApiTestCase
 
         $this->assertEquals(201, $response['status']);
         $this->assertArrayHasKey('id', $response['body']);
-        $this->taskId = $response['body']['id'];
+        $this->taskId = (int) $response['body']['id'];
     }
 
     /**

@@ -17,6 +17,12 @@ abstract class ApiTestCase extends TestCase
     protected static string $testPassword = 'TestPassword123!';
     protected static string $testToken = '';
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        \FarmOS\RateLimiter::reset();
+    }
+
     /**
      * Set up test database connection
      */
@@ -115,6 +121,18 @@ abstract class ApiTestCase extends TestCase
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (farm_id) REFERENCES farms(id)
+            )
+        ');
+
+        self::$db->execute('
+            CREATE TABLE animal_events (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                livestock_id INT NOT NULL,
+                event_type VARCHAR(100) NOT NULL,
+                description TEXT,
+                date DATETIME,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (livestock_id) REFERENCES livestock(id)
             )
         ');
 
@@ -281,7 +299,7 @@ abstract class ApiTestCase extends TestCase
                 'INSERT INTO farms (owner_id, name, type, location) VALUES (?, ?, ?, ?)',
                 [1, 'Test Farm', 'dairy', 'Test Location']
             );
-            return self::$db->lastInsertId();
+            return (int) self::$db->lastInsertId();
         }
 
         return (int) ($result[0]['id'] ?? 0);

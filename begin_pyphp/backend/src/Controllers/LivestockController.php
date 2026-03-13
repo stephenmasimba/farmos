@@ -129,7 +129,7 @@ class LivestockController
             $input['name'] = Validation::sanitizeString($input['name']);
             $input['species'] = Validation::sanitizeString($input['species']);
             $input['breed'] = Validation::sanitizeString($input['breed'] ?? '');
-            
+
             if (!empty($input['birth_date'])) {
                 if (!Validation::validateDate($input['birth_date'], 'Y-m-d')) {
                     return Response::validationError(['birth_date' => 'Invalid date format (YYYY-MM-DD)']);
@@ -286,17 +286,13 @@ class LivestockController
                 return Response::notFound('Livestock not found');
             }
 
-            // Soft delete option: Mark as archived instead
-            $livestock->status = 'archived';
-            $livestock->updated_at = date('Y-m-d H:i:s');
-            $livestock->save();
-
-            Logger::info('Archived livestock', [
+            Livestock::destroy($id, $this->db);
+            Logger::info('Deleted livestock', [
                 'user_id' => $user['user_id'],
                 'livestock_id' => $id,
             ]);
 
-            return Response::success(['id' => $id], 'Livestock archived successfully');
+            return Response::success(['id' => $id], 'Livestock deleted successfully');
         } catch (\Exception $e) {
             Logger::error('Failed to delete livestock', ['error' => $e->getMessage()]);
             return Response::error('Failed to delete livestock', 'DELETE_ERROR', 500);

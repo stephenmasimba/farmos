@@ -10,7 +10,7 @@ use FarmOS\Database;
 class Livestock extends Model
 {
     protected static string $table = 'livestock';
-    
+
     protected static array $fillable = [
         'farm_id',
         'name',
@@ -128,7 +128,7 @@ class Livestock extends Model
     public function addEvent(Database $db, string $eventType, string $description, string $date = null): bool
     {
         $date = $date ?: date('Y-m-d H:i:s');
-        
+
         return (bool) $db->execute(
             'INSERT INTO animal_events (livestock_id, event_type, description, date) VALUES (?, ?, ?, ?)',
             [$this->attributes['id'], $eventType, $description, $date]
@@ -148,7 +148,7 @@ class Livestock extends Model
         $now = new \DateTime();
         $birth = new \DateTime($birthDate);
         $interval = $now->diff($birth);
-        
+
         return $interval->y + ($interval->m / 12);
     }
 
@@ -187,7 +187,7 @@ class Livestock extends Model
         $profile['age_years'] = $this->getAge();
         $profile['events'] = $this->getEvents($db);
         $profile['total_events'] = count($profile['events']);
-        
+
         return $profile;
     }
 }

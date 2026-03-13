@@ -67,7 +67,7 @@ class Request
                 $headers[strtolower($header)] = $value;
             }
         }
-        
+
         return $headers;
     }
 
@@ -83,7 +83,7 @@ class Request
         }
 
         $contentType = $this->getHeader('content-type') ?: '';
-        
+
         if (strpos($contentType, 'application/json') !== false) {
             $raw = isset($GLOBALS['__FARMOS_TEST_RAW_BODY']) ? (string) $GLOBALS['__FARMOS_TEST_RAW_BODY'] : file_get_contents('php://input');
             $decoded = json_decode($raw, true);
@@ -129,16 +129,16 @@ class Request
 
     public function getIP(): string
     {
-        return $_SERVER['HTTP_X_REAL_IP'] 
+        return $_SERVER['HTTP_X_REAL_IP']
             ?? $_SERVER['HTTP_X_FORWARDED_FOR']
-            ?? $_SERVER['REMOTE_ADDR'] 
+            ?? $_SERVER['REMOTE_ADDR']
             ?? 'unknown';
     }
 
     public function getToken(): ?string
     {
         $auth = $this->getHeader('authorization');
-        
+
         if (!$auth) {
             return null;
         }
@@ -153,7 +153,7 @@ class Request
     public function getUser(): ?array
     {
         $token = $this->getToken();
-        
+
         if (!$token) {
             return null;
         }

@@ -48,7 +48,7 @@ class LivestockTest extends ApiTestCase
 
         $this->assertEquals(201, $response['status']);
         $this->assertArrayHasKey('id', $response['body']);
-        $this->livestockId = $response['body']['id'];
+        $this->livestockId = (int) $response['body']['id'];
     }
 
     /**
@@ -121,7 +121,8 @@ class LivestockTest extends ApiTestCase
         $response = $this->apiCall('POST', '/api/livestock', $data);
 
         $this->assertEquals(422, $response['status']);
-        $this->assertArrayHasKey('errors', $response['body']);
+        $this->assertArrayHasKey('error', $response['body']);
+        $this->assertArrayHasKey('details', $response['body']['error']);
     }
 
     /**

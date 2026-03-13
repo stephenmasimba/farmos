@@ -16,9 +16,14 @@ class Logger
     {
         self::$logDir = $logDir;
         self::$format = $format;
-        
-        if (!is_dir($logDir)) {
-            mkdir($logDir, 0755, true);
+
+        if (!is_dir(self::$logDir)) {
+            if (!@mkdir(self::$logDir, 0755, true) && !is_dir(self::$logDir)) {
+                self::$logDir = rtrim(sys_get_temp_dir(), '\\/') . DIRECTORY_SEPARATOR . 'farmos_logs';
+                if (!is_dir(self::$logDir)) {
+                    @mkdir(self::$logDir, 0755, true);
+                }
+            }
         }
     }
 
@@ -47,8 +52,7 @@ class Logger
     private static function log(string $level, string $message, array $context = []): void
     {
         $timestamp = date('Y-m-d H:i:s');
-        $logFile = self::$logDir . '/' . ($level === 'ERROR' ? 'error' : 'farmos') . '.log';
-
+        $logFile = rtrim(self::$logDir, '\\/') . DIRECTORY_SEPARATOR . ($level === 'ERROR' ? 'error' : 'farmos') . '.log';
         if (self::$format === 'json') {
             $logEntry = json_encode([
                 'timestamp' => $timestamp,
@@ -65,7 +69,7 @@ class Logger
             $logEntry .= PHP_EOL;
         }
 
-        error_log($logEntry, 3, $logFile);
+        @error_log($logEntry, 3, $logFile);
     }
 
     /**
@@ -74,7 +78,7 @@ class Logger
     public static function getLogs(string $type = 'farmos', int $lines = 100): array
     {
         $logFile = self::$logDir . '/' . $type . '.log';
-        
+
         if (!file_exists($logFile)) {
             return [];
         }

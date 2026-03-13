@@ -48,7 +48,7 @@ class FinancialTest extends ApiTestCase
 
         $this->assertEquals(201, $response['status']);
         $this->assertArrayHasKey('id', $response['body']);
-        $this->recordId = $response['body']['id'];
+        $this->recordId = (int) $response['body']['id'];
     }
 
     /**

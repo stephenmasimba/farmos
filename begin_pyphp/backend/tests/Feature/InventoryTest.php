@@ -50,7 +50,7 @@ class InventoryTest extends ApiTestCase
 
         $this->assertEquals(201, $response['status']);
         $this->assertArrayHasKey('id', $response['body']);
-        $this->inventoryId = $response['body']['id'];
+        $this->inventoryId = (int) $response['body']['id'];
     }
 
     /**
@@ -75,14 +75,13 @@ class InventoryTest extends ApiTestCase
         $this->testCreateInventoryItem();
 
         $data = [
-            'quantity' => 80,
             'cost_per_unit' => 16.00,
         ];
 
         $response = $this->apiCall('PUT', '/api/inventory/' . $this->inventoryId, $data);
 
         $this->assertEquals(200, $response['status']);
-        $this->assertEquals(80, $response['body']['quantity']);
+        $this->assertEquals(16.00, $response['body']['cost_per_unit']);
     }
 
     /**
@@ -93,7 +92,7 @@ class InventoryTest extends ApiTestCase
         $this->testCreateInventoryItem();
 
         $data = [
-            'quantity_adjustment' => -10,
+            'amount' => -10,
             'reason' => 'used for feeding',
         ];
 

@@ -314,7 +314,7 @@ class WeatherController
             $endDate = date('Y-m-d');
 
             $stats = Weather::getStats($farmId, $startDate, $endDate, $this->db);
-            
+
             if (!$stats) {
                 return Response::success(
                     ['message' => 'Insufficient data for forecast'],

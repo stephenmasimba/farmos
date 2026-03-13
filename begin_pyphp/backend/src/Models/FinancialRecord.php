@@ -10,7 +10,7 @@ use FarmOS\Database;
 class FinancialRecord extends Model
 {
     protected static string $table = 'financial_records';
-    
+
     protected static array $fillable = [
         'farm_id',
         'type',
@@ -131,15 +131,15 @@ class FinancialRecord extends Model
         $income = self::query($db)
             ->where('farm_id', $farmId)
             ->where('type', 'income')
-            ->where('date >= ', $startDate)
-            ->where('date <= ', $endDate)
+            ->where('date >=', $startDate)
+            ->where('date <=', $endDate)
             ->get();
 
         $expenses = self::query($db)
             ->where('farm_id', $farmId)
             ->where('type', 'expense')
-            ->where('date >= ', $startDate)
-            ->where('date <= ', $endDate)
+            ->where('date >=', $startDate)
+            ->where('date <=', $endDate)
             ->get();
 
         $totalIncome = array_sum(array_map(fn($r) => $r->attributes['amount'] ?? 0, $income));
@@ -162,8 +162,8 @@ class FinancialRecord extends Model
     {
         $result = $db->queryOne(
             'SELECT 
-                SUM(CASE WHEN type = "income" THEN amount ELSE 0 END) as total_income,
-                SUM(CASE WHEN type = "expense" THEN amount ELSE 0 END) as total_expense,
+                SUM(CASE WHEN type = \'income\' THEN amount ELSE 0 END) as total_income,
+                SUM(CASE WHEN type = \'expense\' THEN amount ELSE 0 END) as total_expense,
                 COUNT(*) as total_records
              FROM ' . self::$table . ' 
              WHERE farm_id = ? AND YEAR(date) = ?',

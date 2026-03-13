@@ -8,7 +8,6 @@ namespace FarmOS;
 class Security
 {
     private static string $secret;
-    
     public static function init(string $jwtSecret): void
     {
         if (strlen($jwtSecret) < 32) {
@@ -37,7 +36,7 @@ class Security
         if (!preg_match('/[!@#$%^&*()_+\-=\[\]{};:\'",.<>?\/\\|`~]/', $password)) {
             throw new \Exception('Password must contain special characters');
         }
-        
+
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
     }
 
@@ -56,10 +55,10 @@ class Security
     {
         $payload['iat'] = time();
         $payload['exp'] = time() + $expiresIn;
-        
+
         $header = base64_encode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
         $payload = base64_encode(json_encode($payload));
-        
+
         $signature = hash_hmac(
             'sha256',
             "$header.$payload",
@@ -67,7 +66,7 @@ class Security
             true
         );
         $signature = base64_encode($signature);
-        
+
         return "$header.$payload.$signature";
     }
 
@@ -98,7 +97,6 @@ class Security
 
         // Decode payload
         $decoded = json_decode(base64_decode($payload), true);
-        
         if (!$decoded) {
             throw new \Exception('Invalid token payload');
         }
@@ -118,7 +116,7 @@ class Security
     {
         $payload = self::decodeJWT($token);
         unset($payload['iat'], $payload['exp']);
-        
+
         return self::encodeJWT($payload);
     }
 

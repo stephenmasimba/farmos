@@ -10,7 +10,7 @@ use FarmOS\Database;
 class Inventory extends Model
 {
     protected static string $table = 'inventory';
-    
+
     protected static array $fillable = [
         'farm_id',
         'name',
@@ -88,7 +88,7 @@ class Inventory extends Model
                 AND expiry_date IS NOT NULL 
                 AND expiry_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL ? DAY)
                 ORDER BY expiry_date ASC';
-        
+
         $results = $db->query($sql, [$farmId, $days]);
         return array_map(fn($row) => new self($db, $row), $results);
     }
@@ -132,15 +132,15 @@ class Inventory extends Model
     /**
      * Adjust quantity
      */
-    public function adjustQuantity(Database $db, float $amount, string $reason = null): bool
+    public function adjustQuantity(Database $db, float $amount, ?string $reason = null): bool
     {
         $this->quantity = ($this->attributes['quantity'] ?? 0) + $amount;
-        
+
         // Log the adjustment
         if ($reason) {
             $this->notes = ($this->attributes['notes'] ?? '') . "\n[" . date('Y-m-d H:i:s') . "] Adjustment: $amount ($reason)";
         }
-        
+
         $this->updated_at = date('Y-m-d H:i:s');
         return (bool) $this->save();
     }
@@ -161,10 +161,10 @@ class Inventory extends Model
         if (!isset($this->attributes['expiry_date'])) {
             return false;
         }
-        
+
         $expiry = new \DateTime($this->attributes['expiry_date']);
         $now = new \DateTime();
-        
+
         return $now > $expiry;
     }
 
@@ -196,7 +196,7 @@ class Inventory extends Model
         $profile['is_expired'] = $this->isExpired();
         $profile['total_value'] = $this->getValue();
         $profile['status'] = $this->isExpired() ? 'expired' : ($this->isLowStock() ? 'low_stock' : 'ok');
-        
+
         return $profile;
     }
 }

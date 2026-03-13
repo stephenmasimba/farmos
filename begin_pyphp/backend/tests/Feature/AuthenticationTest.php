@@ -52,7 +52,7 @@ class AuthenticationTest extends ApiTestCase
         $response = $this->apiCall('GET', '/api/auth/me');
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('user_id', $response['body']);
+        $this->assertArrayHasKey('id', $response['body']);
         $this->assertEquals(self::$testUser, $response['body']['email']);
     }
 
@@ -132,7 +132,7 @@ class AuthenticationTest extends ApiTestCase
         for ($i = 0; $i < 6; $i++) {
             $data = [
                 'email' => self::$testUser,
-                'password' => 'IncorrectPassword' . $i,
+                'password' => 'WrongPassword123!' . $i,
             ];
             $this->apiCall('POST', '/api/auth/login', $data, '');
         }
@@ -140,7 +140,7 @@ class AuthenticationTest extends ApiTestCase
         // Next attempt should be rate limited
         $data = [
             'email' => self::$testUser,
-            'password' => 'AnotherWrongPassword',
+            'password' => 'WrongPassword123!999',
         ];
         $response = $this->apiCall('POST', '/api/auth/login', $data, '');
 

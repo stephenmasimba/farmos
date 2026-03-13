@@ -83,17 +83,15 @@ class Validation
         if (!is_numeric($value) || intval($value) != $value) {
             return false;
         }
-        
+
         $int = intval($value);
-        
         if ($min !== null && $int < $min) {
             return false;
         }
-        
         if ($max !== null && $int > $max) {
             return false;
         }
-        
+
         return true;
     }
 

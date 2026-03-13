@@ -129,7 +129,7 @@ class AdminMiddleware extends Middleware
         }
 
         $userModel = User::find($user['user_id'], $this->db);
-        
+
         if (!$userModel || !$userModel->isAdmin()) {
             return Response::forbidden('Administrator access required')->setStatusCode(403);
         }

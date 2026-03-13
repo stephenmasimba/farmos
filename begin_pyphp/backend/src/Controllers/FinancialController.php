@@ -395,7 +395,7 @@ class FinancialController
             $incomeByCategory = $this->db->query(
                 'SELECT category, SUM(amount) as total, COUNT(*) as count 
                  FROM ' . FinancialRecord::table() . ' 
-                 WHERE farm_id = ? AND type = "income" AND date >= ? AND date <= ? 
+                 WHERE farm_id = ? AND type = \'income\' AND date >= ? AND date <= ? 
                  GROUP BY category',
                 [$farmId, $startDate, $endDate]
             );
@@ -403,7 +403,7 @@ class FinancialController
             $expenseByCategory = $this->db->query(
                 'SELECT category, SUM(amount) as total, COUNT(*) as count 
                  FROM ' . FinancialRecord::table() . ' 
-                 WHERE farm_id = ? AND type = "expense" AND date >= ? AND date <= ? 
+                 WHERE farm_id = ? AND type = \'expense\' AND date >= ? AND date <= ? 
                  GROUP BY category',
                 [$farmId, $startDate, $endDate]
             );

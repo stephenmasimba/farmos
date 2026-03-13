@@ -165,7 +165,7 @@ class DatabaseException extends Exception
     ) {
         // Don't expose internal database errors to client
         parent::__construct('Database operation failed', 'DATABASE_ERROR', 500, $details, $previous);
-        
+
         // Log the actual error
         Logger::error('Database error: ' . $message, $details);
     }
