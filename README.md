@@ -63,7 +63,7 @@ composer install
 
 ### 2. Configure Database
 
-Update credentials in `begin_pyphp/backend/config/env.php` (or create `begin_pyphp/backend/.env` from `.env.example`).
+Update credentials in `begin_pyphp/backend/config/env.php` (or create `begin_pyphp/backend/config/.env` from `.env.example`).
 
 ### 3. Start Backend
 
@@ -217,7 +217,7 @@ dir begin_pyphp\database\*.sql
 
 Key configuration files:
 - `begin_pyphp/backend/config/env.php` - Backend configuration defaults
-- `begin_pyphp/backend/.env` - Environment variables (optional; overrides defaults)
+- `begin_pyphp/backend/config/.env` - Environment variables (optional; overrides defaults)
 - `begin_pyphp/frontend/config.php` - Frontend configuration
 
 ## 🤝 Contributing

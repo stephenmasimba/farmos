@@ -76,7 +76,7 @@ composer install
 
 ### 3. Configure Environment
 
-- Configure DB settings in `begin_pyphp/backend/config/env.php` (or create `begin_pyphp/backend/.env` from `.env.example`).
+- Configure DB settings in `begin_pyphp/backend/config/env.php` (or create `begin_pyphp/backend/config/.env` from `.env.example`).
 - Ensure MySQL is running and the target database exists.
 
 ### 4. Run Application
