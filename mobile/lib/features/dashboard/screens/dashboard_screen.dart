@@ -6,6 +6,8 @@ import '../../../core/models/livestock.dart';
 import '../../../core/models/task.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/service_providers.dart';
+import '../../../core/services/cache_status_service.dart';
+import '../../../core/services/dashboard_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/common.dart';
@@ -46,6 +48,14 @@ class DashboardScreen extends ConsumerWidget {
     final overview = ref.watch(_overviewProvider);
     final alerts = ref.watch(_alertsProvider);
     final timeline = ref.watch(_timelineProvider);
+    final cacheStatus = _latestOfflineStatus(
+      ref.watch(cacheStatusServiceProvider),
+      const [
+        DashboardService.overviewStatusKey,
+        DashboardService.alertsStatusKey,
+        DashboardService.timelineStatusKey,
+      ],
+    );
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -98,6 +108,16 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ],
             ),
+
+            if (cacheStatus != null)
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                sliver: SliverToBoxAdapter(
+                  child: OfflineDataBanner(
+                    lastUpdatedAt: cacheStatus.lastUpdatedAt,
+                  ),
+                ),
+              ),
 
             // ---- KPI cards ----
             SliverPadding(

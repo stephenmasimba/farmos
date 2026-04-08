@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
+import '../utils/formatters.dart';
 
 /// Renders loading / error / data states from an AsyncValue<T>.
 class AsyncValueWidget<T> extends StatelessWidget {
@@ -263,6 +264,180 @@ class PriorityBadge extends StatelessWidget {
           style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w600),
         ),
       ],
+    );
+  }
+}
+
+class OfflineDataBanner extends StatelessWidget {
+  const OfflineDataBanner({
+    super.key,
+    this.lastUpdatedAt,
+  });
+
+  final DateTime? lastUpdatedAt;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final profile = _profileFor(lastUpdatedAt);
+    final detail = lastUpdatedAt == null
+        ? 'Showing cached data stored on this device.'
+        : 'Last synced ${Fmt.timeAgo(lastUpdatedAt)} · ${Fmt.dateTime(lastUpdatedAt)}';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: profile.background,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: profile.border),
+      ),
+      child: Row(
+        children: [
+          Icon(profile.icon, color: profile.foreground),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  profile.title,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: profile.foreground,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  detail,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: profile.foreground.withAlpha(20),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              profile.badge,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: profile.foreground,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  _OfflineBannerProfile _profileFor(DateTime? lastUpdatedAt) {
+    if (lastUpdatedAt == null) {
+      return const _OfflineBannerProfile(
+        title: 'Offline data',
+        badge: 'UNKNOWN AGE',
+        icon: Icons.cloud_off_rounded,
+        foreground: AppColors.warning,
+        background: Color(0x14C88719),
+        border: Color(0x66C88719),
+      );
+    }
+
+    final age = DateTime.now().difference(lastUpdatedAt);
+    if (age.inHours >= 24) {
+      return const _OfflineBannerProfile(
+        title: 'Stale offline data',
+        badge: 'STALE',
+        icon: Icons.schedule_rounded,
+        foreground: AppColors.error,
+        background: Color(0x14D64545),
+        border: Color(0x66D64545),
+      );
+    }
+
+    return const _OfflineBannerProfile(
+      title: 'Offline data',
+      badge: 'RECENT',
+      icon: Icons.cloud_off_rounded,
+      foreground: AppColors.warning,
+      background: Color(0x14C88719),
+      border: Color(0x66C88719),
+    );
+  }
+}
+
+class _OfflineBannerProfile {
+  const _OfflineBannerProfile({
+    required this.title,
+    required this.badge,
+    required this.icon,
+    required this.foreground,
+    required this.background,
+    required this.border,
+  });
+
+  final String title;
+  final String badge;
+  final IconData icon;
+  final Color foreground;
+  final Color background;
+  final Color border;
+}
+
+class UnsyncedChangesChip extends StatelessWidget {
+  const UnsyncedChangesChip({
+    super.key,
+    required this.count,
+    this.onTap,
+  });
+
+  final int count;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.info.withAlpha(20),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.info.withAlpha(90)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.sync_problem_rounded, color: AppColors.info),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  '$count unsynced change(s) included in this view.',
+                  style: const TextStyle(
+                    color: AppColors.info,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              if (onTap != null) ...[
+                const SizedBox(width: 8),
+                const Icon(Icons.open_in_new_rounded,
+                    size: 16, color: AppColors.info),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

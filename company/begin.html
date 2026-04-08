@@ -18,6 +18,7 @@
         .nav-links { display: flex; gap: 1.8rem; flex-wrap: wrap; }
         .nav-links a { color: #f0fdf4; text-decoration: none; font-weight: 500; transition: 0.2s; font-size: 0.95rem; }
         .nav-links a:hover { color: #eab308; }
+        .nav-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
         .btn-download { background: #d4af37; color: #0a2b1e; border: none; padding: 0.5rem 1.2rem; border-radius: 40px; font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
         .btn-download:hover { background: #f5c842; transform: scale(0.97); }
         .hero { background: linear-gradient(135deg, #0f2c1f 0%, #1a4a2e 100%); color: #fff; padding: 3rem 0 4rem 0; border-bottom: 4px solid #d4af37; }
@@ -41,6 +42,28 @@
         .signature-line { border-top: 1px dashed #aaa; margin-top: 1rem; padding-top: 1rem; font-size: 0.8rem; }
         .btn-outline { background: transparent; border: 1px solid #d4af37; color: #d4af37; padding: 0.3rem 0.9rem; border-radius: 30px; cursor: pointer; font-size: 0.75rem; }
         .btn-outline:hover { background: #d4af37; color: #0a2b1e; }
+        .doc-shell { display: grid; grid-template-columns: 320px 1fr; gap: 1rem; padding: 1rem; }
+        .doc-sidebar { border: 1px solid #eef2f6; border-radius: 18px; padding: 0.9rem; background: #fff; }
+        .doc-sidebar-title { font-weight: 800; letter-spacing: 0.2px; color: #0a2b1e; font-size: 0.9rem; margin-bottom: 0.7rem; }
+        .toc-search { width: 100%; padding: 0.65rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 0.9rem; outline: none; background: #fbfcfe; }
+        .toc-search:focus { border-color: rgba(10, 43, 30, 0.35); box-shadow: 0 0 0 4px rgba(10, 43, 30, 0.08); }
+        .toc { margin-top: 0.7rem; display: flex; flex-direction: column; gap: 0.4rem; max-height: calc(100vh - 260px); overflow: auto; padding-right: 0.4rem; }
+        .toc a { display: block; padding: 0.5rem 0.6rem; border-radius: 14px; text-decoration: none; border: 1px solid transparent; color: #475569; font-size: 0.85rem; font-weight: 650; }
+        .toc a:hover { background: rgba(10, 43, 30, 0.06); color: #0a2b1e; border-color: rgba(10, 43, 30, 0.08); }
+        .toc a[data-level="2"] { padding-left: 1rem; }
+        .toc a[data-level="3"] { padding-left: 1.6rem; font-weight: 600; }
+        .toc a[data-level="4"] { padding-left: 2.2rem; font-weight: 560; }
+        .doc-main { border: 1px solid #eef2f6; border-radius: 18px; padding: 1rem; background: #fff; }
+        .doc-main h1, .doc-main h2, .doc-main h3, .doc-main h4, .doc-main h5, .doc-main h6 { scroll-margin-top: 110px; }
+        .doc { padding: 0; }
+        .doc p { margin: 0.7rem 0; }
+        .doc hr { border: none; border-top: 1px solid #e2e8f0; margin: 1.1rem 0; }
+        .doc code { background: #f1f5f9; padding: 2px 6px; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 0.92em; }
+        .doc pre { background: #0b1220; color: #e2e8f0; padding: 14px 16px; border-radius: 14px; overflow: auto; margin: 12px 0; }
+        .doc pre code { background: transparent; padding: 0; color: inherit; }
+        .doc ul, .doc ol { padding-left: 1.4rem; margin: 0.7rem 0; }
+        .status { margin-top: 0.8rem; color: #64748b; font-size: 0.8rem; }
+        @media (max-width: 980px) { .doc-shell { grid-template-columns: 1fr; } .toc { max-height: none; } }
     </style>
 </head>
 <body>
@@ -54,7 +77,12 @@
             <a href="#governance">Governance</a>
             <a href="#succession">Succession</a>
         </div>
-        <button class="btn-download" id="exportAllBtn"><i class="fas fa-file-alt"></i> Export summary (JSON)</button>
+        <div class="nav-actions">
+            <button class="btn-outline" id="reloadBtn" type="button"><i class="fas fa-rotate"></i> Reload</button>
+            <button class="btn-outline" id="printBtn" type="button"><i class="fas fa-print"></i> Print</button>
+            <button class="btn-outline" id="exportAllBtn" type="button"><i class="fas fa-file-alt"></i> Export JSON</button>
+            <button class="btn-download" id="downloadBtn" type="button"><i class="fas fa-download"></i> Download Markdown</button>
+        </div>
     </div>
 </div>
 
@@ -184,6 +212,19 @@
                 <span style="color:#6b7280">No document selected. Click a button to show summary.</span>
             </div>
         </div>
+        <div class="card" style="margin-top: 1rem; padding: 0;">
+            <div class="doc-shell">
+                <aside class="doc-sidebar" aria-label="Document contents">
+                    <div class="doc-sidebar-title">Contents</div>
+                    <input id="tocSearch" class="toc-search" type="search" placeholder="Search headings" autocomplete="off">
+                    <nav id="toc" class="toc"></nav>
+                </aside>
+                <section class="doc-main">
+                    <div id="markdownPre" class="doc">Loading document…</div>
+                    <div id="status" class="status"></div>
+                </section>
+            </div>
+        </div>
     </section>
 
     <section id="governance">
@@ -256,6 +297,7 @@
 
 <div id="toastMsg" class="toast-msg" style="display: none;">✔ Action completed</div>
 
+<script src="simple-front-fallback.js"></script>
 <script>
     const previews = {
         shareholder: `**ZANAQ Holdings – Shareholder Agreement (excerpt)**\n\n• 100% shares owned by Begin Trust. No share transfer without unanimous Trustee AND Board approval.\n• Protected matters: amendment of MOI, issuing shares, borrowing >$50k, merger, sale of assets >$10k → require Unanimous Trustee Resolution.\n• Dividend policy: at Board discretion, paid to Begin Trust.\n• Dispute resolution: binding arbitration in Harare.`,
@@ -278,6 +320,255 @@
         setTimeout(() => { toast.style.display = 'none'; }, 1800);
     }
 
+    function escapeHtml(text) {
+        return String(text)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function sanitizeHref(href) {
+        const raw = String(href || "").trim();
+        if (raw.startsWith("#")) {
+            if (raw.startsWith("#doc-")) return raw;
+            return `#doc-${raw.slice(1)}`;
+        }
+        if (/^https?:\/\//i.test(raw)) return raw;
+        return "#";
+    }
+
+    function slugify(text, used) {
+        const base = String(text || "")
+            .toLowerCase()
+            .replace(/&amp;/g, "and")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 64) || "section";
+
+        let slug = base;
+        let i = 2;
+        while (used.has(slug)) {
+            slug = `${base}-${i}`;
+            i += 1;
+        }
+        used.add(slug);
+        return slug;
+    }
+
+    function renderInline(text) {
+        let safeText = escapeHtml(text);
+        safeText = safeText.replace(/`([^`]+)`/g, "<code>$1</code>");
+        safeText = safeText.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+        safeText = safeText.replace(/__([^_]+)__/g, "<strong>$1</strong>");
+        safeText = safeText.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+        safeText = safeText.replace(/_([^_]+)_/g, "<em>$1</em>");
+        safeText = safeText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, href) => {
+            const safeHref = sanitizeHref(href);
+            const target = safeHref.startsWith("#") ? "_self" : "_blank";
+            return `<a href="${escapeHtml(safeHref)}" target="${target}" rel="noopener noreferrer">${label}</a>`;
+        });
+        return safeText;
+    }
+
+    function parseTableRow(line) {
+        return line
+            .trim()
+            .replace(/^\||\|$/g, "")
+            .split("|")
+            .map((cell) => cell.trim());
+    }
+
+    function flushList(html, listType, listItems) {
+        if (!listType || listItems.length === 0) return;
+        const tag = listType === "ol" ? "ol" : "ul";
+        html.push(`<${tag}>${listItems.map((item) => `<li>${item}</li>`).join("")}</${tag}>`);
+    }
+
+    function flushTable(html, tableRows) {
+        if (tableRows.length < 2) {
+            tableRows.forEach((row) => html.push(`<p>${renderInline(row)}</p>`));
+            return;
+        }
+
+        const headerLine = tableRows[0];
+        const separatorLine = tableRows[1];
+        if (!/^\s*\|?\s*:?[-]+:?(\s*\|\s*:?[-]+:?)+\s*\|?\s*$/.test(separatorLine)) {
+            tableRows.forEach((row) => html.push(`<p>${renderInline(row)}</p>`));
+            return;
+        }
+
+        const headers = parseTableRow(headerLine);
+        const bodyRows = tableRows.slice(2).map(parseTableRow);
+        html.push(
+            `<table><thead><tr>${headers.map((cell) => `<th>${renderInline(cell)}</th>`).join("")}</tr></thead><tbody>${bodyRows
+                .map((row) => `<tr>${row.map((cell) => `<td>${renderInline(cell)}</td>`).join("")}</tr>`)
+                .join("")}</tbody></table>`,
+        );
+    }
+
+    function parseMarkdown(text) {
+        const usedSlugs = new Set();
+        const tocItems = [];
+        const lines = String(text).split(/\r?\n/);
+        const html = [];
+        let inCode = false;
+        let codeLines = [];
+        let listType = null;
+        let listItems = [];
+        let tableRows = [];
+
+        const flushPending = () => {
+            if (inCode) {
+                html.push(`<pre><code>${escapeHtml(codeLines.join("\n"))}</code></pre>`);
+                inCode = false;
+                codeLines = [];
+            }
+            if (listType) {
+                flushList(html, listType, listItems);
+                listType = null;
+                listItems = [];
+            }
+            if (tableRows.length > 0) {
+                flushTable(html, tableRows);
+                tableRows = [];
+            }
+        };
+
+        lines.forEach((line) => {
+            if (/^```/.test(line)) {
+                if (inCode) {
+                    flushPending();
+                } else {
+                    flushPending();
+                    inCode = true;
+                }
+                return;
+            }
+
+            if (inCode) {
+                codeLines.push(line);
+                return;
+            }
+
+            const trimmed = line.trim();
+            if (trimmed === "") {
+                flushPending();
+                return;
+            }
+
+            const headingMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
+            if (headingMatch) {
+                flushPending();
+                const level = headingMatch[1].length;
+                const headingText = headingMatch[2].trim();
+                const id = `doc-${slugify(headingText, usedSlugs)}`;
+                html.push(`<h${level} id="${id}">${renderInline(headingText)}</h${level}>`);
+                if (level <= 4) tocItems.push({ level, id, text: headingText });
+                return;
+            }
+
+            if (/^---+$/.test(trimmed)) {
+                flushPending();
+                html.push("<hr />");
+                return;
+            }
+
+            const listMatch = trimmed.match(/^([-*+])\s+(.*)$/);
+            if (listMatch) {
+                const newType = "ul";
+                if (tableRows.length > 0) {
+                    flushTable(html, tableRows);
+                    tableRows = [];
+                }
+                if (listType !== newType) {
+                    flushList(html, listType, listItems);
+                    listType = newType;
+                    listItems = [];
+                }
+                listItems.push(renderInline(listMatch[2]));
+                return;
+            }
+
+            const orderedMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+            if (orderedMatch) {
+                const newType = "ol";
+                if (tableRows.length > 0) {
+                    flushTable(html, tableRows);
+                    tableRows = [];
+                }
+                if (listType !== newType) {
+                    flushList(html, listType, listItems);
+                    listType = newType;
+                    listItems = [];
+                }
+                listItems.push(renderInline(orderedMatch[2]));
+                return;
+            }
+
+            if (trimmed.includes("|")) {
+                if (listType) {
+                    flushList(html, listType, listItems);
+                    listType = null;
+                    listItems = [];
+                }
+                tableRows.push(line);
+                return;
+            }
+
+            if (tableRows.length > 0) {
+                flushTable(html, tableRows);
+                tableRows = [];
+            }
+
+            flushPending();
+            html.push(`<p>${renderInline(trimmed)}</p>`);
+        });
+
+        flushPending();
+        return { html: html.join(""), toc: tocItems };
+    }
+
+    function loadMarkdownDocument() {
+        const container = document.getElementById("markdownPre");
+        const status = document.getElementById("status");
+        if (!container) return null;
+        const started = Date.now();
+
+        const text = typeof SIMPLE_FRONT_MARKDOWN === "string" ? SIMPLE_FRONT_MARKDOWN : "";
+        if (!text) {
+            container.textContent = "Document content missing. Ensure simple-front-fallback.js is present next to begin.html.";
+            if (status) status.textContent = "Missing SIMPLE_FRONT_MARKDOWN.";
+            return null;
+        }
+
+        const parsed = parseMarkdown(text);
+        container.innerHTML = parsed.html;
+
+        const toc = document.getElementById("toc");
+        if (toc) {
+            toc.innerHTML = parsed.toc
+                .map((h) => `<a href="#${escapeHtml(h.id)}" data-level="${h.level}">${escapeHtml(h.text)}</a>`)
+                .join("");
+        }
+
+        const search = document.getElementById("tocSearch");
+        if (search && toc && !search.dataset.wired) {
+            search.dataset.wired = "1";
+            search.addEventListener("input", () => {
+                const q = String(search.value || "").trim().toLowerCase();
+                toc.querySelectorAll("a").forEach((a) => {
+                    const t = String(a.textContent || "").toLowerCase();
+                    a.style.display = q === "" || t.includes(q) ? "block" : "none";
+                });
+            });
+        }
+
+        if (status) status.textContent = `Loaded ${text.length.toLocaleString()} chars in ${Date.now() - started} ms.`;
+        return text;
+    }
+
     document.querySelectorAll('.viewDocBtn').forEach(btn => {
         btn.addEventListener('click', () => {
             const doc = btn.getAttribute('data-doc');
@@ -285,6 +576,27 @@
             else showPreview('shareholder');
         });
     });
+
+    let lastMarkdownText = null;
+    document.getElementById("reloadBtn")?.addEventListener("click", () => {
+        lastMarkdownText = loadMarkdownDocument();
+    });
+    document.getElementById("printBtn")?.addEventListener("click", () => window.print());
+    document.getElementById("downloadBtn")?.addEventListener("click", () => {
+        if (!lastMarkdownText) lastMarkdownText = loadMarkdownDocument();
+        if (!lastMarkdownText) return;
+        const blob = new Blob([lastMarkdownText], { type: "text/markdown;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "simple-front.md";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    lastMarkdownText = loadMarkdownDocument();
 
     const exportBtn = document.getElementById('exportAllBtn');
     if (exportBtn) {

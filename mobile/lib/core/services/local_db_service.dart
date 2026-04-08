@@ -30,9 +30,30 @@ class LocalDbService {
             method TEXT NOT NULL,
             path TEXT NOT NULL,
             body TEXT,
-            created_at INTEGER NOT NULL
+            created_at INTEGER NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            last_error TEXT,
+            retry_count INTEGER NOT NULL DEFAULT 0,
+            last_attempt_at INTEGER
           )
         ''');
+      },
+      onOpen: (db) async {
+        // Lightweight migrations for existing DBs.
+        try {
+          await db.execute(
+              "ALTER TABLE sync_queue ADD COLUMN status TEXT NOT NULL DEFAULT 'pending'");
+        } catch (_) {}
+        try {
+          await db.execute("ALTER TABLE sync_queue ADD COLUMN last_error TEXT");
+        } catch (_) {}
+        try {
+          await db.execute(
+              "ALTER TABLE sync_queue ADD COLUMN retry_count INTEGER NOT NULL DEFAULT 0");
+        } catch (_) {}
+        try {
+          await db.execute("ALTER TABLE sync_queue ADD COLUMN last_attempt_at INTEGER");
+        } catch (_) {}
       },
     );
     return _db!;

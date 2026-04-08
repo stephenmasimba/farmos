@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/api/api_endpoints.dart';
 import '../../../core/models/livestock.dart';
 import '../../../core/providers/service_providers.dart';
+import '../../../core/providers/sync_providers.dart';
+import '../../../core/services/cache_status_service.dart';
+import '../../../core/services/livestock_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/common.dart';
@@ -46,6 +50,15 @@ class _LivestockScreenState extends ConsumerState<LivestockScreen>
   @override
   Widget build(BuildContext context) {
     final stats = ref.watch(livestockStatsProvider);
+    final pendingChanges =
+        ref.watch(pendingModuleChangesProvider(ApiEndpoints.livestock));
+    final cacheStatus = latestOfflineStatus(
+      ref.watch(cacheStatusServiceProvider),
+      const [
+        LivestockService.listStatusKey,
+        LivestockService.statsStatusKey,
+      ],
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -69,12 +82,38 @@ class _LivestockScreenState extends ConsumerState<LivestockScreen>
           ),
         ],
       ),
-      body: TabBarView(
-        controller: _tabs,
-        children: _filters.map((f) {
-          final params = f == 'all' ? <String, dynamic>{} : {'status': f};
-          return _LivestockList(filterParams: params);
-        }).toList(),
+      body: Column(
+        children: [
+          if (cacheStatus != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: OfflineDataBanner(
+                lastUpdatedAt: cacheStatus.lastUpdatedAt,
+              ),
+            ),
+          pendingChanges.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (count) => count > 0
+                ? Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                    child: UnsyncedChangesChip(
+                      count: count,
+                      onTap: () => context.push('/sync?module=livestock'),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabs,
+              children: _filters.map((f) {
+                final params = f == 'all' ? <String, dynamic>{} : {'status': f};
+                return _LivestockList(filterParams: params);
+              }).toList(),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {

@@ -24,6 +24,8 @@ import '../../features/users/screens/users_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/more/screens/more_screen.dart';
+import '../../features/calendar/screens/calendar_screen.dart';
+import '../../features/sync/screens/sync_center_screen.dart';
 
 final _rootKey = GlobalKey<NavigatorState>();
 final _shellKey = GlobalKey<NavigatorState>();
@@ -122,6 +124,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/analytics', builder: (_, __) => const AnalyticsScreen()),
           GoRoute(path: '/users', builder: (_, __) => const UsersScreen()),
           GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
+          GoRoute(path: '/calendar', builder: (_, __) => const CalendarScreen()),
+          GoRoute(path: '/sync', builder: (_, __) => const SyncCenterScreen()),
           GoRoute(
             path: '/notifications',
             builder: (_, __) => const NotificationsScreen(),

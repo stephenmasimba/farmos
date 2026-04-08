@@ -1,8 +1,13 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/api/api_endpoints.dart';
 import '../../../core/models/weather.dart';
+import '../../../core/providers/sync_providers.dart';
 import '../../../core/providers/service_providers.dart';
+import '../../../core/services/cache_status_service.dart';
+import '../../../core/services/weather_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/common.dart';
@@ -24,6 +29,16 @@ class WeatherScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final current = ref.watch(_currentWeatherProvider);
     final history = ref.watch(_weatherHistoryProvider);
+    final pendingChanges = ref.watch(
+      pendingModuleChangesProvider(ApiEndpoints.weatherCurrent.split('/current').first),
+    );
+    final cacheStatus = latestOfflineStatus(
+      ref.watch(cacheStatusServiceProvider),
+      const [
+        WeatherService.currentStatusKey,
+        WeatherService.historyStatusKey,
+      ],
+    );
 
     return Scaffold(
       appBar: AppBar(title: const Text('Weather & Irrigation')),
@@ -40,6 +55,23 @@ class WeatherScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            if (cacheStatus != null) ...[
+              OfflineDataBanner(lastUpdatedAt: cacheStatus.lastUpdatedAt),
+              const SizedBox(height: 16),
+            ],
+            pendingChanges.when(
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (count) => count > 0
+                  ? Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: UnsyncedChangesChip(
+                        count: count,
+                        onTap: () => context.push('/sync?module=weather'),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
             current.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => ErrorView(message: e.toString(), onRetry: null),

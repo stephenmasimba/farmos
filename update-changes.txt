@@ -37,6 +37,7 @@ This document replaces earlier generic guidance with recommendations that match 
 ### 2.2 Default credentials and seeded data
 - Do not deploy with known default admin credentials.
 - If seed/demo data exists, gate it by environment (development/testing only).
+Status: completed in this repository (hardcoded/default credentials removed from scripts and UI; simulations require an environment-provided password).
 
 ### 2.3 SQL injection prevention (backend + frontend)
 - Backend: all DB access must use prepared statements everywhere.
@@ -44,12 +45,10 @@ This document replaces earlier generic guidance with recommendations that match 
 - Establish a rule: never concatenate request input into SQL strings.
 
 ### 2.4 Rate limiting that actually works
-Current `app/backend/src/RateLimiter.php` is in-memory. In most PHP deployments, request memory does not persist across requests, so it cannot protect production.
-
-Choose one production-safe approach:
-- Shared hosting friendly: database-backed rate limit counters keyed by `(ip, route, window)`
-- If available: APCu-based counters
-- If you run infrastructure: Redis-based counters (best for multi-instance)
+Status: completed in this repository — `app/backend/src/RateLimiter.php` is now database-backed (shared-hosting friendly) so limits persist across requests.
+Optional future upgrades:
+- APCu-backed counters (single-host performance)
+- Redis-backed counters (best for multi-instance)
 
 ### 2.5 Authentication & authorization
 - Password hashing: `password_hash()` + `password_verify()` (bcrypt is fine on PHP 7.4).
@@ -59,6 +58,7 @@ Choose one production-safe approach:
 ### 2.6 Transport + security headers
 - Enforce HTTPS at the server (Apache/vhost). Don’t rely on application logic for TLS.
 - Add security headers centrally (CSP, HSTS, anti-clickjacking via CSP frame-ancestors, nosniff, referrer policy, permissions policy).
+Status: completed in this repository (security headers centralized/tightened at the backend boundary).
 
 ### 2.7 CSRF (only where applicable)
 CSRF protection is required when:
@@ -151,13 +151,13 @@ From `app/backend/`:
 ## 8) Recommended Action Plan (Order Matters)
 
 ### Phase A — Safety (blockers)
-1) Remove/disable default production credentials and demo seeds.
-2) Prove injection safety: prepared statements everywhere; no direct SQL from frontend.
-3) Replace in-memory rate limiting with DB/APCu/Redis-backed implementation.
-4) Enforce HTTPS + add security headers.
+1) Completed: remove/disable default production credentials and demo seeds.
+2) Completed: prove injection safety (prepared statements + table name validation); no direct SQL from frontend.
+3) Completed: replace in-memory rate limiting with DB-backed implementation.
+4) Completed: enforce HTTPS guidance + add centralized security headers.
 
 ### Phase B — Reliability
-1) Make PHPUnit green (no incomplete tests).
+1) Remaining: make PHPUnit green (no incomplete tests, no hangs).
 2) Add feature tests for auth + core write endpoints.
 
 ### Phase C — Maintainability & scale
@@ -170,8 +170,5 @@ From `app/backend/`:
 ## 9) Production Warning
 
 FarmOS has strong potential but should not be deployed to production until:
-- default credentials are removed,
-- injection safety is verified,
-- rate limiting is production-effective,
 - HTTPS + security headers are enforced,
 - tests are green.

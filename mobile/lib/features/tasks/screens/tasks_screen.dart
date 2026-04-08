@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/api/api_endpoints.dart';
 import '../../../core/models/task.dart';
 import '../../../core/providers/service_providers.dart';
+import '../../../core/providers/sync_providers.dart';
+import '../../../core/services/cache_status_service.dart';
+import '../../../core/services/task_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/common.dart';
@@ -44,6 +48,15 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
   @override
   Widget build(BuildContext context) {
     final stats = ref.watch(_taskStatsProvider);
+    final pendingChanges =
+        ref.watch(pendingModuleChangesProvider(ApiEndpoints.tasks));
+    final cacheStatus = latestOfflineStatus(
+      ref.watch(cacheStatusServiceProvider),
+      const [
+        TaskService.listStatusKey,
+        TaskService.statsStatusKey,
+      ],
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -73,11 +86,37 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
               const SizedBox(),
         ],
       ),
-      body: TabBarView(
-        controller: _tabs,
-        children: _statuses
-            .map((s) => _TaskList(status: s))
-            .toList(),
+      body: Column(
+        children: [
+          if (cacheStatus != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: OfflineDataBanner(
+                lastUpdatedAt: cacheStatus.lastUpdatedAt,
+              ),
+            ),
+          pendingChanges.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (count) => count > 0
+                ? Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                    child: UnsyncedChangesChip(
+                      count: count,
+                      onTap: () => context.push('/sync?module=tasks'),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabs,
+              children: _statuses
+                  .map((s) => _TaskList(status: s))
+                  .toList(),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {

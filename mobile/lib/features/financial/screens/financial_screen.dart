@@ -2,8 +2,12 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/api/api_endpoints.dart';
 import '../../../core/models/financial.dart';
 import '../../../core/providers/service_providers.dart';
+import '../../../core/providers/sync_providers.dart';
+import '../../../core/services/cache_status_service.dart';
+import '../../../core/services/financial_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/common.dart';
@@ -47,6 +51,17 @@ class _FinancialScreenState extends ConsumerState<FinancialScreen>
 
   @override
   Widget build(BuildContext context) {
+    final pendingChanges =
+        ref.watch(pendingModuleChangesProvider(ApiEndpoints.financialRecords));
+    final cacheStatus = latestOfflineStatus(
+      ref.watch(cacheStatusServiceProvider),
+      const [
+        FinancialService.recordsStatusKey,
+        FinancialService.summaryStatusKey,
+        FinancialService.monthlyStatusKey,
+      ],
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Financial'),
@@ -62,12 +77,38 @@ class _FinancialScreenState extends ConsumerState<FinancialScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabs,
-        children: const [
-          _OverviewTab(),
-          _TransactionsTab(),
-          _ReportsTab(),
+      body: Column(
+        children: [
+          if (cacheStatus != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: OfflineDataBanner(
+                lastUpdatedAt: cacheStatus.lastUpdatedAt,
+              ),
+            ),
+          pendingChanges.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (count) => count > 0
+                ? Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                    child: UnsyncedChangesChip(
+                      count: count,
+                      onTap: () => context.push('/sync?module=financial'),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabs,
+              children: const [
+                _OverviewTab(),
+                _TransactionsTab(),
+                _ReportsTab(),
+              ],
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
