@@ -8,6 +8,7 @@ final class FrontendIntegrationTest extends ApiTestCase
 {
     private static $serverProc = null;
     private static int $serverPort = 0;
+    private static array $serverPipes = [];
 
     public static function setUpBeforeClass(): void
     {
@@ -20,14 +21,15 @@ final class FrontendIntegrationTest extends ApiTestCase
             2 => ['pipe', 'w'],
         ];
 
-        $cmd = sprintf('php -S 127.0.0.1:%d -t public/', self::$serverPort);
+        $cmd = sprintf('php -S 127.0.0.1:%d -t public public/index.php', self::$serverPort);
         self::$serverProc = proc_open($cmd, $descriptorSpec, $pipes, BASE_PATH);
         if (!is_resource(self::$serverProc)) {
             throw new \RuntimeException('Failed to start PHP server');
         }
-        foreach ($pipes as $pipe) {
+        self::$serverPipes = $pipes;
+        foreach (self::$serverPipes as $idx => $pipe) {
             if (is_resource($pipe)) {
-                fclose($pipe);
+                stream_set_blocking($pipe, false);
             }
         }
 
@@ -48,6 +50,12 @@ final class FrontendIntegrationTest extends ApiTestCase
             proc_close(self::$serverProc);
         }
         self::$serverProc = null;
+        foreach (self::$serverPipes as $pipe) {
+            if (is_resource($pipe)) {
+                fclose($pipe);
+            }
+        }
+        self::$serverPipes = [];
 
         parent::tearDownAfterClass();
     }
@@ -135,8 +143,30 @@ final class FrontendIntegrationTest extends ApiTestCase
 
     private static function waitForServer(int $port): void
     {
-        $deadline = microtime(true) + 5.0;
+        $deadline = microtime(true) + 15.0;
         while (microtime(true) < $deadline) {
+            if (is_resource(self::$serverProc)) {
+                $status = proc_get_status(self::$serverProc);
+                if (($status['running'] ?? false) !== true) {
+                    $out = '';
+                    if (isset(self::$serverPipes[1]) && is_resource(self::$serverPipes[1])) {
+                        $out .= (string) stream_get_contents(self::$serverPipes[1]);
+                    }
+                    if (isset(self::$serverPipes[2]) && is_resource(self::$serverPipes[2])) {
+                        $out .= (string) stream_get_contents(self::$serverPipes[2]);
+                    }
+                    $out = trim($out);
+                    throw new \RuntimeException($out !== '' ? $out : 'Server exited before becoming ready');
+                }
+            }
+
+            if (isset(self::$serverPipes[1]) && is_resource(self::$serverPipes[1])) {
+                stream_get_contents(self::$serverPipes[1]);
+            }
+            if (isset(self::$serverPipes[2]) && is_resource(self::$serverPipes[2])) {
+                stream_get_contents(self::$serverPipes[2]);
+            }
+
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:' . $port . '/health');
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -153,4 +183,3 @@ final class FrontendIntegrationTest extends ApiTestCase
         throw new \RuntimeException('Server did not become ready');
     }
 }
-

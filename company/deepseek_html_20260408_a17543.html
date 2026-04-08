@@ -4,46 +4,254 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Begin Trust | Family Wealth Fortress</title>
+    <!-- Font Awesome 6 (Free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: Inter + Playfair Display -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f9fafb; color: #111827; line-height: 1.5; scroll-behavior: smooth; }
-        h1, h2, h3, h4, .logo, .serif { font-family: 'Playfair Display', serif; }
-        .container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
-        .navbar { background: #0a2b1e; color: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
-        .nav-container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 1rem 1.5rem; max-width: 1280px; margin: 0 auto; }
-        .logo { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.5px; }
-        .logo span { color: #d4af37; }
-        .nav-links { display: flex; gap: 1.8rem; flex-wrap: wrap; }
-        .nav-links a { color: #f0fdf4; text-decoration: none; font-weight: 500; transition: 0.2s; font-size: 0.95rem; }
-        .nav-links a:hover { color: #eab308; }
-        .btn-download { background: #d4af37; color: #0a2b1e; border: none; padding: 0.5rem 1.2rem; border-radius: 40px; font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
-        .btn-download:hover { background: #f5c842; transform: scale(0.97); }
-        .hero { background: linear-gradient(135deg, #0f2c1f 0%, #1a4a2e 100%); color: #fff; padding: 3rem 0 4rem 0; border-bottom: 4px solid #d4af37; }
-        .hero h1 { font-size: 2.8rem; font-weight: 700; margin-bottom: 1rem; }
-        .hero .badge { background: #d4af37; color: #0a2b1e; display: inline-block; padding: 0.2rem 0.8rem; border-radius: 30px; font-weight: 600; font-size: 0.8rem; margin-bottom: 1rem; }
-        .grid-protection { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 2rem; }
-        .protect-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(4px); border-radius: 24px; padding: 1rem 1.5rem; flex: 1; min-width: 160px; border: 1px solid rgba(255,215,0,0.3); }
-        section { padding: 3rem 0; border-bottom: 1px solid #e5e7eb; }
-        .section-title { font-size: 1.9rem; font-weight: 700; margin-bottom: 1.5rem; position: relative; display: inline-block; }
-        .section-title:after { content: ''; position: absolute; bottom: -8px; left: 0; width: 60%; height: 3px; background: #d4af37; }
-        .card { background: #fff; border-radius: 24px; padding: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); transition: all 0.2s; border: 1px solid #eef2f6; height: 100%; }
-        .diagram { background: #fefce8; border-left: 6px solid #d4af37; font-family: monospace; white-space: pre-wrap; font-size: 0.9rem; padding: 1.2rem; border-radius: 20px; }
-        .grid-2cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.8rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th, td { border: 1px solid #e2e8f0; padding: 0.7rem; text-align: left; vertical-align: top; }
-        th { background: #f1f5f9; font-weight: 600; }
-        .badge-gold { background: #d4af37; color: #0a2b1e; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
-        footer { background: #0f2c1f; color: #cfdfd4; padding: 2rem 0; text-align: center; }
-        .toast-msg { position: fixed; bottom: 20px; right: 20px; background: #0a2b1e; color: #f9fafb; padding: 12px 20px; border-radius: 40px; font-size: 0.85rem; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 999; transition: opacity 0.3s; }
-        @media (max-width: 780px) { .nav-links { gap: 1rem; margin-top: 0.5rem; } .hero h1 { font-size: 2rem; } }
-        .signature-line { border-top: 1px dashed #aaa; margin-top: 1rem; padding-top: 1rem; font-size: 0.8rem; }
-        .btn-outline { background: transparent; border: 1px solid #d4af37; color: #d4af37; padding: 0.3rem 0.9rem; border-radius: 30px; cursor: pointer; font-size: 0.75rem; }
-        .btn-outline:hover { background: #d4af37; color: #0a2b1e; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        /* typography */
+        h1, h2, h3, h4, .logo, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* header / nav */
+        .navbar {
+            background: #0a2b1e;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            padding: 1rem 1.5rem;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .logo span {
+            color: #d4af37;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: #f0fdf4;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        .nav-links a:hover {
+            color: #eab308;
+        }
+        .btn-download {
+            background: #d4af37;
+            color: #0a2b1e;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .btn-download:hover {
+            background: #f5c842;
+            transform: scale(0.97);
+        }
+
+        /* hero */
+        .hero {
+            background: linear-gradient(135deg, #0f2c1f 0%, #1a4a2e 100%);
+            color: white;
+            padding: 3rem 0 4rem 0;
+            border-bottom: 4px solid #d4af37;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .hero .badge {
+            background: #d4af37;
+            color: #0a2b1e;
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .grid-protection {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .protect-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(4px);
+            border-radius: 24px;
+            padding: 1rem 1.5rem;
+            flex: 1;
+            min-width: 160px;
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+
+        /* section styling */
+        section {
+            padding: 3rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .section-title {
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60%;
+            height: 3px;
+            background: #d4af37;
+        }
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            border: 1px solid #eef2f6;
+            height: 100%;
+        }
+        .diagram {
+            background: #fefce8;
+            border-left: 6px solid #d4af37;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            padding: 1.2rem;
+            border-radius: 20px;
+        }
+        .grid-2cols {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.8rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 0.7rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+        .badge-gold {
+            background: #d4af37;
+            color: #0a2b1e;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        footer {
+            background: #0f2c1f;
+            color: #cfdfd4;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0a2b1e;
+            color: #f9fafb;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 999;
+            transition: opacity 0.3s;
+        }
+        @media (max-width: 780px) {
+            .nav-links {
+                gap: 1rem;
+                margin-top: 0.5rem;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+        .signature-line {
+            border-top: 1px dashed #aaa;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            font-size: 0.8rem;
+        }
+        .collapsible-content {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 0.8rem;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            padding: 0.3rem 0.9rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        .btn-outline:hover {
+            background: #d4af37;
+            color: #0a2b1e;
+        }
     </style>
 </head>
 <body>
+
 <div class="navbar">
     <div class="nav-container">
         <div class="logo">BEGIN <span>FORTNESS</span></div>
@@ -58,6 +266,7 @@
     </div>
 </div>
 
+<!-- hero -->
 <div class="hero">
     <div class="container">
         <div class="badge"><i class="fas fa-shield-alt"></i> Zimbabwean Law · Perpetual Wealth</div>
@@ -73,6 +282,7 @@
 </div>
 
 <main class="container">
+    <!-- Structure diagram -->
     <section id="structure">
         <h2 class="section-title"><i class="fas fa-sitemap"></i> Wealth Fortress Structure</h2>
         <div class="grid-2cols">
@@ -89,12 +299,12 @@
                     &nbsp;&nbsp;&nbsp;│<br/>
                     &nbsp;&nbsp;&nbsp;✧ leases land from → BEGIN TRUST
                 </div>
-                <p style="margin-top:1rem"><i class="fas fa-check-circle" style="color:#d4af37;"></i> Land immune from business liabilities · Operating risks isolated · Perpetual trust</p>
+                <p class="mt-2" style="margin-top:1rem"><i class="fas fa-check-circle" style="color:#d4af37;"></i> Land immune from business liabilities · Operating risks isolated · Perpetual trust</p>
             </div>
             <div class="card">
                 <h3>⚔️ Key protections</h3>
                 <ul style="list-style-type: none; padding-left:0">
-                    <li><i class="fas fa-ban"></i> No land sale without unanimous trustees</li>
+                    <li><i class="fas fa-ban text-gold"></i> No land sale without unanimous trustees</li>
                     <li><i class="fas fa-shield-virus"></i> Creditors cannot attach trust assets</li>
                     <li><i class="fas fa-chart-line"></i> 100% trust ownership of shares</li>
                     <li><i class="fas fa-exchange-alt"></i> Share transfers require double unanimous approval</li>
@@ -104,6 +314,7 @@
         </div>
     </section>
 
+    <!-- Trust deed summary -->
     <section id="trust">
         <h2 class="section-title"><i class="fas fa-file-signature"></i> Begin Trust Deed (Core)</h2>
         <div class="card">
@@ -119,6 +330,7 @@
         </div>
     </section>
 
+    <!-- holding + operating -->
     <section>
         <h2 class="section-title"><i class="fas fa-building"></i> ZANAQ Holdings & Begin Masimba Farm</h2>
         <div class="grid-2cols">
@@ -127,7 +339,7 @@
                 <h3>ZANAQ Holdings (Pvt) Ltd</h3>
                 <p><strong>100% owned by Begin Trust</strong> · Authorised shares: 10,000 · Issued: 1,000 ordinary shares.</p>
                 <p><strong>Asset holding:</strong> livestock, greenhouses, equipment, IP, shares of Begin Masimba Farm. <br> <span class="badge-gold">Transfer restrictions</span> Shares cannot be sold/pledged without unanimous Trustee + Board approval.</p>
-                <p><i class="fas fa-gavel"></i> Protected matters: MOI amendment, share issuance, asset sale &gt;$10k require unanimous trustee resolution.</p>
+                <p><i class="fas fa-gavel"></i> Protected matters: MOI amendment, share issuance, asset sale >$10k require unanimous trustee resolution.</p>
             </div>
             <div class="card">
                 <i class="fas fa-tractor" style="font-size:2rem; color:#0a2b1e"></i>
@@ -139,6 +351,7 @@
         </div>
     </section>
 
+    <!-- Land lease agreement summary -->
     <section>
         <h2 class="section-title"><i class="fas fa-file-contract"></i> Land Lease Agreement</h2>
         <div class="card">
@@ -154,12 +367,13 @@
         </div>
     </section>
 
+    <!-- full documents accordion style -->
     <section id="docs">
         <h2 class="section-title"><i class="fas fa-book"></i> Complete legal documents</h2>
         <div class="grid-2cols">
             <div class="card">
                 <h3>📄 Shareholder Agreement (ZANAQ)</h3>
-                <p>Regulates 100% trust ownership, absolute share transfer restrictions, protected matters (borrowing &gt;$50k, mergers). Unanimous trustee vote required for major decisions.</p>
+                <p>Regulates 100% trust ownership, absolute share transfer restrictions, protected matters (borrowing >$50k, mergers). Unanimous trustee vote required for major decisions.</p>
                 <button class="btn-outline viewDocBtn" data-doc="shareholder"><i class="fas fa-eye"></i> Preview excerpt</button>
             </div>
             <div class="card">
@@ -186,6 +400,7 @@
         </div>
     </section>
 
+    <!-- family governance & succession -->
     <section id="governance">
         <h2 class="section-title"><i class="fas fa-users"></i> Family Governance Charter</h2>
         <div class="grid-2cols">
@@ -202,7 +417,7 @@
                     <tr><td>Medium</td><td>Housing, Business capital</td></tr>
                     <tr><td>Low</td><td>Maintenance support</td></tr>
                 </table>
-                <p>All distributions discretionary, no beneficiary entitlement.</p>
+                <p class="mt-2">All distributions discretionary, no beneficiary entitlement.</p>
             </div>
         </div>
     </section>
@@ -224,6 +439,7 @@
         </div>
     </section>
 
+    <!-- beneficial ownership and checklist -->
     <section>
         <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Action Checklist & Registers</h2>
         <div class="card">
@@ -237,10 +453,11 @@
                 <tr><td>6</td><td>File Beneficial Ownership Registers (Trust as UBO)</td><td>☐ Pending</td></tr>
                 <tr><td>7</td><td>Adopt Family Charter & Succession Plan</td><td>☐ Pending</td></tr>
             </table>
-            <p><i class="fas fa-database"></i> <strong>Beneficial owner:</strong> Begin Trust (ultimate) → ZANAQ Holdings → Begin Masimba Farm. Trustees listed in register.</p>
+            <p class="mt-2"><i class="fas fa-database"></i> <strong>Beneficial owner:</strong> Begin Trust (ultimate) → ZANAQ Holdings → Begin Masimba Farm. Trustees listed in register.</p>
         </div>
     </section>
 
+    <!-- final note: full document -->
     <div style="text-align: center; padding: 2rem 0 3rem;">
         <p><i class="fas fa-gavel"></i> Complete trust deed, MOIs, shareholder agreements, and lease available for execution.<br>
         <strong>All documents are lawyer‑ready, governed by Zimbabwean law.</strong></p>
@@ -254,9 +471,11 @@
     </div>
 </footer>
 
+<!-- Toast message -->
 <div id="toastMsg" class="toast-msg" style="display: none;">✔ Action completed</div>
 
 <script>
+    // Document preview data (excerpts from completed docs)
     const previews = {
         shareholder: `**ZANAQ Holdings – Shareholder Agreement (excerpt)**\n\n• 100% shares owned by Begin Trust. No share transfer without unanimous Trustee AND Board approval.\n• Protected matters: amendment of MOI, issuing shares, borrowing >$50k, merger, sale of assets >$10k → require Unanimous Trustee Resolution.\n• Dividend policy: at Board discretion, paid to Begin Trust.\n• Dispute resolution: binding arbitration in Harare.`,
         moi: `**ZANAQ Holdings – Memorandum of Incorporation (MOI) – Section E (Transfer Restrictions)**\n\n10.1 No share may be transferred, sold, pledged, mortgaged, or encumbered except with:\n- Unanimous approval of all Trustees of Begin Trust; AND\n- Unanimous approval of all Directors of the Company.\n10.2 Any purported transfer without such approvals is void.\n\n**Unanimous Trustee Resolution required for:** amendment of MOI, increase/reduction of capital, sale of all assets, winding up, merger.`,
@@ -267,25 +486,28 @@
     function showPreview(docKey) {
         const previewDiv = document.getElementById('previewContent');
         if (previews[docKey]) {
-            const formatted = previews[docKey].replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            let formatted = previews[docKey].replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             previewDiv.innerHTML = `<i class="fas fa-file-lines"></i> <strong>Preview:</strong><br>${formatted}`;
         } else {
             previewDiv.innerHTML = `<span style="color:#6b7280">Preview not available.</span>`;
         }
+        // toast feedback
         const toast = document.getElementById('toastMsg');
         toast.style.display = 'block';
         toast.innerText = '✓ Document preview loaded';
         setTimeout(() => { toast.style.display = 'none'; }, 1800);
     }
 
+    // attach event listeners to all .viewDocBtn
     document.querySelectorAll('.viewDocBtn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
             const doc = btn.getAttribute('data-doc');
             if (doc) showPreview(doc);
             else showPreview('shareholder');
         });
     });
 
+    // Export summary (JSON) for professional reference
     const exportBtn = document.getElementById('exportAllBtn');
     if (exportBtn) {
         exportBtn.addEventListener('click', () => {
@@ -325,6 +547,7 @@
         });
     }
 
+    // smooth anchor links
     document.querySelectorAll('.nav-links a').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
