@@ -13,6 +13,9 @@ require_once BASE_PATH . '/config/env.php';
 // Load autoloader
 require_once BASE_PATH . '/vendor/autoload.php';
 
+putenv('LOG_DIR=' . sys_get_temp_dir() . '/farmos-tests');
+putenv('LOG_FORMAT=json');
+
 // Set up test environment
 error_reporting(E_ALL);
 ini_set('display_errors', '1');

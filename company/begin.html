@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BEGIN TRUST &amp; ASSOCIATED ENTITIES</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: #0f172a;
+      background: #f8fafc;
+      line-height: 1.6;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #0a2b1e;
+      border-bottom: 3px solid #d4af37;
+      color: #f8fafc;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+    .topbar-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .brand {
+      font-family: "Playfair Display", serif;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      font-size: 18px;
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+    }
+    .brand small {
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-weight: 500;
+      opacity: 0.9;
+      font-size: 12px;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      color: #f8fafc;
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: transform 0.06s ease, background 0.12s ease;
+    }
+    .btn:hover { background: rgba(255, 255, 255, 0.14); }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary {
+      background: #d4af37;
+      border-color: #d4af37;
+      color: #0a2b1e;
+    }
+    .btn-primary:hover { background: #f5c842; }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 22px 16px 56px;
+    }
+    .doc {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 8px 18px rgba(2, 6, 23, 0.05);
+    }
+    .doc h1, .doc h2, .doc h3, .doc h4, .doc h5, .doc h6 {
+      font-family: "Playfair Display", serif;
+      margin: 18px 0 10px;
+      line-height: 1.25;
+    }
+    .doc h1 { font-size: 32px; }
+    .doc h2 { font-size: 24px; }
+    .doc h3 { font-size: 20px; }
+    .doc p { margin: 10px 0; }
+    .doc hr { border: none; border-top: 1px solid #e2e8f0; margin: 18px 0; }
+    .doc code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+    .doc pre {
+      background: #0b1220;
+      color: #e2e8f0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      overflow: auto;
+      margin: 12px 0;
+    }
+    .doc pre code { background: transparent; padding: 0; color: inherit; }
+    .doc ul, .doc ol { padding-left: 22px; margin: 10px 0; }
+    .doc table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .doc th, .doc td {
+      border: 1px solid #e2e8f0;
+      padding: 10px 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+    .doc th { background: #f8fafc; font-weight: 700; }
+    .status {
+      margin-top: 10px;
+      color: #475569;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        BEGIN TRUST <small>Document Viewer</small>
+      </div>
+      <div class="actions">
+        <button class="btn" id="reloadBtn" type="button">Reload</button>
+        <button class="btn" id="printBtn" type="button">Print</button>
+        <button class="btn btn-primary" id="downloadBtn" type="button">Download Markdown</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="markdownPre" class="doc">Loading simple-front.md…</div>
+    <div id="status" class="status"></div>
+  </main>
+
+  <script src="simple-front-fallback.js"></script>
+  <script>
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function renderInline(text) {
+      let safeText = escapeHtml(text);
+      safeText = safeText.replace(/`([^`]+)`/g, "<code>$1</code>");
+      safeText = safeText.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      safeText = safeText.replace(/__([^_]+)__/g, "<strong>$1</strong>");
+      safeText = safeText.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+      safeText = safeText.replace(/_([^_]+)_/g, "<em>$1</em>");
+      return safeText;
+    }
+
+    function parseTableRow(line) {
+      return line
+        .trim()
+        .replace(/^\||\|$/g, "")
+        .split("|")
+        .map((cell) => cell.trim());
+    }
+
+    function flushList(html, listType, listItems) {
+      if (!listType || listItems.length === 0) return;
+      const tag = listType === "ol" ? "ol" : "ul";
+      html.push(`<${tag}>${listItems.map((item) => `<li>${item}</li>`).join("")}</${tag}>`);
+    }
+
+    function flushTable(html, tableRows) {
+      if (tableRows.length < 2) {
+        tableRows.forEach((row) => html.push(`<p>${renderInline(row)}</p>`));
+        return;
+      }
+
+      const headerLine = tableRows[0];
+      const separatorLine = tableRows[1];
+      if (!/^\s*\|?\s*:?[-]+:?(\s*\|\s*:?[-]+:?)+\s*\|?\s*$/.test(separatorLine)) {
+        tableRows.forEach((row) => html.push(`<p>${renderInline(row)}</p>`));
+        return;
+      }
+
+      const headers = parseTableRow(headerLine);
+      const bodyRows = tableRows.slice(2).map(parseTableRow);
+      html.push(
+        `<table><thead><tr>${headers.map((cell) => `<th>${renderInline(cell)}</th>`).join("")}</tr></thead><tbody>${bodyRows
+          .map((row) => `<tr>${row.map((cell) => `<td>${renderInline(cell)}</td>`).join("")}</tr>`)
+          .join("")}</tbody></table>`,
+      );
+    }
+
+    function parseMarkdown(text) {
+      const lines = String(text).split(/\r?\n/);
+      const html = [];
+      let inCode = false;
+      let codeLines = [];
+      let listType = null;
+      let listItems = [];
+      let tableRows = [];
+
+      const flushPending = () => {
+        if (inCode) {
+          html.push(`<pre><code>${escapeHtml(codeLines.join("\n"))}</code></pre>`);
+          inCode = false;
+          codeLines = [];
+        }
+        if (listType) {
+          flushList(html, listType, listItems);
+          listType = null;
+          listItems = [];
+        }
+        if (tableRows.length > 0) {
+          flushTable(html, tableRows);
+          tableRows = [];
+        }
+      };
+
+      lines.forEach((line) => {
+        if (/^```/.test(line)) {
+          if (inCode) {
+            flushPending();
+          } else {
+            flushPending();
+            inCode = true;
+          }
+          return;
+        }
+
+        if (inCode) {
+          codeLines.push(line);
+          return;
+        }
+
+        const trimmed = line.trim();
+        if (trimmed === "") {
+          flushPending();
+          return;
+        }
+
+        const headingMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
+        if (headingMatch) {
+          flushPending();
+          const level = headingMatch[1].length;
+          html.push(`<h${level}>${renderInline(headingMatch[2])}</h${level}>`);
+          return;
+        }
+
+        if (/^---+$/.test(trimmed)) {
+          flushPending();
+          html.push("<hr />");
+          return;
+        }
+
+        const listMatch = trimmed.match(/^([-*+])\s+(.*)$/);
+        if (listMatch) {
+          const newType = "ul";
+          if (tableRows.length > 0) {
+            flushTable(html, tableRows);
+            tableRows = [];
+          }
+          if (listType !== newType) {
+            flushList(html, listType, listItems);
+            listType = newType;
+            listItems = [];
+          }
+          listItems.push(renderInline(listMatch[2]));
+          return;
+        }
+
+        const orderedMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+        if (orderedMatch) {
+          const newType = "ol";
+          if (tableRows.length > 0) {
+            flushTable(html, tableRows);
+            tableRows = [];
+          }
+          if (listType !== newType) {
+            flushList(html, listType, listItems);
+            listType = newType;
+            listItems = [];
+          }
+          listItems.push(renderInline(orderedMatch[2]));
+          return;
+        }
+
+        if (trimmed.includes("|")) {
+          if (listType) {
+            flushList(html, listType, listItems);
+            listType = null;
+            listItems = [];
+          }
+          tableRows.push(line);
+          return;
+        }
+
+        if (tableRows.length > 0) {
+          flushTable(html, tableRows);
+          tableRows = [];
+        }
+
+        flushPending();
+        html.push(`<p>${renderInline(trimmed)}</p>`);
+      });
+
+      flushPending();
+      return html.join("");
+    }
+
+    async function loadMarkdownDocument() {
+      const container = document.getElementById("markdownPre");
+      const status = document.getElementById("status");
+      if (!container) return;
+      const started = Date.now();
+
+      try {
+        const response = await fetch("simple-front.md", { cache: "no-store" });
+        if (!response.ok) throw new Error(`Unable to load simple-front.md (${response.status})`);
+        const text = await response.text();
+        container.innerHTML = parseMarkdown(text);
+        if (status) status.textContent = `Loaded simple-front.md (${text.length.toLocaleString()} chars) in ${Date.now() - started} ms.`;
+        return text;
+      } catch (error) {
+        if (typeof window.SIMPLE_FRONT_MARKDOWN === "string" && window.SIMPLE_FRONT_MARKDOWN.length > 0) {
+          const text = window.SIMPLE_FRONT_MARKDOWN;
+          container.innerHTML = parseMarkdown(text);
+          if (status) status.textContent = `Loaded fallback markdown from local script after fetch failed.`;
+          return text;
+        }
+
+        container.textContent = "Unable to load simple-front.md. Please ensure the file exists next to begin.html and is served via HTTP (e.g., XAMPP).";
+        if (status) status.textContent = String(error && error.message ? error.message : error);
+        return null;
+      }
+    }
+
+    let lastMarkdownText = null;
+
+    document.getElementById("reloadBtn")?.addEventListener("click", async () => {
+      lastMarkdownText = await loadMarkdownDocument();
+    });
+    document.getElementById("printBtn")?.addEventListener("click", () => window.print());
+    document.getElementById("downloadBtn")?.addEventListener("click", async () => {
+      if (!lastMarkdownText) lastMarkdownText = await loadMarkdownDocument();
+      if (!lastMarkdownText) return;
+      const blob = new Blob([lastMarkdownText], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "simple-front.md";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    loadMarkdownDocument().then((text) => { lastMarkdownText = text; });
+  </script>
+</body>
+</html>

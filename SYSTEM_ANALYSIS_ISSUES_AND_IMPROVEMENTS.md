@@ -285,7 +285,7 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 #### 1.4 Configuration Management
 - **Issue**: Configuration hardcoded or in multiple places
 - **Improvement**: Centralized configuration
-- **Solution**: Create `backend/config.py` with environment-based configs
+- **Solution**: Create `backend/config.php` with environment-based configs
 
 ---
 

@@ -62,4 +62,3 @@ final class ApiRequestLogRepository
         self::$tableEnsured = true;
     }
 }
-

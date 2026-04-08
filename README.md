@@ -41,7 +41,7 @@ FarmOS/
 │   │   └── components/    # Reusable components
 │   └── database/          # Schema and migrations
 ├── backend/
-│   └── iot_simulations/   # IoT sensor simulators (Python)
+│   └── iot_simulations/   # IoT sensor simulators (PHP)
 ├── docs/                  # Documentation
 └── [configuration files]
 ```

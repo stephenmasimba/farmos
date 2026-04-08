@@ -226,6 +226,28 @@ abstract class ApiTestCase extends TestCase
                 FOREIGN KEY (farm_id) REFERENCES farms(id)
             )
         ');
+
+        self::$db->execute('
+            CREATE TABLE refresh_tokens (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                token_hash VARCHAR(128) NOT NULL UNIQUE,
+                expires_at DATETIME NOT NULL,
+                revoked_at DATETIME NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        ');
+
+        self::$db->execute('
+            CREATE TABLE jwt_blacklist (
+                jti VARCHAR(64) PRIMARY KEY,
+                user_id INT NOT NULL,
+                expires_at DATETIME NOT NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        ');
     }
 
     /**

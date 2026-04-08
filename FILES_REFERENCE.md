@@ -15,7 +15,7 @@
 | `begin_pyphp/backend/src/Models/` | Core | Database models | ✅ UPDATED |
 | `begin_pyphp/backend/tests/` | Tests | PHPUnit feature tests | ✅ UPDATED |
 | `database/schema.sql` | Database | SQL schema for MySQL | ✅ UPDATED |
-| `backend/iot_simulations/` | Tools | Optional Python IoT simulator | ✅ EXISTING |
+| `backend/iot_simulations/` | Tools | Optional PHP IoT simulator | ✅ EXISTING |
 | `README.md` | Docs | Project overview | ✅ NEW |
 | `SECURITY_FIXES_IMPLEMENTATION.md` | Docs | Implementation guide | ✅ NEW |
 | `DATABASE_MIGRATION_GUIDE.md` | Docs | Migration procedures | ✅ NEW |
@@ -301,7 +301,7 @@ farmos/
 │       │   └── Models/                       Database models
 │       └── tests/                            PHPUnit tests
 ├── backend/
-│   └── iot_simulations/                      Optional Python IoT simulator
+│   └── iot_simulations/                      Optional PHP IoT simulator
 ├── README.md                                 [NEW] Overview
 ├── SECURITY_FIXES_IMPLEMENTATION.md          [NEW] Fixes guide
 ├── DATABASE_MIGRATION_GUIDE.md               [NEW] Migration guide

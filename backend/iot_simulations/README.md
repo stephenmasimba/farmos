@@ -26,23 +26,15 @@ generate IoT alerts for testing.
 
 ```
 backend/iot_simulations/
-├── config.py        – all thresholds, device list, DB & API settings
-├── db_setup.py      – creates the 4 IoT tables if they are missing
-├── simulate.py      – main runner
-├── requirements.txt – Python dependencies
+├── config.php       – all thresholds, device list, DB & API settings
+├── db_setup.php     – creates the 4 IoT tables if they are missing
+├── simulate.php     – main runner
 └── README.md        – this file
 ```
 
 ## Quick start
 
-### 1. Install dependencies
-
-```powershell
-cd C:\wamp64\www\farmos\backend\iot_simulations
-pip install -r requirements.txt
-```
-
-### 2. Configure credentials (if needed)
+### 1. Configure credentials (if needed)
 
 The simulator uses the same database as the FarmOS app
 (`begin_masimba_farm`, `root`, no password by default).
@@ -53,23 +45,23 @@ If your MySQL `root` account has a password, set it as an environment variable:
 $env:DB_PASSWORD = "your_mysql_password"
 ```
 
-Or edit `config.py` directly.
+Or edit `config.php` directly.
 
-### 3. Seed historical data (recommended first step)
+### 2. Seed historical data (recommended first step)
 
 This inserts **144 rounds × 20 devices = 2 880 readings** back-dated over the
 last 24 hours – no waiting required.
 
 ```powershell
-python simulate.py --seed 144
+php simulate.php --seed 144
 ```
 
-### 4. Run the live simulator
+### 3. Run the live simulator
 
 ```powershell
-python simulate.py                    # run forever, new reading every 10 s
-$env:SIM_INTERVAL = "5"; python simulate.py   # every 5 seconds
-$env:SIM_ROUNDS   = "100"; python simulate.py # stop after 100 rounds
+php simulate.php                              # run forever, new reading every 10 s
+$env:SIM_INTERVAL = "5"; php simulate.php     # every 5 seconds
+$env:SIM_ROUNDS   = "100"; php simulate.php   # stop after 100 rounds
 ```
 
 Press **Ctrl-C** to stop at any time.
@@ -97,4 +89,4 @@ Press **Ctrl-C** to stop at any time.
 - This is non-fatal.  Device registration and water-quality inserts fall back
   to direct DB writes automatically.
 - If you want API auth to work, make sure the PHP backend is running and that
-  `API_EMAIL` / `API_PASSWORD` in `config.py` match a real FarmOS user.
+  `API_EMAIL` / `API_PASSWORD` in `config.php` match a real FarmOS user.

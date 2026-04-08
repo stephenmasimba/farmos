@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Document Viewer & Task Center with clean Markdown rendering for simple-front.md." />
+  <title>ZANAQ — Document Viewer &amp; Task Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="simple-demo.css" />
+</head>
+<body>
+  <a href="#mainContent" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Skip to content</a>
+  <div class="page-shell">
+    <header class="hero">
+      <div>
+        <span class="hero-badge">ZANAQ Demo</span>
+        <h1>Document Viewer & Task Center</h1>
+        <p>Track quick tasks while previewing the governance document with clean Markdown rendering.</p>
+      </div>
+      <button id="themeToggle" class="btn btn-ghost" type="button">Switch theme</button>
+    </header>
+
+    <main id="mainContent" class="content-grid">
+      <section class="card card-panel">
+        <div class="panel-header">
+          <h2>Task manager</h2>
+          <span id="taskCount" class="badge" aria-live="polite">0 tasks</span>
+        </div>
+        <form id="taskForm" class="task-form">
+          <input id="taskInput" type="text" placeholder="Add a new task" aria-label="New task" autocomplete="off" />
+          <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+        <div class="task-actions">
+          <button id="clearDone" class="btn btn-secondary" type="button">Clear completed</button>
+          <button id="filterAll" class="btn btn-ghost active" type="button">All</button>
+          <button id="filterActive" class="btn btn-ghost" type="button">Active</button>
+          <button id="filterCompleted" class="btn btn-ghost" type="button">Completed</button>
+        </div>
+        <ul id="taskList" class="task-list" aria-label="Task list"></ul>
+      </section>
+
+      <section class="card card-panel stats-panel">
+        <h2>Live summary</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-title">Total</span>
+            <strong id="totalCount" aria-live="polite">0</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-title">Active</span>
+            <strong id="activeCount" aria-live="polite">0</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-title">Completed</span>
+            <strong id="completedCount" aria-live="polite">0</strong>
+          </div>
+        </div>
+        <div class="tip-box">
+          <p>Use this demo to keep track of action items while accessing the document content.</p>
+        </div>
+      </section>
+    </main>
+
+    <section class="card card-panel document-panel">
+      <div class="panel-header">
+        <div>
+          <p class="panel-subtitle">Document preview</p>
+          <h2>Governance & Compliance</h2>
+        </div>
+        <span class="badge badge-soft">Rendered from simple-front.md</span>
+      </div>
+      <div id="markdownContent" class="document-content">
+        <div id="markdownPre" class="markdown-renderer">Loading document content...</div>
+      </div>
+    </section>
+  </div>
+
+  <noscript>This page needs JavaScript enabled to render the markdown document and manage tasks.</noscript>
+  <script src="simple-demo.js" defer></script>
+</body>
+</html>
