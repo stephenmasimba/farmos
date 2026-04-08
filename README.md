@@ -30,7 +30,7 @@
 
 ```
 FarmOS/
-├── begin_pyphp/
+├── app/
 │   ├── backend/           # Pure PHP backend API
 │   │   ├── public/        # Web root (index.php)
 │   │   ├── src/           # Controllers, models, core classes
@@ -57,55 +57,60 @@ FarmOS/
 ### 1. Install Backend Dependencies
 
 ```bash
-cd begin_pyphp/backend
+cd app/backend
 composer install
 ```
 
 ### 2. Configure Database
 
-Update credentials in `begin_pyphp/backend/config/env.php` (or create `begin_pyphp/backend/config/.env` from `.env.example`).
+Update credentials in `app/backend/config/env.php` (or create `app/backend/config/.env` from `.env.example`).
 
 ### 3. Start Backend
 
 The backend runs under Apache (WAMP) at:
-- `http://localhost/farmos/begin_pyphp/backend/`
+- `http://localhost:8081/farmos/app/backend/`
 
 Or, for local development without Apache:
 ```bash
-cd begin_pyphp/backend
+cd app/backend
 composer run serve
 ```
 
 ### 4. Start Frontend (WAMP)
 
 1. Ensure WAMP is running (Apache + PHP + MySQL)
-2. Visit: `http://localhost/farmos/begin_pyphp/frontend/public/`
+2. Visit: `http://localhost:8081/farmos/app/frontend/public/`
 
 ### 5. Verify Installation
 
 ```bash
 # Check backend health
-curl http://localhost/farmos/begin_pyphp/backend/health
+curl http://localhost:8081/farmos/app/backend/health
 
 # Check API version
-curl http://localhost/farmos/begin_pyphp/backend/api/version
+curl http://localhost:8081/farmos/app/backend/api/version
 ```
 
 ## 📖 Documentation
 
+- [Documentation Index](./docs/INDEX.md) - Central navigation for all remaining docs
 - [Quick Start Guide](./QUICK_START.md) - Get up and running in minutes
-- [Getting Started](./begin_pyphp/GETTING_STARTED.md) - Detailed setup instructions
-- [System Design](./system_design.md) - Architecture and design patterns
 - [User Manual](./docs/USER_MANUAL.md) - End-user guide
 - [Developer Guide](./docs/DEVELOPER_GUIDE.md) - Development guidelines
+- [Architecture](./docs/consolidated/ARCHITECTURE.md)
+- [Operations](./docs/consolidated/OPERATIONS.md)
+- [Database](./docs/consolidated/DATABASE.md)
+- [Security](./docs/consolidated/SECURITY.md)
+- [Status](./docs/consolidated/STATUS.md)
+- [App Transition](./docs/consolidated/APP_TRANSITION.md)
 
 ## 🔐 Default Login
 
 After seeding sample data:
 
 ```
-Email: admin@example.com
-Password: password123
+Email: admin@farmos.local
+Password: admin123
 ```
 
 ## 📚 Main Modules
@@ -137,7 +142,7 @@ Password: password123
 
 ## 🔌 API Endpoints
 
-Base URL (WAMP): `http://localhost/farmos/begin_pyphp/backend/api`
+Base URL (WAMP): `http://localhost:8081/farmos/app/backend/api`
 
 ### Authentication
 - `POST /auth/login` - User login
@@ -168,10 +173,10 @@ See [full API documentation](./docs/DEVELOPER_GUIDE.md) for complete endpoint li
 
 ```bash
 # Backend under Apache (WAMP)
-# http://localhost/farmos/begin_pyphp/backend/
+# http://localhost:8081/farmos/app/backend/
 
 # Or start the PHP built-in server
-cd begin_pyphp/backend
+cd app/backend
 composer run serve
 
 # Frontend (WAMP auto-reloads PHP)
@@ -181,7 +186,7 @@ composer run serve
 ### Running Tests
 
 ```bash
-cd begin_pyphp/backend
+cd app/backend
 composer run test
 ```
 
@@ -189,14 +194,14 @@ composer run test
 
 ```bash
 # Database schema files
-dir begin_pyphp\database\*.sql
+dir app\database\*.sql
 ```
 
 ## 🐛 Troubleshooting
 
 ### Backend Won't Start
 - Verify PHP and Composer are installed: `php -v` and `composer -V`
-- Check backend dependencies: `cd begin_pyphp/backend && composer install`
+- Check backend dependencies: `cd app/backend && composer install`
 - If using the built-in server, ensure the port is available (default: 8001)
 
 ### Database Connection Errors
@@ -216,9 +221,9 @@ dir begin_pyphp\database\*.sql
 ## 📝 Configuration
 
 Key configuration files:
-- `begin_pyphp/backend/config/env.php` - Backend configuration defaults
-- `begin_pyphp/backend/config/.env` - Environment variables (optional; overrides defaults)
-- `begin_pyphp/frontend/config.php` - Frontend configuration
+- `app/backend/config/env.php` - Backend configuration defaults
+- `app/backend/config/.env` - Environment variables (optional; overrides defaults)
+- `app/frontend/config.php` - Frontend configuration
 
 ## 🤝 Contributing
 
@@ -250,8 +255,8 @@ For issues, questions, or suggestions:
 ## 📋 Project Status
 
 **Status**: Production Ready  
-**Last Updated**: March 2026  
-**Version**: 1.0.0
+**Last Updated**: April 2026  
+**Version**: 1.1.0
 
 ---
 

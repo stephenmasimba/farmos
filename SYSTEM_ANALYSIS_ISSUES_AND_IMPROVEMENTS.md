@@ -1,14 +1,16 @@
 # FarmOS - System Analysis: Issues and Improvements
 
-**Date**: March 12, 2026  
-**Version**: 1.0  
-**Status**: Comprehensive Review Complete
+**Date**: April 8, 2026  
+**Version**: 1.1  
+**Status**: Updated After Runtime Path Standardization
 
 ---
 
 ## 📊 Executive Summary
 
 FarmOS is a feature-rich farm management system with a pure PHP backend and PHP frontend. The system has strong foundational architecture but requires improvements in security, code quality, testing, and documentation. This document identifies critical issues, medium-priority improvements, and low-priority enhancements.
+
+Recent updates (April 2026): runtime paths were standardized under `app/`, legacy Python startup paths were removed, and startup/test scripts were aligned to the PHP/WAMP flow.
 
 ---
 
@@ -17,32 +19,33 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 ### 1. **Security Vulnerabilities**
 
 #### 1.1 Hardcoded Secrets
-- **Issue**: JWT secret must not fall back to insecure defaults
+- **Issue**: JWT secret must not fall back to insecure defaults (and must be explicitly set in production)
 - **Risk**: HIGH - Anyone can decode JWTs and spoof API access
 - **Impact**: Complete authentication bypass possible
-- **File**: `begin_pyphp/backend/config/env.php`, `begin_pyphp/backend/src/Security.php`
+- **File**: `app/backend/config/env.php`, `app/backend/src/Security.php`
 - **Fix Priority**: CRITICAL
 - **Solution**:
-  - Require `JWT_SECRET` from environment and reject missing/weak values at startup.
+  - Require `JWT_SECRET` in production/staging and reject missing/weak values at startup.
+  - Allow dev-only generation into `app/backend/config/.env` (writable environments only).
 
-#### 1.2 No Input Validation
-- **Issue**: Many endpoints accept user input without validation
+#### 1.2 Input Validation Coverage Gaps
+- **Issue**: Some endpoints may still accept user input without full validation
 - **Risk**: HIGH - SQL Injection, XSS, NoSQL Injection possible
-- **File**: `begin_pyphp/backend/src/Controllers/*`
+- **File**: `app/backend/src/Controllers/*`
 - **Fix Priority**: CRITICAL
-- **Solution**: Validate all request bodies and query params via `begin_pyphp/backend/src/Validation.php`.
+- **Solution**: Validate all request bodies and query params via `app/backend/src/Validation.php`.
 
-#### 1.3 Missing Rate Limiting
-- **Issue**: No rate limiting on authentication endpoints
+#### 1.3 Rate Limiting Coverage Gaps
+- **Issue**: Authentication endpoints must remain consistently rate limited
 - **Risk**: HIGH - Brute force attacks on login
-- **File**: `begin_pyphp/backend/src/RateLimiter.php`, `begin_pyphp/backend/public/index.php`
+- **File**: `app/backend/src/RateLimiter.php`, `app/backend/public/index.php`
 - **Fix Priority**: CRITICAL
-- **Solution**: Implement rate limiting middleware with Redis or in-memory store
+- **Solution**: Implement rate limiting with an in-memory store (or Redis if you add it later)
 
 #### 1.4 CORS Configuration Issues
 - **Issue**: CORS origin is configurable but defaults to localhost only
 - **Risk**: MEDIUM - Potential for CORS bypass if misconfigured in production
-- **File**: `begin_pyphp/backend/public/index.php`
+- **File**: `app/backend/public/index.php`
 - **Fix Priority**: HIGH
 - **Solution**: Validate `CORS_ORIGIN` for production and avoid wildcard origins.
 
@@ -53,17 +56,17 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 - **Fix Priority**: CRITICAL
 - **Solution**: Add HTTPS redirect, SSL/TLS certificates, security headers
 
-#### 1.6 Missing Authentication on Protected Routes
-- **Issue**: Some protected routes may not validate authentication properly
+#### 1.6 Authentication Enforcement Gaps
+- **Issue**: Some protected routes may not validate authentication consistently
 - **Risk**: HIGH - Unauthorized access to sensitive operations
-- **File**: `begin_pyphp/backend/public/index.php`, `begin_pyphp/backend/src/Middleware/*`
+- **File**: `app/backend/public/index.php`, `app/backend/src/Middleware/*`
 - **Fix Priority**: CRITICAL
 - **Solution**: Enforce JWT auth middleware for all protected routes.
 
 #### 1.7 No CSRF Protection
-- **Issue**: PHP frontend lacks CSRF token generation and validation
-- **Risk**: HIGH - Cross-site request forgery attacks possible
-- **File**: `frontend/public/index.php`, all forms
+- **Issue**: CSRF protection is required for cookie-based auth or state-changing form posts.
+- **Risk**: HIGH - Cross-site request forgery attacks possible (when browser automatically sends credentials)
+- **File**: PHP frontend forms / endpoints that mutate state via cookies
 - **Fix Priority**: HIGH
 - **Solution**:
   - Generate unique CSRF tokens per session
@@ -73,7 +76,7 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 #### 1.8 Password Storage Concerns
 - **Issue**: Password hashing implementation not verified
 - **Risk**: MEDIUM - Weak password hashing vulnerable to attacks
-- **File**: `begin_pyphp/backend/src/Auth.php`
+- **File**: `app/backend/src/Auth.php`
 - **Fix Priority**: HIGH
 - **Requirement**: 
   - Use bcrypt with appropriate cost factor (10-12)
@@ -81,11 +84,11 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
   - Implement password complexity requirements
 
 #### 1.9 Missing SQL Injection Protection
-- **Issue**: Dynamic SQL queries without parameterization in PHP frontend
-- **Risk**: CRITICAL - Direct database access vulnerable
-- **File**: `frontend/pages/*.php`
+- **Issue**: Avoid direct database access from the PHP frontend; if needed, always use prepared statements.
+- **Risk**: CRITICAL - Direct database access is vulnerable without strict parameterization
+- **File**: Any PHP frontend code that runs SQL directly
 - **Fix Priority**: CRITICAL
-- **Solution**: Use prepared statements for all database queries
+- **Solution**: Use prepared statements everywhere (or route all data access via the API)
 
 #### 1.10 No API Key Rotation Mechanism
 - **Issue**: If API keys are introduced, they must be rotatable and revocable
@@ -97,9 +100,9 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 
 ### 2. **Critical Dependency Issues**
 
-#### 2.1 Missing Critical Dependencies
-- **Issue**: Dependency manifest must be complete and reproducible
-- **File**: `begin_pyphp/backend/composer.json`, `begin_pyphp/backend/composer.lock`
+#### 2.1 Dependency Reproducibility Risks
+- **Issue**: Dependency manifests must remain complete and reproducible
+- **File**: `app/backend/composer.json`, `app/backend/composer.lock`
 - **Fix Priority**: CRITICAL
 - **Solution**: Use Composer for dependency management and lock versions via `composer.lock`.
 
@@ -117,7 +120,7 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 - **Risk**: CRITICAL - Cannot rollback changes, difficult to replicate environments
 - **File**: Database schema and deployment scripts
 - **Fix Priority**: CRITICAL
-- **Solution**: Track schema via `begin_pyphp/database/schema.sql` and apply incremental SQL migrations with a `schema_migrations` table.
+- **Solution**: Track schema via `app/database/schema.sql` and apply incremental SQL migrations with a `schema_migrations` table.
 
 #### 3.2 Missing Foreign Key Constraints
 - **Issue**: Relationships between tables not enforced at database level
@@ -145,11 +148,11 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 ### 4. **Code Quality Issues**
 
 #### 4.1 No Error Handling Standards
-- **Issue**: Inconsistent error responses across API endpoints
+- **Issue**: Keep error responses consistent across all API endpoints
 - **Risk**: MEDIUM - Difficult to debug, bad UX
 - **File**: All routers
 - **Fix Priority**: HIGH
-- **Solution**: Create standardized error response format
+- **Solution**: Use a standardized error response format (already provided by `app/backend/src/Response.php`)
   ```json
   {
     "error": {
@@ -161,16 +164,16 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
   ```
 
 #### 4.2 No Logging Framework
-- **Issue**: No centralized logging, only print statements
+- **Issue**: Logging must be structured and written to a writable location in production
 - **Risk**: MEDIUM - Difficult to debug production issues
-- **File**: All PHP backend code paths
+- **File**: `app/backend/src/Logger.php`, `app/backend/config/env.php`
 - **Fix Priority**: HIGH
 - **Solution**: Use centralized JSON logging with configurable log levels and rotation
 
-#### 4.3 Missing Environment Variable Validation
-- **Issue**: Environment variables not validated on startup
+#### 4.3 Environment Variable Validation Gaps
+- **Issue**: Environment variables may not be validated comprehensively on startup
 - **Risk**: MEDIUM - Missing configuration causes runtime errors
-- **File**: `begin_pyphp/backend/config/env.php`
+- **File**: `app/backend/config/env.php`
 - **Fix Priority**: MEDIUM
 - **Solution**: Create startup validation function checking all required env vars
 
@@ -186,9 +189,9 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 ### 5. **Testing Issues**
 
 #### 5.1 Minimal Test Coverage
-- **Issue**: Few unit tests, no integration tests documented
+- **Issue**: Keep expanding unit + feature test coverage
 - **Risk**: HIGH - Regressions not caught before production
-- **File**: `backend/tests/` exists but appears minimal
+- **File**: `app/backend/tests/`
 - **Fix Priority**: CRITICAL
 - **Solution**: 
   - Target 80%+ code coverage
@@ -197,9 +200,9 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
   - Use PHPUnit with shared test helpers
 
 #### 5.2 No Test Database Configuration
-- **Issue**: Tests may run against production database
+- **Issue**: Tests must never run against production data
 - **Risk**: CRITICAL - Data corruption in production
-- **File**: All test files
+- **File**: `app/backend/tests/ApiTestCase.php`
 - **Fix Priority**: CRITICAL
 - **Solution**: Use an isolated test database created/dropped by the test suite
 
@@ -227,11 +230,11 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
   - `DELETE /resources/{id}` - Delete
 
 #### 6.2 No API Versioning
-- **Issue**: Version system exists but not enforced
+- **Issue**: API versioning is not currently enforced
 - **Risk**: MEDIUM - Breaking changes confuse clients
-- **File**: `app.py`
+- **File**: `app/backend/public/index.php`
 - **Fix Priority**: MEDIUM
-- **Solution**: Require `Accept: application/vnd.farmos.v1+json` header
+- **Solution**: Add `/api/v1/...` route prefix (simplest), or enforce an `Accept` vendor media type header
 
 #### 6.3 No Request/Response Compression
 - **Issue**: Large responses not compressed
@@ -256,36 +259,34 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 ### 1. **Architecture and Code Organization**
 
 #### 1.1 Router Organization
-- **Issue**: 45+ router files, potential for 4-5k lines in each
-- **Improvement**: Break into smaller logical components
-- **Solution**: Reorganize into domain-based packages
+- **Issue**: Routing can become too large if all endpoints live in a single file.
+- **Improvement**: Keep routing thin and move logic into controllers/services.
+- **Solution**: Keep this structure (already present in `app/backend/src/`):
   ```
-  routers/
-    ├── livestock/
-    │   ├── __init__.py
-    │   ├── routes.py
-    │   ├── models.py
-    │   └── services.py
-    ├── inventory/
-    │   ├── routes.py
-    │   ├── models.py
-    │   └── services.py
+  app/backend/
+    public/index.php
+    src/
+      Controllers/
+      Models/
+      Services/
+      Repositories/
+      Middleware/
   ```
 
 #### 1.2 Service Layer Missing
-- **Issue**: Business logic mixed with route handlers
-- **Improvement**: Separate concerns with service layer
-- **Solution**: Create `backend/services/` directory with business logic
+- **Issue**: Business logic can drift into controllers/routes.
+- **Improvement**: Separate concerns with a service layer.
+- **Solution**: Use the existing `app/backend/src/Services/` and keep controllers thin.
 
 #### 1.3 Repository Pattern Missing
-- **Issue**: Database access scattered across routers
-- **Improvement**: Centralize with repository pattern
-- **Solution**: Create `backend/repositories/` for data access layer
+- **Issue**: Database access can get duplicated across controllers.
+- **Improvement**: Centralize with a repository pattern.
+- **Solution**: Use the existing `app/backend/src/Repositories/` for shared queries.
 
 #### 1.4 Configuration Management
 - **Issue**: Configuration hardcoded or in multiple places
 - **Improvement**: Centralized configuration
-- **Solution**: Create `backend/config.php` with environment-based configs
+- **Solution**: Use `app/backend/config/env.php` + `app/backend/config/.env` (not committed).
 
 ---
 
@@ -295,10 +296,9 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 - **Issue**: Mixed concerns in PHP files
 - **Improvement**: Implement proper MVC separation
 - **Solution**: 
-  - Models in `database/models.php`
-  - Controllers in `app/controllers/`
-  - Views in `app/views/`
-  - Routes in `routes.php`
+  - Keep templates/components focused on rendering
+  - Keep API calls and business logic in shared helpers (e.g. `lib/`)
+  - Avoid direct SQL from frontend pages; use the API as the data boundary
 
 #### 2.2 Frontend Authentication
 - **Issue**: Session handling may have security gaps
@@ -352,15 +352,15 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 #### 4.1 No Centralized Logging
 - **Issue**: Logs scattered across files
 - **Improvement**: Centralized logging with ELK or similar
-- **Solution**: Implement structured logging to stdout for container-friendly logging
+- **Solution**: Implement structured logging to a writable directory (e.g. `app/backend/storage/logs`) and/or web server error logs
 
 #### 4.2 No Metrics Collection
 - **Issue**: No performance metrics tracked
 - **Improvement**: Collect and monitor metrics
 - **Solution**: Integrate Prometheus metrics
 
-#### 4.3 No Health Check Endpoints
-- **Issue**: Basic health check exists but incomplete
+#### 4.3 Health Check Depth Is Limited
+- **Issue**: Basic health checks exist but are incomplete
 - **Improvement**: Detailed health checks
 - **Solution**: 
   - Database connectivity check
@@ -410,13 +410,13 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 
 ### 6. **DevOps and Deployment**
 
-#### 6.1 No Containerization
-- **Issue**: Deployment not standardized for shared hosting
-- **Improvement**: Document shared hosting deployment setup
+#### 6.1 Deployment Standardization Gaps
+- **Issue**: Shared-hosting deployment must remain standardized and repeatable
+- **Improvement**: Document shared hosting deployment setup (no container requirement)
 - **Solution**:
-  - Document web root (`begin_pyphp/backend/public/`)
-  - Document environment file (`begin_pyphp/backend/config/.env`)
-  - Document schema import (`begin_pyphp/database/schema.sql`)
+  - Document web root (`app/backend/public/`)
+  - Document environment file (`app/backend/config/.env`)
+  - Document schema import (`app/database/schema.sql`)
 
 #### 6.2 No CI/CD Pipeline
 - **Issue**: No automated testing or deployment
@@ -639,12 +639,13 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 #### 5.4 Security Headers
 - **Enhancement**: Add HTTP security headers
 - **Solution**:
-  ```python
+  ```text
   Content-Security-Policy
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
-  X-XSS-Protection
   Strict-Transport-Security
+  Referrer-Policy
+  Permissions-Policy
   ```
 
 ---
@@ -654,25 +655,25 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 ## 📋 Implementation Roadmap
 
 ### Phase 1: Critical Security (Weeks 1-2)
-- [ ] Fix hardcoded secrets
-- [ ] Implement input validation on all endpoints
-- [ ] Add rate limiting to auth endpoints
-- [ ] Implement CSRF protection
-- [ ] Add SQL injection protection
+- [x] Fix hardcoded secrets (require `JWT_SECRET` in production/staging)
+- [x] Implement input validation on core endpoints
+- [x] Add rate limiting to auth endpoints
+- [ ] Implement CSRF protection where cookie-based state changes exist
+- [x] Add SQL injection protection via prepared statements in the backend DB layer
 
 ### Phase 2: Testing Infrastructure (Weeks 3-4)
-- [ ] Set up test database
+- [x] Set up isolated test database
 - [ ] Write unit tests (target 80%+ coverage)
-- [ ] Create integration tests
+- [x] Create integration/feature tests for API endpoints
 - [ ] Set up CI/CD pipeline
 - [ ] Add automated testing on commit
 
 ### Phase 3: Code Quality (Weeks 5-6)
-- [ ] Implement logging framework
-- [ ] Add error handling standards
-- [ ] Refactor into service/repository layers
-- [ ] Add type checking with PHPStan
-- [ ] Set up code formatting with PHPCBF
+- [x] Implement logging framework
+- [x] Add error handling standards
+- [x] Refactor into service/repository layers
+- [x] Add type checking with PHPStan
+- [x] Set up code formatting with PHPCBF
 
 ### Phase 4: Infrastructure (Weeks 7-8)
 - [ ] Set up environment management
@@ -764,8 +765,10 @@ FarmOS is a feature-rich farm management system with a pure PHP backend and PHP 
 - Actual issues may differ after running the application
 - Some issues may require different solutions based on specific use cases
 - Regular security audits recommended (quarterly minimum)
+- Runtime and documentation now use `app/` as the primary project path.
+- If `begin_pyphp/backend` still appears on a machine, it is a legacy locked-path cleanup item (typically held by a running web server process).
 
 ---
 
-**Document prepared**: March 12, 2026  
+**Document prepared**: April 8, 2026  
 **Review cycle**: Recommend quarterly updates to this analysis

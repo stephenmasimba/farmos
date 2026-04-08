@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo FarmOS System Test & Configuration
+echo FarmOS System Test ^& Configuration
 echo ========================================
 echo.
 
@@ -28,15 +28,10 @@ if errorlevel 1 (
 
 echo.
 echo ========================================
-echo Starting FarmOS Backend Server...
+echo Validating FarmOS Backend...
 echo ========================================
 
-REM Start backend server
-cd /c/wamp64/www/farmos
-start "FarmOS Backend" cmd /k "python start_backend.py"
-
-REM Wait for backend to start
-timeout /t 5 /nobreak >nul
+REM Backend runs under Apache/WAMP via app/backend
 
 echo.
 echo ========================================
@@ -45,10 +40,10 @@ echo ========================================
 
 REM Test backend health
 echo Testing backend health...
-curl -s http://127.0.0.1:8000/health >nul 2>&1
+curl -s http://localhost:8081/farmos/app/backend/health >nul 2>&1
 if errorlevel 1 (
     echo ❌ Backend health check failed
-    echo Backend server may not be running properly
+    echo Expected URL: http://localhost:8081/farmos/app/backend/health
 ) else (
     echo ✅ Backend health check passed
 )
@@ -56,7 +51,7 @@ if errorlevel 1 (
 REM Test frontend access
 echo.
 echo Testing frontend access...
-curl -s -I http://localhost:8081/farmos/begin_pyphp/frontend/public/ >nul 2>&1
+curl -s -I http://localhost:8081/farmos/app/frontend/public/ >nul 2>&1
 if errorlevel 1 (
     echo ❌ Frontend not accessible at port 8081
     echo Please check Apache configuration
@@ -70,25 +65,22 @@ echo FarmOS System URLs
 echo ========================================
 echo.
 echo 🌐 Frontend (Main Application):
-echo    http://localhost:8081/farmos/begin_pyphp/frontend/public/
+echo    http://localhost:8081/farmos/app/frontend/public/
 echo.
 echo 🔧 Backend API:
-echo    http://127.0.0.1:8000/
-echo.
-echo 📚 API Documentation:
-echo    http://127.0.0.1:8000/docs
+echo    http://localhost:8081/farmos/app/backend/
 echo.
 echo 📊 Dashboard Direct Link:
-echo    http://localhost:8081/farmos/begin_pyphp/frontend/public/index.php?page=dashboard
+echo    http://localhost:8081/farmos/app/frontend/public/index.php?page=dashboard
 echo.
 echo 🔐 Login Page:
-echo    http://localhost:8081/farmos/begin_pyphp/frontend/public/index.php?page=login
+echo    http://localhost:8081/farmos/app/frontend/public/index.php?page=login
 echo.
 
 echo ========================================
 echo Opening FarmOS in browser...
 echo ========================================
-start http://localhost:8081/farmos/begin_pyphp/frontend/public/
+start http://localhost:8081/farmos/app/frontend/public/
 
 echo.
 echo ✅ FarmOS system test complete!

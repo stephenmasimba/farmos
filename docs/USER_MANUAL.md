@@ -1,5 +1,7 @@
 # FarmOS User Manual
 
+See [INDEX.md](./INDEX.md) for the full documentation map.
+
 ## Introduction
 Welcome to FarmOS, your complete farm management solution. This guide will help you get started with managing your livestock, inventory, and farm operations.
 

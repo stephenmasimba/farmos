@@ -31,7 +31,7 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f begin_pyphp/backend/requirements.txt ]; then pip install -r begin_pyphp/backend/requirements.txt; fi
+        if [ -f app/backend/requirements.txt ]; then pip install -r app/backend/requirements.txt; fi
         pip install pytest httpx
 
     - name: Run Tests

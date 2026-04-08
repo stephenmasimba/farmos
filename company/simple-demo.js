@@ -296,14 +296,12 @@ async function loadMarkdownDocument() {
   const markdownPre = document.getElementById("markdownPre");
   if (!markdownPre) return;
 
-  try {
-    const response = await fetch("simple-front.md");
-    if (!response.ok) throw new Error(`Unable to load document: ${response.status}`);
-    const text = await response.text();
-    markdownPre.innerHTML = parseMarkdown(text);
-  } catch (error) {
-    markdownPre.textContent = `Unable to load simple-front.md. Please ensure the file is available next to this page.`;
+  if (typeof SIMPLE_FRONT_MARKDOWN === "string" && SIMPLE_FRONT_MARKDOWN.length > 0) {
+    markdownPre.innerHTML = parseMarkdown(SIMPLE_FRONT_MARKDOWN);
+    return;
   }
+
+  markdownPre.textContent = "No embedded markdown found. Ensure simple-front-fallback.js is present next to this page.";
 }
 
 loadMarkdownDocument();

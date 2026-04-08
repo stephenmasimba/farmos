@@ -45,20 +45,20 @@ test_system.bat
 # 1. Start WAMP server (Apache + MySQL)
 
 # 2. Backend runs under Apache (WAMP) automatically:
-#    http://localhost:8081/farmos/begin_pyphp/backend/
+#    http://localhost:8081/farmos/app/backend/
 
 # 3. Access the application
-http://localhost:8081/farmos/begin_pyphp/frontend/public/
+http://localhost:8081/farmos/app/frontend/public/
 ```
 
 ### 3. System URLs
 
 | Component | URL |
 |-----------|------|
-| **Main Application** | http://localhost:8081/farmos/begin_pyphp/frontend/public/ |
-| **Dashboard** | http://localhost:8081/farmos/begin_pyphp/frontend/public/index.php?page=dashboard |
-| **Login** | http://localhost:8081/farmos/begin_pyphp/frontend/public/index.php?page=login |
-| **Backend Health** | http://localhost:8081/farmos/begin_pyphp/backend/health |
+| **Main Application** | http://localhost:8081/farmos/app/frontend/public/ |
+| **Dashboard** | http://localhost:8081/farmos/app/frontend/public/index.php?page=dashboard |
+| **Login** | http://localhost:8081/farmos/app/frontend/public/index.php?page=login |
+| **Backend Health** | http://localhost:8081/farmos/app/backend/health |
 
 ### 4. Default Login Credentials
 
@@ -127,22 +127,22 @@ mysql -u root -p begin_masimba_farm -e "SHOW TABLES;"
 ### 7. Development Mode
 
 For development, you can access the system at:
-- **Development URL**: http://localhost/farmos/begin_pyphp/frontend/public/
-- **Production URL**: http://localhost:8081/farmos/begin_pyphp/frontend/public/
+- **Development URL**: http://localhost/farmos/app/frontend/public/
+- **Production URL**: http://localhost:8081/farmos/app/frontend/public/
 
 ### 8. API Testing
 
 Test the backend API:
 ```bash
 # Health check
-curl http://127.0.0.1:8001/health
+curl http://localhost:8081/farmos/app/backend/health
 
 # API version
-curl http://127.0.0.1:8001/api/version
+curl http://localhost:8081/farmos/app/backend/api/version
 
 # Dashboard data (with auth)
-TOKEN=$(curl -s -X POST http://127.0.0.1:8001/api/auth/login -H "Content-Type: application/json" -d "{\"email\":\"admin@example.com\",\"password\":\"password123\"}" | php -r '$j=json_decode(stream_get_contents(STDIN), true); echo $j["access_token"] ?? "";')
-curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8001/api/dashboard/summary
+TOKEN=$(curl -s -X POST http://localhost:8081/farmos/app/backend/api/auth/login -H "Content-Type: application/json" -d "{\"email\":\"admin@farmos.local\",\"password\":\"admin123\"}" | php -r '$j=json_decode(stream_get_contents(STDIN), true); echo $j["access_token"] ?? "";')
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8081/farmos/app/backend/api/dashboard/summary
 ```
 
 ---
@@ -151,10 +151,10 @@ curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8001/api/dashboard/summa
 
 For issues and support:
 1. Check the troubleshooting section above
-2. Review system logs in `logs/` directory
+2. Review system logs in `app/backend/storage/logs/`
 3. Check Apache error logs
-4. Review the comprehensive documentation in `SYSTEM_FIXES.md`
+4. Start from `docs/INDEX.md` and then use `docs/consolidated/` for deeper topics
 
 ---
 
-*Last Updated: January 13, 2026*
+*Last Updated: April 8, 2026*

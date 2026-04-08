@@ -4,37 +4,41 @@ echo Begin Masimba FarmOS Backend Startup
 echo ========================================
 echo.
 
-REM Check if Python is installed
-python --version >nul 2>&1
+REM FarmOS backend is Pure PHP and runs via Apache/WAMP.
+REM This script validates prerequisites and checks backend health.
+
+echo Checking WAMP Apache process...
+tasklist | find "wampapache.exe" >nul
 if errorlevel 1 (
-    echo ERROR: Python is not installed or not in PATH
-    echo Please install Python 3.8+ and add it to PATH
+    echo ERROR: WAMP Apache is not running.
+    echo Start WAMP server first, then rerun this script.
     pause
     exit /b 1
 )
 
-REM Check if required packages are installed
-echo Checking Python packages...
-python -c "import fastapi, uvicorn, sqlalchemy, pydantic_settings, dotenv" 2>nul
+echo Checking WAMP MySQL process...
+tasklist | find "wampmysqld.exe" >nul
 if errorlevel 1 (
-    echo Installing required packages...
-    pip install fastapi uvicorn sqlalchemy pymysql pydantic-settings python-dotenv
-    if errorlevel 1 (
-        echo ERROR: Failed to install required packages
-        pause
-        exit /b 1
-    )
+    echo ERROR: WAMP MySQL is not running.
+    echo Start WAMP server first, then rerun this script.
+    pause
+    exit /b 1
 )
 
-REM Start the backend server
 echo.
-echo Starting backend server...
-echo Server will be available at: http://127.0.0.1:8000
-echo API docs at: http://127.0.0.1:8000/docs
-echo.
-echo Press Ctrl+C to stop the server
-echo.
+echo Testing backend health endpoint...
+curl -s http://localhost:8081/farmos/app/backend/health >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: Backend health check failed.
+    echo Expected URL: http://localhost:8081/farmos/app/backend/health
+    echo Verify Apache port 8081 and vhost/alias configuration.
+    pause
+    exit /b 1
+)
 
-python start_backend.py
+echo.
+echo Backend is healthy and reachable.
+echo Backend API base: http://localhost:8081/farmos/app/backend
+echo Frontend URL:    http://localhost:8081/farmos/app/frontend/public/
 
 pause

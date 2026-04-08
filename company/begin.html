@@ -11,20 +11,24 @@
       margin: 0;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: #0f172a;
-      background: #f8fafc;
+      background:
+        radial-gradient(1100px 520px at 10% -10%, rgba(212, 175, 55, 0.18), transparent 60%),
+        radial-gradient(900px 520px at 110% 0%, rgba(10, 43, 30, 0.12), transparent 60%),
+        #f6f7fb;
       line-height: 1.6;
     }
     .topbar {
       position: sticky;
       top: 0;
       z-index: 20;
-      background: #0a2b1e;
+      background: linear-gradient(180deg, rgba(10, 43, 30, 0.98), rgba(10, 43, 30, 0.92));
       border-bottom: 3px solid #d4af37;
       color: #f8fafc;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
     }
     .topbar-inner {
-      max-width: 1100px;
+      max-width: 1220px;
       margin: 0 auto;
       padding: 14px 16px;
       display: flex;
@@ -73,21 +77,114 @@
     }
     .btn-primary:hover { background: #f5c842; }
     .container {
-      max-width: 1100px;
+      max-width: 1220px;
       margin: 0 auto;
       padding: 22px 16px 56px;
     }
-    .doc {
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .panel {
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 8px 18px rgba(2, 6, 23, 0.05);
+      box-shadow: 0 12px 26px rgba(2, 6, 23, 0.08);
+    }
+    .sidebar {
+      position: sticky;
+      top: 86px;
+      align-self: start;
+      padding: 14px;
+    }
+    .sidebar-title {
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      color: #0a2b1e;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .toc-search {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 13px;
+      outline: none;
+      background: #fbfcfe;
+    }
+    .toc-search:focus {
+      border-color: rgba(10, 43, 30, 0.35);
+      box-shadow: 0 0 0 4px rgba(10, 43, 30, 0.08);
+    }
+    .toc {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: calc(100vh - 190px);
+      overflow: auto;
+      padding-right: 6px;
+    }
+    .toc a {
+      display: block;
+      padding: 8px 10px;
+      border-radius: 12px;
+      text-decoration: none;
+      border: 1px solid transparent;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .toc a:hover {
+      background: rgba(10, 43, 30, 0.06);
+      color: #0a2b1e;
+      border-color: rgba(10, 43, 30, 0.08);
+    }
+    .toc a[data-level="2"] { padding-left: 16px; }
+    .toc a[data-level="3"] { padding-left: 26px; font-weight: 600; }
+    .toc a[data-level="4"] { padding-left: 36px; font-weight: 560; }
+    .content {
+      padding: 18px;
+    }
+    .doc-header {
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+    }
+    .doc-kicker {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+      color: #475569;
+    }
+    .doc-title {
+      font-family: "Playfair Display", serif;
+      font-weight: 700;
+      font-size: 34px;
+      line-height: 1.15;
+      letter-spacing: -0.6px;
+      margin: 6px 0 0;
+    }
+    .doc-subtitle {
+      margin: 6px 0 0;
+      color: #475569;
+      font-weight: 600;
+    }
+    .doc {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
     }
     .doc h1, .doc h2, .doc h3, .doc h4, .doc h5, .doc h6 {
       font-family: "Playfair Display", serif;
       margin: 18px 0 10px;
       line-height: 1.25;
+      scroll-margin-top: 110px;
     }
     .doc h1 { font-size: 32px; }
     .doc h2 { font-size: 24px; }
@@ -129,6 +226,11 @@
       color: #475569;
       font-size: 12px;
     }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; top: auto; }
+      .toc { max-height: none; }
+    }
   </style>
 </head>
 <body>
@@ -146,10 +248,23 @@
   </header>
 
   <main class="container">
-    <div id="markdownPre" class="doc">Loading simple-front.md…</div>
-    <div id="status" class="status"></div>
+    <div class="layout">
+      <aside class="sidebar panel" aria-label="Document contents">
+        <div class="sidebar-title">Contents</div>
+        <input id="tocSearch" class="toc-search" type="search" placeholder="Search headings" autocomplete="off" />
+        <nav id="toc" class="toc"></nav>
+      </aside>
+      <section class="content panel">
+        <div class="doc-header">
+          <div class="doc-kicker">Document Viewer</div>
+          <div class="doc-title">BEGIN TRUST &amp; Associated Entities</div>
+          <div class="doc-subtitle">Corporate structure, agreements, governance and registration checklist</div>
+        </div>
+        <div id="markdownPre" class="doc">Loading document…</div>
+        <div id="status" class="status"></div>
+      </section>
+    </div>
   </main>
-
   <script src="simple-front-fallback.js"></script>
   <script>
     function escapeHtml(text) {
@@ -161,6 +276,31 @@
         .replace(/'/g, "&#39;");
     }
 
+    function sanitizeHref(href) {
+      const raw = String(href || "").trim();
+      if (raw.startsWith("#")) return raw;
+      if (/^https?:\/\//i.test(raw)) return raw;
+      return "#";
+    }
+
+    function slugify(text, used) {
+      const base = String(text || "")
+        .toLowerCase()
+        .replace(/&amp;/g, "and")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 64) || "section";
+
+      let slug = base;
+      let i = 2;
+      while (used.has(slug)) {
+        slug = `${base}-${i}`;
+        i += 1;
+      }
+      used.add(slug);
+      return slug;
+    }
+
     function renderInline(text) {
       let safeText = escapeHtml(text);
       safeText = safeText.replace(/`([^`]+)`/g, "<code>$1</code>");
@@ -168,6 +308,11 @@
       safeText = safeText.replace(/__([^_]+)__/g, "<strong>$1</strong>");
       safeText = safeText.replace(/\*([^*]+)\*/g, "<em>$1</em>");
       safeText = safeText.replace(/_([^_]+)_/g, "<em>$1</em>");
+      safeText = safeText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, href) => {
+        const safeHref = sanitizeHref(href);
+        const target = safeHref.startsWith("#") ? "_self" : "_blank";
+        return `<a href="${escapeHtml(safeHref)}" target="${target}" rel="noopener noreferrer">${label}</a>`;
+      });
       return safeText;
     }
 
@@ -208,6 +353,8 @@
     }
 
     function parseMarkdown(text) {
+      const usedSlugs = new Set();
+      const tocItems = [];
       const lines = String(text).split(/\r?\n/);
       const html = [];
       let inCode = false;
@@ -259,7 +406,10 @@
         if (headingMatch) {
           flushPending();
           const level = headingMatch[1].length;
-          html.push(`<h${level}>${renderInline(headingMatch[2])}</h${level}>`);
+          const headingText = headingMatch[2].trim();
+          const id = slugify(headingText, usedSlugs);
+          html.push(`<h${level} id="${id}">${renderInline(headingText)}</h${level}>`);
+          if (level <= 4) tocItems.push({ level, id, text: headingText });
           return;
         }
 
@@ -321,44 +471,56 @@
       });
 
       flushPending();
-      return html.join("");
+      return { html: html.join(""), toc: tocItems };
     }
 
-    async function loadMarkdownDocument() {
+    function loadMarkdownDocument() {
       const container = document.getElementById("markdownPre");
       const status = document.getElementById("status");
       if (!container) return;
       const started = Date.now();
 
-      try {
-        const response = await fetch("simple-front.md", { cache: "no-store" });
-        if (!response.ok) throw new Error(`Unable to load simple-front.md (${response.status})`);
-        const text = await response.text();
-        container.innerHTML = parseMarkdown(text);
-        if (status) status.textContent = `Loaded simple-front.md (${text.length.toLocaleString()} chars) in ${Date.now() - started} ms.`;
-        return text;
-      } catch (error) {
-        if (typeof window.SIMPLE_FRONT_MARKDOWN === "string" && window.SIMPLE_FRONT_MARKDOWN.length > 0) {
-          const text = window.SIMPLE_FRONT_MARKDOWN;
-          container.innerHTML = parseMarkdown(text);
-          if (status) status.textContent = `Loaded fallback markdown from local script after fetch failed.`;
-          return text;
-        }
-
-        container.textContent = "Unable to load simple-front.md. Please ensure the file exists next to begin.html and is served via HTTP (e.g., XAMPP).";
-        if (status) status.textContent = String(error && error.message ? error.message : error);
+      const text = typeof SIMPLE_FRONT_MARKDOWN === "string" ? SIMPLE_FRONT_MARKDOWN : "";
+      if (!text) {
+        container.textContent = "Document content missing. Ensure simple-front-fallback.js is present next to begin.html.";
+        if (status) status.textContent = "Missing SIMPLE_FRONT_MARKDOWN.";
         return null;
       }
+
+      const parsed = parseMarkdown(text);
+      container.innerHTML = parsed.html;
+
+      const toc = document.getElementById("toc");
+      if (toc) {
+        toc.innerHTML = parsed.toc
+          .map((h) => `<a href="#${escapeHtml(h.id)}" data-level="${h.level}">${escapeHtml(h.text)}</a>`)
+          .join("");
+      }
+
+      const search = document.getElementById("tocSearch");
+      if (search && toc && !search.dataset.wired) {
+        search.dataset.wired = "1";
+        search.addEventListener("input", () => {
+          const q = String(search.value || "").trim().toLowerCase();
+          toc.querySelectorAll("a").forEach((a) => {
+            const t = String(a.textContent || "").toLowerCase();
+            a.style.display = q === "" || t.includes(q) ? "block" : "none";
+          });
+        });
+      }
+
+      if (status) status.textContent = `Loaded ${text.length.toLocaleString()} chars in ${Date.now() - started} ms.`;
+      return text;
     }
 
     let lastMarkdownText = null;
 
-    document.getElementById("reloadBtn")?.addEventListener("click", async () => {
-      lastMarkdownText = await loadMarkdownDocument();
+    document.getElementById("reloadBtn")?.addEventListener("click", () => {
+      lastMarkdownText = loadMarkdownDocument();
     });
     document.getElementById("printBtn")?.addEventListener("click", () => window.print());
-    document.getElementById("downloadBtn")?.addEventListener("click", async () => {
-      if (!lastMarkdownText) lastMarkdownText = await loadMarkdownDocument();
+    document.getElementById("downloadBtn")?.addEventListener("click", () => {
+      if (!lastMarkdownText) lastMarkdownText = loadMarkdownDocument();
       if (!lastMarkdownText) return;
       const blob = new Blob([lastMarkdownText], { type: "text/markdown;charset=utf-8" });
       const url = URL.createObjectURL(blob);
@@ -371,7 +533,7 @@
       URL.revokeObjectURL(url);
     });
 
-    loadMarkdownDocument().then((text) => { lastMarkdownText = text; });
+    lastMarkdownText = loadMarkdownDocument();
   </script>
 </body>
 </html>

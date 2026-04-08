@@ -6,7 +6,7 @@ $dbName = getenv('DATABASE_NAME') !== false ? (string) getenv('DATABASE_NAME') :
 $dbUser = getenv('DB_USER') !== false ? (string) getenv('DB_USER') : 'root';
 $dbPassword = getenv('DB_PASSWORD') !== false ? (string) getenv('DB_PASSWORD') : '';
 
-$apiBaseUrl = getenv('API_BASE_URL') !== false ? (string) getenv('API_BASE_URL') : 'http://localhost/farmos/begin_pyphp/backend/public';
+$apiBaseUrl = getenv('API_BASE_URL') !== false ? (string) getenv('API_BASE_URL') : 'http://localhost/farmos/app/backend/public';
 $apiEmail = getenv('API_EMAIL') !== false ? (string) getenv('API_EMAIL') : 'admin@example.com';
 $apiPassword = getenv('API_PASSWORD') !== false ? (string) getenv('API_PASSWORD') : 'password123';
 
