@@ -13,10 +13,12 @@ class IoTService {
   static const devicesStatusKey = 'iot:devices';
   static const readingsStatusKey = 'iot:readings';
   static const alertsStatusKey = 'iot:alerts';
+  static const waterQualityStatusKey = 'iot:water_quality';
 
   String _devicesCacheKey() => 'iot_devices';
   String _readingsCacheKey() => 'iot_readings_latest';
   String _alertsCacheKey() => 'iot_alerts';
+  String _waterQualityCacheKey() => 'iot_water_quality';
 
   Future<List<IoTDevice>> getDevices() async {
     try {
@@ -126,4 +128,43 @@ class IoTService {
       );
     }
   }
+
+  Future<List<WaterQualityLog>> getWaterQuality() async {
+    try {
+      final list = await _api.getList(ApiEndpoints.iotWaterQuality);
+      await _sync.cache(_waterQualityCacheKey(), {'items': list});
+      _cacheStatus.markFresh(waterQualityStatusKey);
+      return list
+          .map((e) => WaterQualityLog.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on ApiException catch (e) {
+      if (e.statusCode != null) rethrow;
+      final cached = await _sync.readCacheEntry(_waterQualityCacheKey());
+      final items = cached?.payload['items'] as List<dynamic>?;
+      if (items != null) {
+        _cacheStatus.markOffline(
+          waterQualityStatusKey,
+          lastUpdatedAt: cached?.updatedAt,
+        );
+        return items
+            .map((e) => WaterQualityLog.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> addWaterQuality(Map<String, dynamic> body) async {
+    try {
+      await _api.post(ApiEndpoints.iotWaterQuality, data: body);
+    } on ApiException catch (e) {
+      if (e.statusCode != null) rethrow;
+      await _sync.enqueue(
+        method: 'POST',
+        path: ApiEndpoints.iotWaterQuality,
+        body: body,
+      );
+    }
+  }
 }
+  }

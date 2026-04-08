@@ -12,9 +12,14 @@ class WeatherService {
 
   static const currentStatusKey = 'weather:current';
   static const historyStatusKey = 'weather:history';
+  static const statsStatusKey = 'weather:stats';
+  static const forecastStatusKey = 'weather:forecast';
 
   String _currentCacheKey() => 'weather_current';
   String _historyCacheKey(int? limit) => 'weather_history_${limit ?? 'all'}';
+  String _statsCacheKey(String? start, String? end) =>
+      'weather_stats_${start ?? ''}_${end ?? ''}';
+  String _forecastCacheKey(int days) => 'weather_forecast_${days}d';
 
   Future<CurrentWeather> getCurrent() async {
     try {
@@ -90,4 +95,63 @@ class WeatherService {
 
   double? _toDouble(dynamic v) =>
       v == null ? null : double.tryParse(v.toString());
+
+  Future<WeatherStats> getStats({String? startDate, String? endDate}) async {
+    final cacheKey = _statsCacheKey(startDate, endDate);
+    try {
+      final data = await _api.get(
+        ApiEndpoints.weatherStats,
+        params: {
+          if (startDate != null) 'start_date': startDate,
+          if (endDate != null) 'end_date': endDate,
+        },
+      );
+      await _sync.cache(cacheKey, data);
+      _cacheStatus.markFresh(statsStatusKey);
+      return WeatherStats.fromJson(data);
+    } on ApiException catch (e) {
+      if (e.statusCode != null) rethrow;
+      final cached = await _sync.readCacheEntry(cacheKey);
+      if (cached != null) {
+        _cacheStatus.markOffline(
+          statsStatusKey,
+          lastUpdatedAt: cached.updatedAt,
+        );
+        return WeatherStats.fromJson(cached.payload);
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<WeatherForecastDay>> getForecast({int days = 7}) async {
+    final cacheKey = _forecastCacheKey(days);
+    try {
+      final data = await _api.get(
+        ApiEndpoints.weatherForecast,
+        params: {'days': days},
+      );
+      final list = (data['forecast'] as List<dynamic>?) ?? [];
+      await _sync.cache(cacheKey, {'items': list});
+      _cacheStatus.markFresh(forecastStatusKey);
+      return list
+          .map((e) => WeatherForecastDay.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on ApiException catch (e) {
+      if (e.statusCode != null) rethrow;
+      final cached = await _sync.readCacheEntry(cacheKey);
+      final items = cached?.payload['items'] as List<dynamic>?;
+      if (items != null) {
+        _cacheStatus.markOffline(
+          forecastStatusKey,
+          lastUpdatedAt: cached?.updatedAt,
+        );
+        return items
+            .map(
+              (e) => WeatherForecastDay.fromJson(e as Map<String, dynamic>),
+            )
+            .toList();
+      }
+      rethrow;
+    }
+  }
 }

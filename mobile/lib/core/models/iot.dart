@@ -111,3 +111,44 @@ double _parseDouble(dynamic v) =>
 
 DateTime? _parseDate(dynamic v) =>
     v == null ? null : DateTime.tryParse(v.toString());
+
+// ---- Water Quality ----
+
+class WaterQualityLog extends Equatable {
+  const WaterQualityLog({
+      required this.date,
+      required this.source,
+      required this.ph,
+      required this.dissolvedOxygen,
+      required this.turbidity,
+      this.notes,
+    });
+
+    final String date;
+    final String source;
+    final double ph;
+    final double dissolvedOxygen;
+    final double turbidity;
+    final String? notes;
+
+    factory WaterQualityLog.fromJson(Map<String, dynamic> j) => WaterQualityLog(
+          date: j['date'] as String? ?? '',
+          source: j['source'] as String? ?? '',
+          ph: _parseDouble(j['ph']),
+          dissolvedOxygen: _parseDouble(j['dissolved_oxygen']),
+          turbidity: _parseDouble(j['turbidity']),
+          notes: j['notes'] as String?,
+        );
+
+    Map<String, dynamic> toJson() => {
+          'date': date,
+          'source': source,
+          'ph': ph,
+          'dissolved_oxygen': dissolvedOxygen,
+          'turbidity': turbidity,
+          if (notes != null) 'notes': notes,
+        };
+
+    @override
+    List<Object?> get props => [date, source, ph];
+  }

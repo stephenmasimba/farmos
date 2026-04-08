@@ -21,6 +21,15 @@ final _weatherHistoryProvider =
     FutureProvider.autoDispose<List<WeatherLog>>((ref) {
   return ref.read(weatherServiceProvider).getHistory(limit: 30);
 });
+final _weatherStatsProvider =
+    FutureProvider.autoDispose<WeatherStats>((ref) {
+  return ref.read(weatherServiceProvider).getStats();
+});
+
+final _weatherForecastProvider =
+    FutureProvider.autoDispose<List<WeatherForecastDay>>((ref) {
+  return ref.read(weatherServiceProvider).getForecast();
+});
 
 class WeatherScreen extends ConsumerWidget {
   const WeatherScreen({super.key});
@@ -51,6 +60,8 @@ class WeatherScreen extends ConsumerWidget {
         onRefresh: () async {
           ref.invalidate(_currentWeatherProvider);
           ref.invalidate(_weatherHistoryProvider);
+          ref.invalidate(_weatherStatsProvider);
+          ref.invalidate(_weatherForecastProvider);
         },
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -148,6 +159,30 @@ class WeatherScreen extends ConsumerWidget {
                 );
               },
             ),
+              const SizedBox(height: 24),
+              const SectionHeader(title: '7-Day Forecast'),
+              const SizedBox(height: 12),
+              ref.watch(_weatherForecastProvider).when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, __) => const SizedBox.shrink(),
+                data: (days) => days.isEmpty
+                    ? const EmptyState(
+                        icon: Icons.wb_sunny_outlined,
+                        title: 'No forecast data',
+                        subtitle: 'Add observations to generate forecasts',
+                      )
+                    : Column(
+                        children: days.map((d) => _ForecastTile(day: d)).toList(),
+                      ),
+              ),
+              const SizedBox(height: 24),
+              const SectionHeader(title: 'Period Statistics'),
+              const SizedBox(height: 12),
+              ref.watch(_weatherStatsProvider).when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, __) => const SizedBox.shrink(),
+                data: (stats) => _StatsCard(stats: stats),
+              ),
           ],
         ),
       ),
@@ -401,3 +436,101 @@ class _AddObservationSheetState extends ConsumerState<_AddObservationSheet> {
     );
   }
 }
+
+  class _ForecastTile extends StatelessWidget {
+    const _ForecastTile({required this.day});
+
+    final WeatherForecastDay day;
+
+    @override
+    Widget build(BuildContext context) {
+      final conditionIcon = switch (day.condition) {
+        'rainy' => Icons.umbrella_rounded,
+        'cloudy' || 'overcast' => Icons.cloud_rounded,
+        'partly_cloudy' => Icons.wb_cloudy_rounded,
+        _ => Icons.wb_sunny_rounded,
+      };
+
+      return Card(
+        margin: const EdgeInsets.only(bottom: 6),
+        child: ListTile(
+          leading: Icon(conditionIcon, color: AppColors.info),
+          title: Text(day.date),
+          subtitle: Text(
+            '${day.temperatureLow.toStringAsFixed(1)} – '
+            '${day.temperatureHigh.toStringAsFixed(1)}°C  '
+            '💧 ${day.precipitationChance}%',
+          ),
+          trailing: Text(
+            '💨 ${day.windSpeed.toStringAsFixed(0)} km/h',
+            style: const TextStyle(
+                fontSize: 12, color: AppColors.onSurfaceVariant),
+          ),
+        ),
+      );
+    }
+  }
+
+  class _StatsCard extends StatelessWidget {
+    const _StatsCard({required this.stats});
+
+    final WeatherStats stats;
+
+    @override
+    Widget build(BuildContext context) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${stats.startDate} → ${stats.endDate}',
+                style: const TextStyle(
+                    fontSize: 11, color: AppColors.onSurfaceVariant),
+              ),
+              const SizedBox(height: 12),
+              _StatRow(label: 'Observations', value: '${stats.observations}'),
+              _StatRow(
+                  label: 'Avg Temperature',
+                  value: '${stats.avgTemperature.toStringAsFixed(1)}°C'),
+              _StatRow(
+                  label: 'Min / Max',
+                  value:
+                      '${stats.minTemperature.toStringAsFixed(1)} / ${stats.maxTemperature.toStringAsFixed(1)}°C'),
+              _StatRow(
+                  label: 'Avg Humidity',
+                  value: '${stats.avgHumidity.toStringAsFixed(0)}%'),
+              _StatRow(
+                  label: 'Total Precipitation',
+                  value: '${stats.totalPrecipitation.toStringAsFixed(1)} mm'),
+              _StatRow(label: 'Rainy Days', value: '${stats.rainyDays}'),
+              _StatRow(label: 'Frost Risk Days', value: '${stats.frostRiskDays}'),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  class _StatRow extends StatelessWidget {
+    const _StatRow({required this.label, required this.value});
+
+    final String label;
+    final String value;
+
+    @override
+    Widget build(BuildContext context) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label,
+                style: const TextStyle(color: AppColors.onSurfaceVariant)),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+          ],
+        ),
+      );
+    }
+  }

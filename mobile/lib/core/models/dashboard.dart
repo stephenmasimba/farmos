@@ -106,3 +106,107 @@ double _parseDouble(dynamic v) =>
 
 DateTime? _parseDate(dynamic v) =>
     v == null ? null : DateTime.tryParse(v.toString());
+
+// ---- Farm Health ----
+
+class FarmHealthMetrics extends Equatable {
+  const FarmHealthMetrics({
+    required this.overallScore,
+    required this.status,
+    required this.livestockHealth,
+    required this.inventoryHealth,
+    required this.taskCompletionRate,
+    required this.profitMargin,
+  });
+
+  final double overallScore;
+  final String status; // excellent | good | fair | needs_attention
+  final double livestockHealth;
+  final double inventoryHealth;
+  final double taskCompletionRate;
+  final double profitMargin;
+
+  factory FarmHealthMetrics.fromJson(Map<String, dynamic> j) {
+    final scores = j['scores'] as Map<String, dynamic>? ?? {};
+    return FarmHealthMetrics(
+      overallScore: _parseDouble(j['overall_health_score']),
+      status: j['status'] as String? ?? 'unknown',
+      livestockHealth: _parseDouble(scores['livestock_health']),
+      inventoryHealth: _parseDouble(scores['inventory_health']),
+      taskCompletionRate: _parseDouble(scores['task_completion_rate']),
+      profitMargin: _parseDouble(scores['profit_margin']),
+    );
+  }
+
+  @override
+  List<Object?> get props => [overallScore, status];
+}
+
+// ---- Farm Forecast ----
+
+class FarmForecast extends Equatable {
+  const FarmForecast({
+    required this.inventoryCritical,
+    required this.inventoryWarning,
+    required this.inventoryAdequate,
+    required this.monthlyTrend,
+    required this.predictedIncome,
+    required this.predictedExpense,
+    required this.predictedProfit,
+  });
+
+  final int inventoryCritical;
+  final int inventoryWarning;
+  final int inventoryAdequate;
+  final List<FinancialForecastMonth> monthlyTrend;
+  final double predictedIncome;
+  final double predictedExpense;
+  final double predictedProfit;
+
+  factory FarmForecast.fromJson(Map<String, dynamic> j) {
+    final inv = j['inventory_forecast'] as Map<String, dynamic>? ?? {};
+    final fin = j['financial_forecast'] as Map<String, dynamic>? ?? {};
+    final predicted =
+        fin['predicted_next_month'] as Map<String, dynamic>? ?? {};
+    final trend = (fin['trend'] as List<dynamic>?) ?? [];
+    return FarmForecast(
+      inventoryCritical: _parseInt(inv['critical']),
+      inventoryWarning: _parseInt(inv['warning']),
+      inventoryAdequate: _parseInt(inv['adequate']),
+      monthlyTrend: trend
+          .map((e) =>
+              FinancialForecastMonth.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      predictedIncome: _parseDouble(predicted['income']),
+      predictedExpense: _parseDouble(predicted['expense']),
+      predictedProfit: _parseDouble(predicted['profit']),
+    );
+  }
+
+  @override
+  List<Object?> get props => [inventoryCritical, predictedProfit];
+}
+
+class FinancialForecastMonth extends Equatable {
+  const FinancialForecastMonth({
+    required this.month,
+    required this.income,
+    required this.expense,
+  });
+
+  final String month;
+  final double income;
+  final double expense;
+
+  double get profit => income - expense;
+
+  factory FinancialForecastMonth.fromJson(Map<String, dynamic> j) =>
+      FinancialForecastMonth(
+        month: j['month'] as String? ?? '',
+        income: _parseDouble(j['income']),
+        expense: _parseDouble(j['expense']),
+      );
+
+  @override
+  List<Object?> get props => [month];
+}

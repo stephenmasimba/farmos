@@ -12,6 +12,8 @@ import '../services/dashboard_service.dart';
 import '../services/weather_service.dart';
 import '../services/iot_service.dart';
 import '../services/sync_service.dart';
+import '../services/analytics_service.dart';
+import '../services/reports_service.dart';
 
 final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
   return const FlutterSecureStorage(
@@ -97,4 +99,16 @@ final iotServiceProvider = Provider<IoTService>((ref) {
 
 final syncServiceProvider = Provider<SyncService>((ref) {
   return SyncService(ref.read(apiClientProvider));
+});
+
+final analyticsServiceProvider = Provider<AnalyticsService>((ref) {
+  return AnalyticsService(
+    ref.read(apiClientProvider),
+    ref.read(syncServiceProvider),
+    ref.read(cacheStatusServiceProvider.notifier),
+  );
+});
+
+final reportsServiceProvider = Provider<ReportsService>((ref) {
+  return ReportsService(ref.read(apiClientProvider));
 });

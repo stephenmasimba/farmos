@@ -13,9 +13,13 @@ class DashboardService {
   static const _overviewCacheKey = 'dashboard_overview';
   static const _alertsCacheKey = 'dashboard_alerts';
   static const _timelineCacheKey = 'dashboard_timeline';
+  static const _healthCacheKey = 'dashboard_health';
+  static const _forecastCacheKey = 'dashboard_forecast';
   static const overviewStatusKey = 'dashboard:overview';
   static const alertsStatusKey = 'dashboard:alerts';
   static const timelineStatusKey = 'dashboard:timeline';
+  static const healthStatusKey = 'dashboard:health';
+  static const forecastStatusKey = 'dashboard:forecast';
 
   Future<DashboardOverview> getOverview() async {
     try {
@@ -87,6 +91,46 @@ class DashboardService {
         return items
             .map((e) => TimelineItem.fromJson(e as Map<String, dynamic>))
             .toList();
+      }
+      rethrow;
+    }
+  }
+  
+  Future<FarmHealthMetrics> getHealth() async {
+    try {
+      final data = await _api.get(ApiEndpoints.dashboardHealth);
+      await _sync.cache(_healthCacheKey, data);
+      _cacheStatus.markFresh(healthStatusKey);
+      return FarmHealthMetrics.fromJson(data);
+    } on ApiException catch (e) {
+      if (e.statusCode != null) rethrow;
+      final cached = await _sync.readCacheEntry(_healthCacheKey);
+      if (cached != null) {
+        _cacheStatus.markOffline(
+          healthStatusKey,
+          lastUpdatedAt: cached.updatedAt,
+        );
+        return FarmHealthMetrics.fromJson(cached.payload);
+      }
+      rethrow;
+    }
+  }
+  
+  Future<FarmForecast> getForecast() async {
+    try {
+      final data = await _api.get(ApiEndpoints.dashboardForecast);
+      await _sync.cache(_forecastCacheKey, data);
+      _cacheStatus.markFresh(forecastStatusKey);
+      return FarmForecast.fromJson(data);
+    } on ApiException catch (e) {
+      if (e.statusCode != null) rethrow;
+      final cached = await _sync.readCacheEntry(_forecastCacheKey);
+      if (cached != null) {
+        _cacheStatus.markOffline(
+          forecastStatusKey,
+          lastUpdatedAt: cached.updatedAt,
+        );
+        return FarmForecast.fromJson(cached.payload);
       }
       rethrow;
     }

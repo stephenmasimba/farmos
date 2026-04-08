@@ -37,6 +37,14 @@ final _taskStatsProvider = FutureProvider.autoDispose<TaskStats>((ref) {
   return ref.read(taskServiceProvider).getStats();
 });
 
+final _healthProvider = FutureProvider.autoDispose<FarmHealthMetrics>((ref) {
+  return ref.read(dashboardServiceProvider).getHealth();
+});
+
+final _forecastProvider = FutureProvider.autoDispose<FarmForecast>((ref) {
+  return ref.read(dashboardServiceProvider).getForecast();
+});
+
 // --------------- screen ---------------
 
 class DashboardScreen extends ConsumerWidget {
@@ -48,12 +56,14 @@ class DashboardScreen extends ConsumerWidget {
     final overview = ref.watch(_overviewProvider);
     final alerts = ref.watch(_alertsProvider);
     final timeline = ref.watch(_timelineProvider);
-    final cacheStatus = _latestOfflineStatus(
+    final cacheStatus = latestOfflineStatus(
       ref.watch(cacheStatusServiceProvider),
       const [
         DashboardService.overviewStatusKey,
         DashboardService.alertsStatusKey,
         DashboardService.timelineStatusKey,
+        DashboardService.healthStatusKey,
+        DashboardService.forecastStatusKey,
       ],
     );
     final theme = Theme.of(context);
@@ -65,6 +75,8 @@ class DashboardScreen extends ConsumerWidget {
           ref.invalidate(_overviewProvider);
           ref.invalidate(_alertsProvider);
           ref.invalidate(_timelineProvider);
+          ref.invalidate(_healthProvider);
+          ref.invalidate(_forecastProvider);
         },
         child: CustomScrollView(
           slivers: [
@@ -207,6 +219,29 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
             ),
+              // ---- Health card ----
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                sliver: SliverToBoxAdapter(
+                  child: ref.watch(_healthProvider).whenOrNull(
+                        data: (h) => Padding(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          child: _FarmHealthCard(metrics: h),
+                        ),
+                      ) ??
+                      const SizedBox.shrink(),
+                ),
+              ),
+              // ---- Forecast card ----
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                sliver: SliverToBoxAdapter(
+                  child: ref.watch(_forecastProvider).whenOrNull(
+                        data: (f) => _FarmForecastCard(forecast: f),
+                      ) ??
+                      const SizedBox.shrink(),
+                ),
+              ),
             const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
           ],
         ),
@@ -393,6 +428,182 @@ class _TimelineTile extends StatelessWidget {
           style: const TextStyle(fontSize: 13), maxLines: 2),
       subtitle: Text(Fmt.timeAgo(item.timestamp),
           style: const TextStyle(fontSize: 11)),
+    );
+  }
+}
+
+class _FarmHealthCard extends StatelessWidget {
+  const _FarmHealthCard({required this.metrics});
+
+  final FarmHealthMetrics metrics;
+
+  Color get _statusColor => switch (metrics.status) {
+        'excellent' => AppColors.success,
+        'good' => AppColors.info,
+        'fair' => AppColors.warning,
+        _ => AppColors.error,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SectionHeader(title: 'Farm Health'),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: LinearProgressIndicator(
+                    value: (metrics.overallScore / 100).clamp(0.0, 1.0),
+                    minHeight: 10,
+                    color: _statusColor,
+                    backgroundColor: AppColors.surfaceVariant,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '${metrics.overallScore.toStringAsFixed(1)}%',
+                  style: TextStyle(
+                    color: _statusColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                StatusBadge(status: metrics.status),
+                _MiniMetricChip(
+                  label:
+                      'Livestock ${metrics.livestockHealth.toStringAsFixed(0)}%',
+                ),
+                _MiniMetricChip(
+                  label:
+                      'Inventory ${metrics.inventoryHealth.toStringAsFixed(0)}%',
+                ),
+                _MiniMetricChip(
+                  label:
+                      'Tasks ${metrics.taskCompletionRate.toStringAsFixed(0)}%',
+                ),
+                _MiniMetricChip(
+                  label: 'Margin ${metrics.profitMargin.toStringAsFixed(0)}%',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FarmForecastCard extends StatelessWidget {
+  const _FarmForecastCard({required this.forecast});
+
+  final FarmForecast forecast;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SectionHeader(title: 'Next-Month Forecast'),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _ForecastStat(
+                    label: 'Income',
+                    value: Fmt.currency(forecast.predictedIncome),
+                    color: AppColors.success,
+                  ),
+                ),
+                Expanded(
+                  child: _ForecastStat(
+                    label: 'Expense',
+                    value: Fmt.currency(forecast.predictedExpense),
+                    color: AppColors.warning,
+                  ),
+                ),
+                Expanded(
+                  child: _ForecastStat(
+                    label: 'Profit',
+                    value: Fmt.currency(forecast.predictedProfit),
+                    color: forecast.predictedProfit >= 0
+                        ? AppColors.success
+                        : AppColors.error,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Inventory outlook: ${forecast.inventoryCritical} critical, '
+              '${forecast.inventoryWarning} warning, '
+              '${forecast.inventoryAdequate} adequate',
+              style: const TextStyle(
+                  fontSize: 12, color: AppColors.onSurfaceVariant),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ForecastStat extends StatelessWidget {
+  const _ForecastStat({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: const TextStyle(
+                fontSize: 11, color: AppColors.onSurfaceVariant)),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(fontWeight: FontWeight.bold, color: color),
+        ),
+      ],
+    );
+  }
+}
+
+class _MiniMetricChip extends StatelessWidget {
+  const _MiniMetricChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(label, style: const TextStyle(fontSize: 11)),
     );
   }
 }
