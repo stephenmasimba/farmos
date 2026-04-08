@@ -1,4 +1,13 @@
 <?php
+require_once __DIR__ . '/../backend/config/env.php';
+
+$appEnv = strtolower((string) (getenv('APP_ENV') ?: 'production'));
+$remoteAddr = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+if (in_array($appEnv, ['production', 'prod', 'staging'], true) || !in_array($remoteAddr, ['127.0.0.1', '::1'], true)) {
+    http_response_code(404);
+    exit;
+}
+
 /**
  * Test Form Submission
  */
@@ -53,12 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <form method="POST" action="" style="max-width: 400px; margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
     <div style="margin-bottom: 15px;">
         <label for="email" style="display: block; margin-bottom: 5px;">Email:</label>
-        <input type="email" id="email" name="email" value="manager@masimba.farm" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="email" id="email" name="email" value="" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
     </div>
     
     <div style="margin-bottom: 15px;">
         <label for="password" style="display: block; margin-bottom: 5px;">Password:</label>
-        <input type="password" id="password" name="password" value="manager123" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="password" id="password" name="password" value="" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
     </div>
     
     <button type="submit" style="background: #007cba; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Test Login</button>

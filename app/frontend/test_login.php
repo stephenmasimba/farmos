@@ -1,4 +1,13 @@
 <?php
+require_once __DIR__ . '/../backend/config/env.php';
+
+$appEnv = strtolower((string) (getenv('APP_ENV') ?: 'production'));
+$remoteAddr = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+if (in_array($appEnv, ['production', 'prod', 'staging'], true) || !in_array($remoteAddr, ['127.0.0.1', '::1'], true)) {
+    http_response_code(404);
+    exit;
+}
+
 /**
  * Test Login Directly
  */
@@ -12,14 +21,20 @@ require_once 'simple_auth.php';
 
 echo "<h2>🔑 Testing Login Process</h2>";
 
-// Simulate login POST request
+$testEmail = (string) (getenv('TEST_AUTH_EMAIL') ?: '');
+$testPassword = (string) (getenv('TEST_AUTH_PASSWORD') ?: '');
+if ($testEmail === '' || $testPassword === '') {
+    echo "<p style='color: orange;'>⚠️ Set TEST_AUTH_EMAIL and TEST_AUTH_PASSWORD to run this test.</p>";
+    exit;
+}
+
 $_SERVER['REQUEST_METHOD'] = 'POST';
-$_POST['email'] = 'manager@masimba.farm';
-$_POST['password'] = 'manager123';
+$_POST['email'] = $testEmail;
+$_POST['password'] = $testPassword;
 
 echo "<h3>Login Credentials:</h3>";
 echo "<p><strong>Email:</strong> " . htmlspecialchars($_POST['email']) . "</p>";
-echo "<p><strong>Password:</strong> " . htmlspecialchars($_POST['password']) . "</p>";
+echo "<p><strong>Password:</strong> " . str_repeat('*', strlen((string) $_POST['password'])) . "</p>";
 
 // Test authentication
 $user = authenticate_user($_POST['email'], $_POST['password']);

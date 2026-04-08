@@ -14,6 +14,12 @@ use FarmOS\{Database, Security, Logger};
 Logger::init(sys_get_temp_dir() . '/farmos-uat-seed', 'json');
 Security::init(getenv('JWT_SECRET'));
 
+$appEnv = strtolower((string) (getenv('APP_ENV') ?: 'production'));
+if (in_array($appEnv, ['production', 'prod', 'staging'], true)) {
+    fwrite(STDERR, "Refusing to run in production/staging\n");
+    exit(1);
+}
+
 $dsn = (string) getenv('DATABASE_URL');
 $user = (string) (getenv('DB_USER') ?: 'root');
 $pass = (string) (getenv('DB_PASSWORD') ?: '');

@@ -187,12 +187,16 @@ class Security
      */
     public static function getSecurityHeaders(): array
     {
-        return [
+        $headers = [
             'X-Content-Type-Options' => 'nosniff',
             'X-Frame-Options' => 'DENY',
-            'X-XSS-Protection' => '1; mode=block',
+            'Referrer-Policy' => 'no-referrer',
+            'Permissions-Policy' => 'geolocation=(), microphone=(), camera=()',
+            'Cross-Origin-Opener-Policy' => 'same-origin',
+            'Cross-Origin-Resource-Policy' => 'same-origin',
             'Strict-Transport-Security' => 'max-age=31536000; includeSubDomains',
             'Content-Security-Policy' => "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'",
         ];
+        return $headers;
     }
 }

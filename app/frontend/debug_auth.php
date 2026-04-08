@@ -1,10 +1,26 @@
 <?php
+require_once __DIR__ . '/../backend/config/env.php';
+
+$appEnv = strtolower((string) (getenv('APP_ENV') ?: 'production'));
+$remoteAddr = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+if (in_array($appEnv, ['production', 'prod', 'staging'], true) || !in_array($remoteAddr, ['127.0.0.1', '::1'], true)) {
+    http_response_code(404);
+    exit;
+}
+
 require_once 'simple_auth.php';
+
+$testEmail = (string) (getenv('TEST_AUTH_EMAIL') ?: '');
+$testPassword = (string) (getenv('TEST_AUTH_PASSWORD') ?: '');
+if ($testEmail === '' || $testPassword === '') {
+    echo "<p style='color: orange;'>⚠️ Set TEST_AUTH_EMAIL and TEST_AUTH_PASSWORD to run this debug page.</p>";
+    exit;
+}
 
 echo "<h2>🔍 Authentication Debug</h2>";
 
 echo "<h3>Testing authentication...</h3>";
-$user = authenticate_user('manager@masimba.farm', 'manager123');
+$user = authenticate_user($testEmail, $testPassword);
 
 if ($user) {
     echo "<p style='color: green;'>✅ Authentication successful!</p>";
@@ -16,12 +32,12 @@ if ($user) {
     
     echo "<h3>Checking database connection...</h3>";
     try {
-        $pdo = new PDO('mysql:host=localhost;dbname=begin_masimba_farm;charset=utf8mb4', 'root', '');
+        $pdo = new PDO((string) getenv('DATABASE_URL'), (string) getenv('DB_USER'), (string) getenv('DB_PASSWORD'));
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         echo "<p style='color: green;'>✅ Database connected</p>";
         
         $stmt = $pdo->prepare('SELECT id, name, email, hashed_password, role FROM users WHERE email = :email');
-        $stmt->execute(['email' => 'manager@masimba.farm']);
+        $stmt->execute(['email' => $testEmail]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($user) {
@@ -32,27 +48,10 @@ if ($user) {
             echo "<h3>Testing password verification...</h3>";
             
             // Test with password_verify
-            if (password_verify('manager123', $user['hashed_password'])) {
+            if (password_verify($testPassword, $user['hashed_password'])) {
                 echo "<p style='color: green;'>✅ password_verify() successful!</p>";
             } else {
-                echo "<p style='color: orange;'>⚠️ password_verify() failed, trying bcrypt...</p>";
-                
-                // Test with bcrypt variants
-                if (function_exists('password_verify')) {
-                    // Try to detect if it's a bcrypt hash
-                    if (substr($user['hashed_password'], 0, 4) === '$2y$' || substr($user['hashed_password'], 0, 4) === '$2b$') {
-                        echo "<p style='color: blue;'>🔍 Detected bcrypt hash format</p>";
-                        
-                        // Try different password variants
-                        $passwords = ['manager123', 'Admin123', 'admin123', 'password'];
-                        foreach ($passwords as $pwd) {
-                            if (password_verify($pwd, $user['hashed_password'])) {
-                                echo "<p style='color: green;'>✅ Found working password: " . htmlspecialchars($pwd) . "</p>";
-                                break;
-                            }
-                        }
-                    }
-                }
+                echo "<p style='color: orange;'>⚠️ password_verify() failed</p>";
             }
         } else {
             echo "<p style='color: red;'>❌ User not found!</p>";

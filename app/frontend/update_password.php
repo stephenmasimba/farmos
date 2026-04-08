@@ -1,64 +1,49 @@
 <?php
+require_once __DIR__ . '/../backend/config/env.php';
+
+$appEnv = strtolower((string) (getenv('APP_ENV') ?: 'production'));
+$remoteAddr = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+if (in_array($appEnv, ['production', 'prod', 'staging'], true) || !in_array($remoteAddr, ['127.0.0.1', '::1'], true)) {
+    http_response_code(404);
+    exit;
+}
+
+$targetEmail = (string) (getenv('PASSWORD_RESET_EMAIL') ?: '');
+$newPassword = (string) (getenv('PASSWORD_RESET_NEW_PASSWORD') ?: '');
+if ($targetEmail === '' || $newPassword === '') {
+    echo "<p style='color: orange;'>⚠️ Set PASSWORD_RESET_EMAIL and PASSWORD_RESET_NEW_PASSWORD to run this page.</p>";
+    exit;
+}
+
 /**
  * Update Manager Password Immediately
  */
 
 echo "<h2>🔧 Updating Manager Password...</h2>";
 
-// Database connection
-$host = 'localhost';
-$dbname = 'begin_masimba_farm';
-$username = 'root';
-$password = '';
-
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo = new PDO((string) getenv('DATABASE_URL'), (string) getenv('DB_USER'), (string) getenv('DB_PASSWORD'));
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
     // Create new PHP-compatible hash
-    $new_password = 'manager123';
-    $new_hash = password_hash($new_password, PASSWORD_DEFAULT);
-    
-    echo "<h3>New Password Hash:</h3>";
-    echo "<p><strong>Password:</strong> " . htmlspecialchars($new_password) . "</p>";
-    echo "<p><strong>Hash:</strong> " . htmlspecialchars($new_hash) . "</p>";
+    $new_hash = password_hash($newPassword, PASSWORD_DEFAULT);
     
     // Update the database
     $update_stmt = $pdo->prepare("UPDATE users SET hashed_password = :hash WHERE email = :email");
-    $result = $update_stmt->execute(['hash' => $new_hash, 'email' => 'manager@masimba.farm']);
+    $result = $update_stmt->execute(['hash' => $new_hash, 'email' => $targetEmail]);
     
     if ($result) {
         echo "<p style='color: green; font-weight: bold;'>✅ Password updated successfully!</p>";
         
         // Verify the update
         $verify_stmt = $pdo->prepare("SELECT hashed_password FROM users WHERE email = :email");
-        $verify_stmt->execute(['email' => 'manager@masimba.farm']);
+        $verify_stmt->execute(['email' => $targetEmail]);
         $stored_hash = $verify_stmt->fetchColumn();
         
-        if (password_verify($new_password, $stored_hash)) {
+        if (is_string($stored_hash) && password_verify($newPassword, $stored_hash)) {
             echo "<p style='color: green;'>✅ Password verification successful!</p>";
         } else {
             echo "<p style='color: red;'>❌ Password verification failed!</p>";
-        }
-        
-        // Test authentication
-        require_once 'simple_auth.php';
-        $test_user = authenticate_user('manager@masimba.farm', $new_password);
-        
-        if ($test_user) {
-            echo "<p style='color: green; font-weight: bold;'>✅ Authentication test successful!</p>";
-            echo "<p><strong>User:</strong> " . htmlspecialchars($test_user['name']) . "</p>";
-            echo "<p><strong>Email:</strong> " . htmlspecialchars($test_user['email']) . "</p>";
-            echo "<p><strong>Role:</strong> " . htmlspecialchars($test_user['role']) . "</p>";
-            
-            echo "<hr>";
-            echo "<h3>🎉 Ready to Login!</h3>";
-            echo "<p><strong>Login URL:</strong> <a href='pages/login.php'>Login Page</a></p>";
-            echo "<p><strong>Email:</strong> manager@masimba.farm</p>";
-            echo "<p><strong>Password:</strong> manager123</p>";
-            
-        } else {
-            echo "<p style='color: red;'>❌ Authentication test failed!</p>";
         }
         
     } else {

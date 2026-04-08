@@ -8,7 +8,11 @@ $dbPassword = getenv('DB_PASSWORD') !== false ? (string) getenv('DB_PASSWORD') :
 
 $apiBaseUrl = getenv('API_BASE_URL') !== false ? (string) getenv('API_BASE_URL') : 'http://localhost/farmos/app/backend/public';
 $apiEmail = getenv('API_EMAIL') !== false ? (string) getenv('API_EMAIL') : 'admin@example.com';
-$apiPassword = getenv('API_PASSWORD') !== false ? (string) getenv('API_PASSWORD') : 'password123';
+$apiPassword = getenv('API_PASSWORD') !== false ? (string) getenv('API_PASSWORD') : '';
+
+if ($apiPassword === '') {
+    throw new RuntimeException('API_PASSWORD must be set to run IoT simulations.');
+}
 
 $simulationIntervalSeconds = getenv('SIM_INTERVAL') !== false ? (int) getenv('SIM_INTERVAL') : 10;
 $rounds = getenv('SIM_ROUNDS') !== false ? (int) getenv('SIM_ROUNDS') : 0;

@@ -60,12 +60,12 @@ http://localhost:8081/farmos/app/frontend/public/
 | **Login** | http://localhost:8081/farmos/app/frontend/public/index.php?page=login |
 | **Backend Health** | http://localhost:8081/farmos/app/backend/health |
 
-### 4. Default Login Credentials
+### 4. Login
 
-```
-Email: admin@farmos.local
-Password: admin123
-```
+FarmOS does not ship with default production credentials.
+
+- Create a user via the registration endpoint, or
+- Use a non-production seed process where credentials are supplied via environment variables.
 
 ### 5. System Features
 
@@ -141,7 +141,7 @@ curl http://localhost:8081/farmos/app/backend/health
 curl http://localhost:8081/farmos/app/backend/api/version
 
 # Dashboard data (with auth)
-TOKEN=$(curl -s -X POST http://localhost:8081/farmos/app/backend/api/auth/login -H "Content-Type: application/json" -d "{\"email\":\"admin@farmos.local\",\"password\":\"admin123\"}" | php -r '$j=json_decode(stream_get_contents(STDIN), true); echo $j["access_token"] ?? "";')
+TOKEN=$(curl -s -X POST http://localhost:8081/farmos/app/backend/api/auth/login -H "Content-Type: application/json" -d "{\"email\":\"you@example.com\",\"password\":\"StrongPass123!\"}" | php -r '$j=json_decode(stream_get_contents(STDIN), true); echo $j["access_token"] ?? "";')
 curl -H "Authorization: Bearer $TOKEN" http://localhost:8081/farmos/app/backend/api/dashboard/summary
 ```
 

@@ -31,12 +31,37 @@ $method = $request->getMethod();
 $path = $request->getPath();
 $requestStartedAt = microtime(true);
 
+$corsOriginRaw = trim((string) (getenv('CORS_ORIGIN') ?: ''));
+$corsMethods = trim((string) (getenv('CORS_METHODS') ?: 'GET,POST,PUT,PATCH,DELETE,OPTIONS'));
+$corsHeaders = trim((string) (getenv('CORS_HEADERS') ?: 'Content-Type,Authorization'));
+$origin = (string) ($_SERVER['HTTP_ORIGIN'] ?? '');
+$appUrl = trim((string) (getenv('APP_URL') ?: ''));
+$allowedOrigins = [];
+if ($corsOriginRaw !== '' && $corsOriginRaw !== '*') {
+    $allowedOrigins = array_values(array_unique(array_filter(array_map(
+        'trim',
+        array_merge(explode(',', $corsOriginRaw), [$appUrl])
+    ))));
+}
+
+$corsAllowOrigin = null;
+if ($corsOriginRaw === '*') {
+    $corsAllowOrigin = '*';
+} elseif ($origin !== '' && in_array($origin, $allowedOrigins, true)) {
+    $corsAllowOrigin = $origin;
+} elseif ($origin === '' && $corsOriginRaw !== '' && $corsOriginRaw !== '*') {
+    $corsAllowOrigin = $allowedOrigins[0] ?? null;
+}
+
 // CORS handling
 if ($method === 'OPTIONS') {
     if (!headers_sent()) {
-        header('Access-Control-Allow-Origin: ' . getenv('CORS_ORIGIN'));
-        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type, Authorization');
+        if ($corsAllowOrigin !== null) {
+            header('Access-Control-Allow-Origin: ' . $corsAllowOrigin);
+            header('Vary: Origin');
+        }
+        header('Access-Control-Allow-Methods: ' . $corsMethods);
+        header('Access-Control-Allow-Headers: ' . $corsHeaders);
         header('Access-Control-Max-Age: 3600');
     }
     Response::success()->send();
@@ -45,7 +70,10 @@ if ($method === 'OPTIONS') {
 
 // Add CORS headers
 if (!headers_sent()) {
-    header('Access-Control-Allow-Origin: ' . getenv('CORS_ORIGIN'));
+    if ($corsAllowOrigin !== null) {
+        header('Access-Control-Allow-Origin: ' . $corsAllowOrigin);
+        header('Vary: Origin');
+    }
 }
 
 // Health check without DB
@@ -65,18 +93,9 @@ if ($stateChanging) {
         exit;
     }
 
-    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    $corsOriginRaw = (string) (getenv('CORS_ORIGIN') ?: '');
-    $appUrl = (string) (getenv('APP_URL') ?: '');
-    if ($origin !== '' && $corsOriginRaw !== '*') {
-        $allowedOrigins = array_values(array_unique(array_filter(array_map(
-            'trim',
-            array_merge(explode(',', $corsOriginRaw), [$appUrl])
-        ))));
-        if (!in_array($origin, $allowedOrigins, true)) {
-            Response::error('Forbidden', 'FORBIDDEN', 403)->send();
-            exit;
-        }
+    if ($origin !== '' && $corsOriginRaw !== '*' && !in_array($origin, $allowedOrigins, true)) {
+        Response::error('Forbidden', 'FORBIDDEN', 403)->send();
+        exit;
     }
 }
 

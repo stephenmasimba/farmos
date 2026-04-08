@@ -54,7 +54,7 @@ class QueryBuilder
 
         $this->wheres[] = [
             'column' => $column,
-            'operator' => $operator,
+            'operator' => $this->normalizeOperator((string) $operator),
             'value' => $value,
         ];
 
@@ -77,7 +77,7 @@ class QueryBuilder
 
         $this->wheres[] = [
             'column' => $column,
-            'operator' => $operator,
+            'operator' => $this->normalizeOperator((string) $operator),
             'value' => $value,
             'boolean' => 'or',
         ];
@@ -90,9 +90,14 @@ class QueryBuilder
      */
     public function orderBy(string $column, string $direction = 'ASC'): self
     {
+        $this->assertSafeIdentifierChain($column);
+        $dir = strtoupper($direction);
+        if (!in_array($dir, ['ASC', 'DESC'], true)) {
+            $dir = 'ASC';
+        }
         $this->orders[] = [
             'column' => $column,
-            'direction' => strtoupper($direction),
+            'direction' => $dir,
         ];
         return $this;
     }
@@ -104,8 +109,12 @@ class QueryBuilder
 
     protected function quoteIdentifier(string $identifier): string
     {
-        if ($identifier === '*' || strpos($identifier, '`') !== false) {
+        if ($identifier === '*') {
             return $identifier;
+        }
+
+        if (strpos($identifier, '`') !== false) {
+            throw new \InvalidArgumentException('Unsafe identifier');
         }
 
         $parts = explode('.', $identifier);
@@ -115,10 +124,62 @@ class QueryBuilder
             }
             if (preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $part)) {
                 $parts[$i] = '`' . $part . '`';
+            } else {
+                throw new \InvalidArgumentException('Unsafe identifier');
             }
         }
 
         return implode('.', $parts);
+    }
+
+    protected function assertSafeIdentifierChain(string $identifier): void
+    {
+        if ($identifier === '*') {
+            return;
+        }
+        if ($identifier === '' || strpos($identifier, '`') !== false) {
+            throw new \InvalidArgumentException('Unsafe identifier');
+        }
+        foreach (explode('.', $identifier) as $part) {
+            if ($part === '*') {
+                continue;
+            }
+            if (!preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $part)) {
+                throw new \InvalidArgumentException('Unsafe identifier');
+            }
+        }
+    }
+
+    protected function normalizeOperator(string $operator): string
+    {
+        $op = strtoupper(trim($operator));
+        $allowed = ['=', '!=', '<>', '<', '<=', '>', '>=', 'LIKE'];
+        if (!in_array($op, $allowed, true)) {
+            return '=';
+        }
+        return $op;
+    }
+
+    protected function sanitizeSelectPart(string $part): string
+    {
+        $trimmed = trim($part);
+        if ($trimmed === '' || strpos($trimmed, '`') !== false) {
+            throw new \InvalidArgumentException('Unsafe select expression');
+        }
+
+        if (strcasecmp($trimmed, 'DISTINCT') === 0) {
+            return 'DISTINCT';
+        }
+
+        if (preg_match('/^DISTINCT\\s+([A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*|\\*)$/i', $trimmed, $m)) {
+            return 'DISTINCT ' . $this->quoteIdentifier($m[1]);
+        }
+
+        if (preg_match('/^[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*|\\*$/', $trimmed)) {
+            return $this->quoteIdentifier($trimmed);
+        }
+
+        throw new \InvalidArgumentException('Unsafe select expression');
     }
 
     /**
@@ -182,7 +243,8 @@ class QueryBuilder
      */
     protected function buildSql(): array
     {
-        $sql = 'SELECT ' . implode(', ', $this->select) . ' FROM ' . $this->table;
+        $selectParts = array_map(fn ($part) => $this->sanitizeSelectPart((string) $part), $this->select);
+        $sql = 'SELECT ' . implode(', ', $selectParts) . ' FROM ' . $this->quoteIdentifier($this->table);
         $params = [];
 
         // Add JOINs
@@ -202,6 +264,7 @@ class QueryBuilder
                     $currentBoolean = 'OR';
                 }
 
+                $this->assertSafeIdentifierChain((string) $where['column']);
                 $whereParts[] = $this->quoteIdentifier($where['column']) . ' ' . $where['operator'] . ' ?';
                 $params[] = $where['value'];
             }
@@ -213,6 +276,7 @@ class QueryBuilder
         if (!empty($this->orders)) {
             $orderParts = [];
             foreach ($this->orders as $order) {
+                $this->assertSafeIdentifierChain((string) $order['column']);
                 $orderParts[] = $this->quoteIdentifier($order['column']) . ' ' . $order['direction'];
             }
             $sql .= ' ORDER BY ' . implode(', ', $orderParts);
@@ -303,7 +367,8 @@ class QueryBuilder
     public function distinct(string $column = null): array
     {
         if ($column) {
-            $this->select = ["DISTINCT $column"];
+            $this->assertSafeIdentifierChain($column);
+            $this->select = ['DISTINCT ' . $column];
         } else {
             array_unshift($this->select, 'DISTINCT');
         }

@@ -1,0 +1,177 @@
+Managing **FarmOS** requires secure defaults, a clear backend boundary, and a repeatable deployment workflow.
+
+This document replaces earlier generic guidance with recommendations that match the current FarmOS repository and a typical WAMP/shared-hosting deployment.
+
+---
+
+## 0) What FarmOS Is Today (Repo-Accurate)
+
+### Backend (pure PHP)
+- Entrypoint and routing: `app/backend/public/index.php`
+- Core utilities: `app/backend/src/{Request,Response,Database,Logger,Validation,Security,Auth,RateLimiter}.php`
+- Domain code: `app/backend/src/Controllers/*`, `Services/*`, `Repositories/*`, `Models/*`
+- Configuration: `app/backend/config/env.php`
+- Tests: `app/backend/tests/*` (PHPUnit)
+
+### Frontend (PHP pages/templates)
+- `app/frontend/` (browser UI). Treat this as a separate surface with its own security needs (escaping, CSRF if forms/cookies are used).
+
+---
+
+## 1) Goals
+
+1. Production safety (no default credentials, no secret fallbacks, no injection paths, predictable error handling)
+2. Maintainability (thin controllers, reusable services, consistent validation and responses)
+3. Scalability (indexes, pagination, observability, safe background tasks)
+4. Developer velocity (tests always green, lint/typecheck gates)
+
+---
+
+## 2) Production Readiness: Critical Checklist
+
+### 2.1 Secrets & environment
+- Require strong `JWT_SECRET` in production/staging. Never silently fall back.
+- Require correct `APP_URL`, `CORS_ORIGIN` (avoid `*` for authenticated endpoints).
+- Ensure the log directory is writable in the target environment.
+
+### 2.2 Default credentials and seeded data
+- Do not deploy with known default admin credentials.
+- If seed/demo data exists, gate it by environment (development/testing only).
+
+### 2.3 SQL injection prevention (backend + frontend)
+- Backend: all DB access must use prepared statements everywhere.
+- Frontend: do not run raw SQL from pages. Use the API as the data boundary.
+- Establish a rule: never concatenate request input into SQL strings.
+
+### 2.4 Rate limiting that actually works
+Current `app/backend/src/RateLimiter.php` is in-memory. In most PHP deployments, request memory does not persist across requests, so it cannot protect production.
+
+Choose one production-safe approach:
+- Shared hosting friendly: database-backed rate limit counters keyed by `(ip, route, window)`
+- If available: APCu-based counters
+- If you run infrastructure: Redis-based counters (best for multi-instance)
+
+### 2.5 Authentication & authorization
+- Password hashing: `password_hash()` + `password_verify()` (bcrypt is fine on PHP 7.4).
+- Implement role-based access control (RBAC) for sensitive features (financial data, user admin, exports).
+- Ensure JWT expiry and invalid/expired token errors are consistent and do not leak internal details.
+
+### 2.6 Transport + security headers
+- Enforce HTTPS at the server (Apache/vhost). Don’t rely on application logic for TLS.
+- Add security headers centrally (CSP, HSTS, anti-clickjacking via CSP frame-ancestors, nosniff, referrer policy, permissions policy).
+
+### 2.7 CSRF (only where applicable)
+CSRF protection is required when:
+- the browser automatically sends credentials (cookies/sessions), and
+- a request changes state (POST/PUT/PATCH/DELETE).
+
+If your frontend uses JWT in the `Authorization` header (not cookies) for state-changing API calls, CSRF risk is much lower.
+If you have PHP forms that POST with cookie/session auth, add CSRF tokens.
+
+---
+
+## 3) Architecture & Code Quality (Practical and Incremental)
+
+### 3.1 Keep `public/index.php` thin
+- Keep routing/dispatch in `app/backend/public/index.php`, but push business logic out.
+- Standardize a small request pipeline:
+  1) request id + logging context
+  2) JSON validation for JSON endpoints
+  3) CORS rules
+  4) rate limiting
+  5) auth (where required)
+  6) validation
+  7) controller call
+  8) consistent response + error mapping
+
+### 3.2 Separate responsibilities
+- Controllers: parse request, call service, return `Response`.
+- Services: implement business rules and cross-entity workflows.
+- Repositories: database reads/writes only.
+
+### 3.3 Centralize validation and errors
+- Use `app/backend/src/Validation.php` consistently.
+- Return consistent error formats via `app/backend/src/Response.php`.
+
+---
+
+## 4) Database & Performance
+
+### 4.1 Indexing and pagination
+- Add indexes for common filters (e.g. `farm_id`, `created_at`, foreign keys).
+- Add pagination to list endpoints to avoid unbounded queries.
+
+### 4.2 Migrations (optional but recommended)
+- If multiple environments exist (dev/staging/prod), introduce a migration workflow.
+- Keep it minimal if needed (incremental SQL migrations + schema version table) before adopting heavier tools.
+
+---
+
+## 5) Observability
+
+### 5.1 Structured logs
+- Log request id, path, user id (if available), duration, and status.
+- Avoid logging secrets or raw passwords.
+
+### 5.2 API analytics
+- If you log API requests to DB, ensure retention/cleanup and proper indexes.
+
+---
+
+## 6) Testing and Quality Gates
+
+### 6.1 Make the suite green
+- Fix incomplete tests and remove placeholders for critical security behavior (expired JWT, DB tests).
+
+### 6.2 Minimum local gates (before merge/deploy)
+From `app/backend/`:
+- `composer run lint`
+- `composer run type-check`
+- `composer run test`
+
+### 6.3 CI (when hosted on GitHub)
+- Add a workflow that runs the same three commands.
+- Coverage reporting is optional; stabilize a green pipeline first.
+
+---
+
+## 7) Deployment Guidance (Shared Hosting vs VPS)
+
+### Shared hosting (most likely)
+- Use `app/backend/public/` as web root.
+- Keep `.env` / environment variables secure (never commit secrets).
+- Ensure writable directories exist (logs/uploads) with correct permissions.
+- Schedule DB backups and test restores.
+
+### VPS / managed server
+- All of the above plus centralized logs, optional Redis/APCu, and more automated CI/CD.
+
+---
+
+## 8) Recommended Action Plan (Order Matters)
+
+### Phase A — Safety (blockers)
+1) Remove/disable default production credentials and demo seeds.
+2) Prove injection safety: prepared statements everywhere; no direct SQL from frontend.
+3) Replace in-memory rate limiting with DB/APCu/Redis-backed implementation.
+4) Enforce HTTPS + add security headers.
+
+### Phase B — Reliability
+1) Make PHPUnit green (no incomplete tests).
+2) Add feature tests for auth + core write endpoints.
+
+### Phase C — Maintainability & scale
+1) Move complex logic into services and keep controllers thin.
+2) Add pagination + indexes for heavy tables.
+3) Add a minimal migrations workflow.
+
+---
+
+## 9) Production Warning
+
+FarmOS has strong potential but should not be deployed to production until:
+- default credentials are removed,
+- injection safety is verified,
+- rate limiting is production-effective,
+- HTTPS + security headers are enforced,
+- tests are green.

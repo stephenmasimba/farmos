@@ -1,4 +1,13 @@
 <?php
+require_once __DIR__ . '/../backend/config/env.php';
+
+$appEnv = strtolower((string) (getenv('APP_ENV') ?: 'production'));
+$remoteAddr = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+if (in_array($appEnv, ['production', 'prod', 'staging'], true) || !in_array($remoteAddr, ['127.0.0.1', '::1'], true)) {
+    http_response_code(404);
+    exit;
+}
+
 /**
  * Check Login Issue
  */
@@ -32,7 +41,14 @@ if (isset($_SESSION)) {
 // Test authentication directly
 require_once 'simple_auth.php';
 echo "<h3>Direct Auth Test:</h3>";
-$test_user = authenticate_user('manager@masimba.farm', 'manager123');
+$testEmail = (string) (getenv('TEST_AUTH_EMAIL') ?: '');
+$testPassword = (string) (getenv('TEST_AUTH_PASSWORD') ?: '');
+$test_user = null;
+if ($testEmail !== '' && $testPassword !== '') {
+    $test_user = authenticate_user($testEmail, $testPassword);
+} else {
+    echo "<p style='color: orange;'>⚠️ Set TEST_AUTH_EMAIL and TEST_AUTH_PASSWORD to run the direct auth test.</p>";
+}
 if ($test_user) {
     echo "<p style='color: green;'>✅ Direct auth works</p>";
     echo "<p>User: " . htmlspecialchars($test_user['name']) . "</p>";

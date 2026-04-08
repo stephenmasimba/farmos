@@ -3,7 +3,7 @@
         'name' => 'farmos/backend',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '60a9c0b4e379df04212f50b41889aba37fb54439',
+        'reference' => '453958bcd1f3208b9feab0656f46229c557104c5',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'farmos/backend' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '60a9c0b4e379df04212f50b41889aba37fb54439',
+            'reference' => '453958bcd1f3208b9feab0656f46229c557104c5',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

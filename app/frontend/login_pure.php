@@ -196,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             type="email" 
                             autocomplete="email" 
                             required 
-                            value="manager@masimba.farm"
+                            value=""
                             class="block w-full pl-10 pr-3 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
                             placeholder="Enter your email"
                         >
@@ -220,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             type="password" 
                             autocomplete="current-password" 
                             required 
-                            value="manager123"
+                            value=""
                             class="block w-full pl-10 pr-3 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
                             placeholder="Enter your password"
                         >
@@ -250,13 +250,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </button>
                 </div>
             </form>
-
-            <!-- Test Credentials Info -->
-            <div class="mt-6 p-4 bg-white/10 rounded-xl">
-                <p class="text-white/80 text-sm font-medium mb-2">🔑 Test Credentials:</p>
-                <p class="text-white/60 text-xs">Email: manager@masimba.farm</p>
-                <p class="text-white/60 text-xs">Password: manager123</p>
-            </div>
         </div>
     </div>
 </body>

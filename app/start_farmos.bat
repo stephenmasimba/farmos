@@ -25,10 +25,8 @@ if %errorlevel% equ 0 (
     echo 🌐 Access at: http://localhost:8081/farmos/
     echo 🔧 API at: http://127.0.0.1:8001
     echo.
-    echo 📋 Login Credentials:
-    echo 📧 Admin: admin@masimba.farm / admin123
-    echo 👨‍🌾 Manager: manager@masimba.farm / manager123
-    echo 👷 Worker: worker@masimba.farm / worker123
+    echo 🔐 No default credentials are shipped.
+    echo 💡 Create an admin user via your setup/seed process or use the registration endpoint.
     echo.
     pause
     exit /b

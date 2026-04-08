@@ -22,28 +22,21 @@ if (isset($_SESSION['user'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
-    
-    echo "<div style='background: #f0f0f0; padding: 10px; margin: 10px; border-radius: 5px;'>";
-    echo "<strong>Debug:</strong> Processing login for " . htmlspecialchars($email) . "<br>";
-    
+
     $user = authenticate_user($email, $password);
     
     if ($user) {
-        echo "✅ Authentication successful!<br>";
         $_SESSION['user'] = [
             'id' => $user['id'],
             'name' => $user['name'],
             'email' => $user['email'],
             'role' => $user['role']
         ];
-        echo "Session set. Redirecting to dashboard...<br>";
         header('Location: public/index.php?page=dashboard');
         exit;
     } else {
-        echo "❌ Authentication failed!<br>";
         $error = 'Invalid email or password';
     }
-    echo "</div>";
 }
 ?>
 <!DOCTYPE html>
@@ -76,22 +69,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" action="">
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="manager@masimba.farm" required>
+                <input type="email" id="email" name="email" value="" required>
             </div>
             
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" value="manager123" required>
+                <input type="password" id="password" name="password" value="" required>
             </div>
             
             <button type="submit">Sign In</button>
         </form>
-        
-        <p style="text-align: center; margin-top: 20px; color: white;">
-            <strong>Test Credentials:</strong><br>
-            Email: manager@masimba.farm<br>
-            Password: manager123
-        </p>
     </div>
 </body>
 </html>

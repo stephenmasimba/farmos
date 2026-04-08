@@ -27,10 +27,8 @@ if %errorlevel% equ 0 (
     echo 🌐 Opening FarmOS...
     start http://localhost:8081/farmos/
     echo.
-    echo 📋 Login Credentials:
-    echo 📧 Admin: admin@masimba.farm / admin123
-    echo 👨‍🌾 Manager: manager@masimba.farm / manager123
-    echo 👷 Worker: worker@masimba.farm / worker123
+    echo 🔐 No default credentials are shipped.
+    echo 💡 Create an admin user via your setup/seed process or use the registration endpoint.
     echo.
     echo 💡 FarmOS is ready! Close this window to keep server running.
     pause
@@ -64,10 +62,8 @@ echo ✅ FarmOS is running!
 echo 📍 Server: http://127.0.0.1:8001
 echo 🌐 Web Interface: http://localhost:8081/farmos/
 echo.
-echo 📋 Login Credentials:
-echo 📧 Admin: admin@masimba.farm / admin123
-echo 👨‍🌾 Manager: manager@masimba.farm / manager123
-echo 👷 Worker: worker@masimba.farm / worker123
+echo 🔐 No default credentials are shipped.
+echo 💡 Create an admin user via your setup/seed process or use the registration endpoint.
 echo.
 echo 💡 Keep this window open to keep FarmOS running
 echo 🔄 Server will auto-restart if it stops

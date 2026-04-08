@@ -36,6 +36,7 @@ abstract class Model
      */
     public static function table(): string
     {
+        self::assertSafeIdentifier(static::$table);
         return static::$table;
     }
 
@@ -44,6 +45,7 @@ abstract class Model
      */
     public static function primaryKey(): string
     {
+        self::assertSafeIdentifier(static::$primaryKey);
         return static::$primaryKey;
     }
 
@@ -204,6 +206,7 @@ abstract class Model
      */
     public static function where(string $column, $value, Database $db)
     {
+        self::assertSafeIdentifier($column);
         $result = $db->queryOne(
             'SELECT * FROM ' . static::table() . ' WHERE ' . $column . ' = ?',
             [$value]
@@ -240,6 +243,7 @@ abstract class Model
 
         foreach ($this->attributes as $key => $value) {
             if ($key !== static::$primaryKey) {
+                self::assertSafeIdentifier($key);
                 $fields[] = $key;
                 $values[] = '?';
                 $params[] = $value;
@@ -274,6 +278,7 @@ abstract class Model
 
         foreach ($this->attributes as $key => $value) {
             if ($key !== static::$primaryKey && $key !== 'created_at') {
+                self::assertSafeIdentifier($key);
                 $sets[] = $key . ' = ?';
                 $params[] = $value;
             }
@@ -284,7 +289,7 @@ abstract class Model
         }
 
         $params[] = $id;
-        $sql = 'UPDATE ' . static::table() . ' SET ' . implode(', ', $sets) . ' WHERE ' . static::$primaryKey . ' = ?';
+        $sql = 'UPDATE ' . static::table() . ' SET ' . implode(', ', $sets) . ' WHERE ' . static::primaryKey() . ' = ?';
 
         return $this->db->execute($sql, $params);
     }
@@ -300,7 +305,7 @@ abstract class Model
             throw new ValidationException('No primary key for delete', [static::class]);
         }
 
-        $sql = 'DELETE FROM ' . static::table() . ' WHERE ' . static::$primaryKey . ' = ?';
+        $sql = 'DELETE FROM ' . static::table() . ' WHERE ' . static::primaryKey() . ' = ?';
         return $this->db->execute($sql, [$id]);
     }
 
@@ -355,5 +360,12 @@ abstract class Model
     public function clearDirty(): void
     {
         $this->original = $this->attributes;
+    }
+
+    private static function assertSafeIdentifier(string $name): void
+    {
+        if ($name === '' || !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $name)) {
+            throw new DatabaseException('Unsafe SQL identifier', ['identifier' => $name]);
+        }
     }
 }

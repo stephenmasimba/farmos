@@ -95,8 +95,18 @@ class SecurityTest extends BaseTestCase
      */
     public function testExpiredToken()
     {
-        // This would require mocking time or creating an actually expired token
-        $this->markTestIncomplete('Test expired JWT');
+        $claims = [
+            'user_id' => 1,
+            'email' => 'test@example.com',
+            'role' => 'admin',
+            'exp' => time() - 10,
+        ];
+
+        $token = Security::encodeJWT($claims, 3600);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Token expired');
+        Security::decodeJWT($token);
     }
 
     /**
@@ -125,7 +135,7 @@ class SecurityTest extends BaseTestCase
         // Check critical headers are present
         $this->assertArrayHasKey('X-Content-Type-Options', $headers);
         $this->assertArrayHasKey('X-Frame-Options', $headers);
-        $this->assertArrayHasKey('Strict-Transport-Security', $headers);
+        $this->assertArrayHasKey('Content-Security-Policy', $headers);
         
         // Check values
         $this->assertEquals('nosniff', $headers['X-Content-Type-Options']);
@@ -285,13 +295,18 @@ class RateLimiterTest extends BaseTestCase
  */
 class DatabaseTest extends BaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->db = Database::init('sqlite::memory:', '', '');
+    }
+
     /**
      * Test connection
      */
     public function testConnection()
     {
-        // Would test actual database connection
-        $this->markTestIncomplete('Database connection test');
+        $this->assertTrue($this->db->test());
     }
 
     /**
@@ -299,8 +314,11 @@ class DatabaseTest extends BaseTestCase
      */
     public function testQuery()
     {
-        // Would test query with mocked database
-        $this->markTestIncomplete('Query execution test');
+        $this->db->execute('CREATE TABLE t (id INTEGER PRIMARY KEY, name TEXT NOT NULL)');
+        $this->db->execute('INSERT INTO t (name) VALUES (?)', ['a']);
+        $row = $this->db->queryOne('SELECT id, name FROM t WHERE name = ? LIMIT 1', ['a']);
+        $this->assertNotNull($row);
+        $this->assertEquals('a', $row['name']);
     }
 }
 

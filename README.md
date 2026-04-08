@@ -104,14 +104,12 @@ curl http://localhost:8081/farmos/app/backend/api/version
 - [Status](./docs/consolidated/STATUS.md)
 - [App Transition](./docs/consolidated/APP_TRANSITION.md)
 
-## 🔐 Default Login
+## 🔐 Login
 
-After seeding sample data:
+FarmOS does not ship with default production credentials.
 
-```
-Email: admin@farmos.local
-Password: admin123
-```
+- Create users via `POST /api/auth/register`, or
+- Use a controlled seed process for non-production (credentials should be provided via environment variables and/or printed at seed time).
 
 ## 📚 Main Modules
 

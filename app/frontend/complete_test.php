@@ -1,4 +1,20 @@
 <?php
+require_once __DIR__ . '/../backend/config/env.php';
+
+$appEnv = strtolower((string) (getenv('APP_ENV') ?: 'production'));
+$remoteAddr = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+if (in_array($appEnv, ['production', 'prod', 'staging'], true) || !in_array($remoteAddr, ['127.0.0.1', '::1'], true)) {
+    http_response_code(404);
+    exit;
+}
+
+$testEmail = (string) (getenv('TEST_AUTH_EMAIL') ?: '');
+$testPassword = (string) (getenv('TEST_AUTH_PASSWORD') ?: '');
+if ($testEmail === '' || $testPassword === '') {
+    echo "<p style='color: orange;'>⚠️ Set TEST_AUTH_EMAIL and TEST_AUTH_PASSWORD to run this test.</p>";
+    exit;
+}
+
 /**
  * Complete Login Flow Test
  */
@@ -8,7 +24,7 @@ echo "<h2>🔧 Complete Login Flow Test</h2>";
 // Test 1: Database Connection
 echo "<h3>1. Database Connection:</h3>";
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=begin_masimba_farm;charset=utf8mb4", 'root', '');
+    $pdo = new PDO((string) getenv('DATABASE_URL'), (string) getenv('DB_USER'), (string) getenv('DB_PASSWORD'));
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     echo "<p style='color: green;'>✅ Database connected</p>";
 } catch(PDOException $e) {
@@ -19,7 +35,7 @@ try {
 // Test 2: User Exists
 echo "<h3>2. User Check:</h3>";
 $stmt = $pdo->prepare("SELECT id, name, email, hashed_password, role FROM users WHERE email = :email");
-$stmt->execute(['email' => 'manager@masimba.farm']);
+$stmt->execute(['email' => $testEmail]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($user) {
@@ -32,7 +48,7 @@ if ($user) {
 
 // Test 3: Password Verification
 echo "<h3>3. Password Verification:</h3>";
-if (password_verify('manager123', $user['hashed_password'])) {
+if (password_verify($testPassword, $user['hashed_password'])) {
     echo "<p style='color: green;'>✅ Password verified successfully</p>";
 } else {
     echo "<p style='color: red;'>❌ Password verification failed</p>";
@@ -41,7 +57,7 @@ if (password_verify('manager123', $user['hashed_password'])) {
 // Test 4: Authentication Function
 echo "<h3>4. Authentication Function:</h3>";
 require_once 'simple_auth.php';
-$auth_user = authenticate_user('manager@masimba.farm', 'manager123');
+$auth_user = authenticate_user($testEmail, $testPassword);
 
 if ($auth_user) {
     echo "<p style='color: green;'>✅ Authentication function works</p>";

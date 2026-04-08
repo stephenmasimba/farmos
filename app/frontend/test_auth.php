@@ -1,4 +1,13 @@
 <?php
+require_once __DIR__ . '/../backend/config/env.php';
+
+$appEnv = strtolower((string) (getenv('APP_ENV') ?: 'production'));
+$remoteAddr = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+if (in_array($appEnv, ['production', 'prod', 'staging'], true) || !in_array($remoteAddr, ['127.0.0.1', '::1'], true)) {
+    http_response_code(404);
+    exit;
+}
+
 /**
  * Test Authentication Script
  */
@@ -14,7 +23,14 @@ echo "<h2>🔐 FarmOS Authentication Test</h2>";
 
 // Test login
 echo "<h3>Testing Login:</h3>";
-$user = authenticate_user('manager@masimba.farm', 'manager123');
+$testEmail = (string) (getenv('TEST_AUTH_EMAIL') ?: '');
+$testPassword = (string) (getenv('TEST_AUTH_PASSWORD') ?: '');
+$user = null;
+if ($testEmail !== '' && $testPassword !== '') {
+    $user = authenticate_user($testEmail, $testPassword);
+} else {
+    echo "<p style='color: orange;'>⚠️ Set TEST_AUTH_EMAIL and TEST_AUTH_PASSWORD to run the login test.</p>";
+}
 
 if ($user) {
     echo "<p style='color: green;'>✅ Login successful!</p>";
