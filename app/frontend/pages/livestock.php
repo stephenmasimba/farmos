@@ -9,13 +9,48 @@ require_once __DIR__ . '/../lib/i18n.php';
 
 // Fetch Batches
 $batches = [];
-$res = call_api('/api/livestock/', 'GET');
-if ($res && $res['status'] === 200) $batches = $res['data'];
+$res = call_api('/api/livestock', 'GET');
+if ($res && $res['status'] === 200) {
+    $rawBatches = $res['data'] ?? [];
+    $batches = is_array($rawBatches['livestock'] ?? null) ? $rawBatches['livestock'] : (is_array($rawBatches) ? $rawBatches : []);
+}
 
 // Fetch Breeding Records
 $breeding = [];
 $res_breeding = call_api('/api/livestock/breeding', 'GET');
-if ($res_breeding['status'] === 200) $breeding = $res_breeding['data'];
+if (($res_breeding['status'] ?? 0) === 200) {
+    $rawBreeding = $res_breeding['data'] ?? [];
+    $breeding = is_array($rawBreeding) ? $rawBreeding : [];
+}
+
+$healthRecords = [];
+$reproductionCycles = [];
+$productionLogs = [];
+$vaccinationSchedule = [];
+
+$resHealth = call_api('/api/livestock-platform/health', 'GET');
+if (($resHealth['status'] ?? 0) === 200) {
+    $payload = $resHealth['data'] ?? [];
+    $healthRecords = is_array($payload) ? $payload : [];
+}
+
+$resRepro = call_api('/api/livestock-platform/reproduction', 'GET');
+if (($resRepro['status'] ?? 0) === 200) {
+    $payload = $resRepro['data'] ?? [];
+    $reproductionCycles = is_array($payload) ? $payload : [];
+}
+
+$resProduction = call_api('/api/livestock-platform/production', 'GET');
+if (($resProduction['status'] ?? 0) === 200) {
+    $payload = $resProduction['data'] ?? [];
+    $productionLogs = is_array($payload) ? $payload : [];
+}
+
+$resVaccinations = call_api('/api/livestock-platform/vaccinations', 'GET');
+if (($resVaccinations['status'] ?? 0) === 200) {
+    $payload = $resVaccinations['data'] ?? [];
+    $vaccinationSchedule = is_array($payload) ? $payload : [];
+}
 
 $page_title = __('livestock') . ' - Begin Masimba';
 $active_page = 'livestock';
@@ -23,6 +58,26 @@ require __DIR__ . '/../components/header.php';
 ?>
 
 <div class="max-w-7xl mx-auto">
+    <div id="livestockNotice" class="hidden mb-4 rounded-lg border px-4 py-3 text-sm"></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+            <p class="text-xs text-gray-500 uppercase">Health Records</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><?php echo count($healthRecords); ?></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+            <p class="text-xs text-gray-500 uppercase">Reproduction Cycles</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><?php echo count($reproductionCycles); ?></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+            <p class="text-xs text-gray-500 uppercase">Production Logs</p>
+            <p class="text-2xl font-bold text-emerald-600"><?php echo count($productionLogs); ?></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+            <p class="text-xs text-gray-500 uppercase">Vaccination Items</p>
+            <p class="text-2xl font-bold text-amber-600"><?php echo count($vaccinationSchedule); ?></p>
+        </div>
+    </div>
+
     <div class="mb-8 flex justify-between items-end">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white"><?php echo __('livestock'); ?> Management</h1>
@@ -34,6 +89,13 @@ require __DIR__ . '/../components/header.php';
                 <?php echo __('add_batch'); ?>
             </button>
         </div>
+    </div>
+
+    <div class="mb-6 flex flex-wrap gap-2">
+        <button type="button" onclick="document.getElementById('healthModal').classList.remove('hidden')" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Log Health</button>
+        <button type="button" onclick="document.getElementById('reproModal').classList.remove('hidden')" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Record Reproduction</button>
+        <button type="button" onclick="document.getElementById('productionModal').classList.remove('hidden')" class="bg-emerald-600 text-white px-3 py-2 rounded-md text-sm hover:bg-emerald-700">Add Production Log</button>
+        <button type="button" onclick="document.getElementById('vaccinationModal').classList.remove('hidden')" class="bg-amber-600 text-white px-3 py-2 rounded-md text-sm hover:bg-amber-700">Schedule Vaccination</button>
     </div>
 
     <!-- Tabs -->
@@ -118,6 +180,223 @@ require __DIR__ . '/../components/header.php';
                 </table>
             </div>
         </div>
+    </div>
+
+    <div class="mt-8 bg-white dark:bg-gray-800 shadow-sm overflow-hidden sm:rounded-xl border border-gray-100 dark:border-gray-700">
+        <div class="px-6 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Vaccination Schedule</h3>
+            <span class="text-xs text-gray-500">Advanced Livestock Platform</span>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700/50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Livestock ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Vaccine</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Scheduled</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Status</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                <?php if (empty($vaccinationSchedule)): ?>
+                    <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No vaccination schedule entries yet.</td></tr>
+                <?php else: ?>
+                    <?php foreach (array_slice($vaccinationSchedule, 0, 10) as $v): ?>
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300"><?php echo htmlspecialchars((string)($v['livestock_id'] ?? '')); ?></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white"><?php echo htmlspecialchars((string)($v['vaccine_name'] ?? '')); ?></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300"><?php echo htmlspecialchars((string)($v['scheduled_date'] ?? '')); ?></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300"><?php echo htmlspecialchars((string)($v['status'] ?? 'scheduled')); ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Platform Health Modal -->
+<div id="healthModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Health Record</h3>
+        <form id="healthForm">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Livestock ID</label>
+                    <input type="number" name="livestock_id" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Record Date</label>
+                    <input type="date" name="record_date" value="<?php echo date('Y-m-d'); ?>" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Condition</label>
+                <input type="text" name="condition_name" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Treatment</label>
+                    <input type="text" name="treatment" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Medicine</label>
+                    <input type="text" name="medicine" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Status</label>
+                    <select name="status" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="open">Open</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="chronic">Chronic</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Next Follow-up</label>
+                    <input type="date" name="next_followup_date" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('healthModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Cancel</button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-primary-600 text-white text-sm hover:bg-primary-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Platform Reproduction Modal -->
+<div id="reproModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Reproduction Cycle</h3>
+        <form id="reproForm">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Dam ID</label>
+                    <input type="number" name="dam_id" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Sire ID</label>
+                    <input type="number" name="sire_id" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Heat Date</label>
+                    <input type="date" name="heat_date" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Insemination Date</label>
+                    <input type="date" name="insemination_date" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Expected Calving</label>
+                    <input type="date" name="expected_calving_date" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Outcome</label>
+                    <select name="outcome" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="pending">Pending</option>
+                        <option value="pregnant">Pregnant</option>
+                        <option value="calved">Calved</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Notes</label>
+                <textarea name="notes" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"></textarea>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('reproModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Cancel</button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-primary-600 text-white text-sm hover:bg-primary-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Platform Production Modal -->
+<div id="productionModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Production Log</h3>
+        <form id="productionForm">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Livestock ID</label>
+                    <input type="number" name="livestock_id" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Log Date</label>
+                    <input type="date" name="log_date" value="<?php echo date('Y-m-d'); ?>" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Metric</label>
+                    <input type="text" name="metric" required placeholder="milk" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Value</label>
+                    <input type="number" step="0.001" name="value" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Unit</label>
+                    <input type="text" name="unit" required placeholder="L" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Notes</label>
+                <input type="text" name="notes" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('productionModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Cancel</button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-emerald-600 text-white text-sm hover:bg-emerald-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Platform Vaccination Modal -->
+<div id="vaccinationModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Vaccination Schedule</h3>
+        <form id="vaccinationForm">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Livestock ID</label>
+                    <input type="number" name="livestock_id" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Vaccine Name</label>
+                    <input type="text" name="vaccine_name" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Scheduled Date</label>
+                    <input type="date" name="scheduled_date" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Status</label>
+                    <select name="status" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="scheduled">Scheduled</option>
+                        <option value="completed">Completed</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Batch No (optional)</label>
+                <input type="text" name="batch_no" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('vaccinationModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Cancel</button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-amber-600 text-white text-sm hover:bg-amber-700">Save</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -212,6 +491,9 @@ require __DIR__ . '/../components/header.php';
                 </li>
                 <li class="mr-2">
                     <button onclick="switchManageTab('log')" id="tab-log" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300">Log Event</button>
+                </li>
+                <li class="mr-2">
+                    <button onclick="switchManageTab('lineage')" id="tab-lineage" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300">Lineage</button>
                 </li>
             </ul>
         </div>
@@ -354,38 +636,63 @@ function switchManageTab(tab) {
     document.getElementById('content-events').classList.add('hidden');
     document.getElementById('content-log').classList.add('hidden');
     document.getElementById('content-lineage').classList.add('hidden');
-    document.getElementById('tab-events').classList.remove('border-blue-600', 'text-blue-600');
-    document.getElementById('tab-events').classList.add('border-transparent', 'text-gray-500');
-    document.getElementById('tab-log').classList.remove('border-blue-600', 'text-blue-600');
-    document.getElementById('tab-log').classList.add('border-transparent', 'text-gray-500');
-    document.getElementById('tab-lineage').classList.remove('border-blue-600', 'text-blue-600');
-    document.getElementById('tab-lineage').classList.add('border-transparent', 'text-gray-500');
+    const tabEvents = document.getElementById('tab-events');
+    const tabLog = document.getElementById('tab-log');
+    const tabLineage = document.getElementById('tab-lineage');
+
+    if (tabEvents) {
+        tabEvents.classList.remove('border-blue-600', 'text-blue-600');
+        tabEvents.classList.add('border-transparent', 'text-gray-500');
+    }
+    if (tabLog) {
+        tabLog.classList.remove('border-blue-600', 'text-blue-600');
+        tabLog.classList.add('border-transparent', 'text-gray-500');
+    }
+    if (tabLineage) {
+        tabLineage.classList.remove('border-blue-600', 'text-blue-600');
+        tabLineage.classList.add('border-transparent', 'text-gray-500');
+    }
 
     if (tab === 'events') {
         document.getElementById('content-events').classList.remove('hidden');
-        document.getElementById('tab-events').classList.add('border-blue-600', 'text-blue-600');
-        document.getElementById('tab-events').classList.remove('border-transparent', 'text-gray-500');
+        if (tabEvents) {
+            tabEvents.classList.add('border-blue-600', 'text-blue-600');
+            tabEvents.classList.remove('border-transparent', 'text-gray-500');
+        }
     } else if (tab === 'log') {
         document.getElementById('content-log').classList.remove('hidden');
-        document.getElementById('tab-log').classList.add('border-blue-600', 'text-blue-600');
-        document.getElementById('tab-log').classList.remove('border-transparent', 'text-gray-500');
+        if (tabLog) {
+            tabLog.classList.add('border-blue-600', 'text-blue-600');
+            tabLog.classList.remove('border-transparent', 'text-gray-500');
+        }
     } else if (tab === 'lineage') {
         document.getElementById('content-lineage').classList.remove('hidden');
-        document.getElementById('tab-lineage').classList.add('border-blue-600', 'text-blue-600');
-        document.getElementById('tab-lineage').classList.remove('border-transparent', 'text-gray-500');
+        if (tabLineage) {
+            tabLineage.classList.add('border-blue-600', 'text-blue-600');
+            tabLineage.classList.remove('border-transparent', 'text-gray-500');
+        }
         if (currentBatchId) loadLineage(currentBatchId);
     }
 }
 
 // Helper to get headers with Auth
 const token = "<?php echo $_SESSION['access_token'] ?? ''; ?>";
-const API_BASE_URL = '<?php echo api_base_url(); ?>';
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-    'x-api-key': 'begin-api-key',
-    'X-Tenant-ID': '1'
-};
+const API_BASE_URL = window.AppApi.baseUrl;
+const TENANT_ID = window.AppApi.tenantId;
+const headers = window.AppApi.jsonHeaders();
+
+function showLivestockNotice(message, kind = 'success') {
+    const el = document.getElementById('livestockNotice');
+    if (!el) return;
+    const styles = {
+        success: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+        error: 'border-red-200 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-300',
+        info: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+    };
+    el.className = `mb-4 rounded-lg border px-4 py-3 text-sm ${styles[kind] || styles.info}`;
+    el.textContent = message;
+    el.classList.remove('hidden');
+}
 
 function renderBatches(list) {
     const tbody = document.getElementById('batchesList');
@@ -434,12 +741,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const resBatches = await window.OfflineService.getCachedData('/livestock/', 'livestock_batches');
         if (resBatches && resBatches.data) renderBatches(resBatches.data);
         if (navigator.onLine) {
-            const resp = await fetch(`${API_BASE_URL}/api/livestock/`, { headers });
+            const resp = await fetch(`${API_BASE_URL}/api/livestock?farm_id=${TENANT_ID}`, { headers });
             if (resp.ok) {
                 const data = await resp.json();
-                renderBatches(data);
-                if (Array.isArray(data)) {
-                    for (const it of data) await window.OfflineService.storeData('livestock_batches', it);
+                const list = Array.isArray(data) ? data : (Array.isArray(data.livestock) ? data.livestock : []);
+                renderBatches(list);
+                if (Array.isArray(list)) {
+                    for (const it of list) await window.OfflineService.storeData('livestock_batches', it);
                 }
             }
         }
@@ -448,12 +756,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const resBreed = await window.OfflineService.getCachedData('/livestock/breeding', 'breeding_records');
         if (resBreed && resBreed.data) renderBreeding(resBreed.data);
         if (navigator.onLine) {
-            const resp = await fetch(`${API_BASE_URL}/api/livestock/breeding`, { headers });
+            const resp = await fetch(`${API_BASE_URL}/api/livestock/breeding?farm_id=${TENANT_ID}`, { headers });
             if (resp.ok) {
                 const data = await resp.json();
-                renderBreeding(data);
-                if (Array.isArray(data)) {
-                    for (const it of data) await window.OfflineService.storeData('breeding_records', it);
+                const list = Array.isArray(data) ? data : [];
+                renderBreeding(list);
+                if (Array.isArray(list)) {
+                    for (const it of list) await window.OfflineService.storeData('breeding_records', it);
                 }
             }
         }
@@ -466,7 +775,8 @@ async function loadEvents(batchId) {
     
     try {
         const response = await fetch(`${API_BASE_URL}/api/livestock/${batchId}/events`, { headers });
-        const events = await response.json();
+        const payload = await response.json();
+        const events = Array.isArray(payload) ? payload : (Array.isArray(payload.events) ? payload.events : []);
         
         tbody.innerHTML = '';
         if (events.length === 0) {
@@ -584,14 +894,14 @@ async function postData(url, data) {
                     }
                 }
             } catch (parseError) {}
-            alert(message);
+            showLivestockNotice(message, 'error');
             if (res.status === 401 || res.status === 403) {
                 window.location.href = '../public/index.php?page=login';
             }
         }
     } catch (err) {
         console.error(err);
-        alert('Error occurred');
+        showLivestockNotice('Error occurred while saving data.', 'error');
     }
 }
 
@@ -600,15 +910,15 @@ document.getElementById('addBatchForm').addEventListener('submit', async (e) => 
     const data = Object.fromEntries(new FormData(e.target));
     data.count = parseInt(data.count);
     if (navigator.onLine) {
-        postData('/api/livestock/', data);
+        postData('/api/livestock', data);
     } else {
         await window.OfflineService.queueForSync({
-            endpoint: '/livestock/',
+            endpoint: '/livestock',
             method: 'POST',
             data
         });
         closeAddModal();
-        alert('Queued for sync');
+        showLivestockNotice('Batch queued for sync.', 'info');
     }
 });
 
@@ -625,7 +935,7 @@ document.getElementById('logEventForm').addEventListener('submit', async (e) => 
             method: 'POST',
             data
         });
-        alert('Queued for sync');
+        showLivestockNotice('Event queued for sync.', 'info');
     }
 });
 
@@ -642,8 +952,50 @@ document.getElementById('addBreedingForm').addEventListener('submit', async (e) 
             method: 'POST',
             data
         });
-        alert('Queued for sync');
+        showLivestockNotice('Breeding record queued for sync.', 'info');
     }
+});
+
+document.getElementById('healthForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = Object.fromEntries(new FormData(e.target));
+    const payload = {
+        ...raw,
+        livestock_id: Number(raw.livestock_id || 0)
+    };
+    postData('/api/livestock-platform/health', payload);
+});
+
+document.getElementById('reproForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = Object.fromEntries(new FormData(e.target));
+    const payload = {
+        ...raw,
+        dam_id: Number(raw.dam_id || 0),
+        sire_id: raw.sire_id ? Number(raw.sire_id) : null
+    };
+    postData('/api/livestock-platform/reproduction', payload);
+});
+
+document.getElementById('productionForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = Object.fromEntries(new FormData(e.target));
+    const payload = {
+        ...raw,
+        livestock_id: Number(raw.livestock_id || 0),
+        value: Number(raw.value || 0)
+    };
+    postData('/api/livestock-platform/production', payload);
+});
+
+document.getElementById('vaccinationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = Object.fromEntries(new FormData(e.target));
+    const payload = {
+        ...raw,
+        livestock_id: Number(raw.livestock_id || 0)
+    };
+    postData('/api/livestock-platform/vaccinations', payload);
 });
 </script>
 

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/livestock.dart';
+import '../../../core/models/weight_record.dart';
 import '../../../core/providers/service_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/common.dart';
+import '../widgets/weight_chart.dart';
 import 'livestock_screen.dart';
 
 final _detailProvider =
@@ -17,6 +19,11 @@ final _eventsProvider =
   return ref.read(livestockServiceProvider).getEvents(id);
 });
 
+final _weightRecordsProvider =
+    FutureProvider.autoDispose.family<List<WeightRecord>, int>((ref, id) {
+  return ref.read(weightTrackingServiceProvider).getRecords(id);
+});
+
 class LivestockDetailScreen extends ConsumerWidget {
   const LivestockDetailScreen({super.key, required this.id});
 
@@ -26,6 +33,7 @@ class LivestockDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final detail = ref.watch(_detailProvider(id));
     final events = ref.watch(_eventsProvider(id));
+    final weights = ref.watch(_weightRecordsProvider(id));
 
     return Scaffold(
       appBar: AppBar(
@@ -103,10 +111,30 @@ class LivestockDetailScreen extends ConsumerWidget {
                   );
                 },
               ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                sliver: SliverToBoxAdapter(
+                  child: weights.when(
+                    loading: () => const LinearProgressIndicator(),
+                    error: (e, _) => Text('Weight tracking error: $e'),
+                    data: (records) => Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: WeightChart(records: records),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _addWeight(context, ref),
+        icon: const Icon(Icons.monitor_weight_rounded),
+        label: const Text('Log Weight'),
       ),
     );
   }
@@ -119,6 +147,56 @@ class LivestockDetailScreen extends ConsumerWidget {
     );
     if (result == true) {
       ref.invalidate(_eventsProvider(id));
+    }
+  }
+
+  Future<void> _addWeight(BuildContext context, WidgetRef ref) async {
+    final controller = TextEditingController();
+    final notesCtrl = TextEditingController();
+
+    final weight = await showDialog<double>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Log Weight'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(labelText: 'Weight (kg)'),
+            ),
+            TextField(
+              controller: notesCtrl,
+              decoration: const InputDecoration(labelText: 'Notes (optional)'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final w = double.tryParse(controller.text.trim());
+              if (w != null) {
+                Navigator.pop(context, w);
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (weight != null) {
+      await ref.read(weightTrackingServiceProvider).addRecord(
+            id,
+            weight,
+            notes: notesCtrl.text,
+          );
+      ref.invalidate(_weightRecordsProvider(id));
     }
   }
 }

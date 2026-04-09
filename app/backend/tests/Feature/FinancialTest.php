@@ -191,6 +191,46 @@ class FinancialTest extends ApiTestCase
         $this->assertArrayHasKey('records', $response['body']);
     }
 
+    public function testCreateAndListBudgets(): void
+    {
+        $create = $this->apiCall('POST', '/api/financial/budgets', [
+            'farm_id' => $this->farmId,
+            'category' => 'feed',
+            'limit' => 500.00,
+            'period' => 'monthly',
+            'year' => (int) date('Y'),
+        ]);
+
+        $this->assertEquals(201, $create['status']);
+        $this->assertArrayHasKey('id', $create['body']);
+
+        $list = $this->apiCall('GET', '/api/financial/budgets?farm_id=' . $this->farmId);
+        $this->assertEquals(200, $list['status']);
+        $this->assertArrayHasKey('budgets', $list['body']);
+        $this->assertIsArray($list['body']['budgets']);
+    }
+
+    public function testCreateAndListInvoices(): void
+    {
+        $create = $this->apiCall('POST', '/api/financial/invoices', [
+            'farm_id' => $this->farmId,
+            'customer_name' => 'Test Customer',
+            'items' => 'Milk x10',
+            'amount' => 120.50,
+            'due_date' => date('Y-m-d', strtotime('+14 days')),
+            'status' => 'unpaid',
+        ]);
+
+        $this->assertEquals(201, $create['status']);
+        $this->assertArrayHasKey('id', $create['body']);
+        $this->assertArrayHasKey('invoice_number', $create['body']);
+
+        $list = $this->apiCall('GET', '/api/financial/invoices?farm_id=' . $this->farmId);
+        $this->assertEquals(200, $list['status']);
+        $this->assertArrayHasKey('invoices', $list['body']);
+        $this->assertIsArray($list['body']['invoices']);
+    }
+
     /**
      * Test: Validation - Invalid type
      */

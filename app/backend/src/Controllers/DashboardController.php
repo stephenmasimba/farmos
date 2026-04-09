@@ -29,6 +29,65 @@ class DashboardController
     }
 
     /**
+     * Get simplified dashboard summary for the PHP frontend.
+     * GET /api/dashboard/summary?farm_id={id}
+     */
+    public function summary(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $farmId = (int) ($this->request->getQuery()['farm_id'] ?? 0);
+            if (!$farmId) {
+                return Response::validationError(['farm_id' => 'Farm ID is required']);
+            }
+
+            $taskStats = Task::getStats($farmId, $this->db);
+            $lowStock = Inventory::lowStock($farmId, $this->db);
+            $financial = $this->db->queryOne(
+                'SELECT 
+                    SUM(CASE WHEN type = "income" THEN amount ELSE 0 END) as total_income,
+                    SUM(CASE WHEN type = "expense" THEN amount ELSE 0 END) as total_expense
+                 FROM ' . FinancialRecord::table() . '
+                 WHERE farm_id = ?',
+                [$farmId]
+            ) ?: ['total_income' => 0, 'total_expense' => 0];
+
+            $alertsCount = (int) count($lowStock) + (int) ($taskStats['overdue'] ?? 0) + (int) ($taskStats['critical_pending'] ?? 0);
+            $totalIncome = (float) ($financial['total_income'] ?? 0);
+            $totalExpense = (float) ($financial['total_expense'] ?? 0);
+
+            return Response::success([
+                'alerts' => $alertsCount,
+                'tasks_due' => (int) (($taskStats['pending'] ?? 0) + ($taskStats['overdue'] ?? 0)),
+                'livestock_batches' => Livestock::countByFarm($farmId, $this->db),
+                'inventory_low' => count($lowStock),
+                'low_stock_items' => array_map(static function ($item) {
+                    $profile = $item->getFullProfile();
+                    return [
+                        'id' => $profile['id'] ?? null,
+                        'name' => $profile['name'] ?? '',
+                        'location' => $profile['location'] ?? '',
+                        'quantity' => $profile['quantity'] ?? 0,
+                        'unit' => $profile['unit'] ?? 'unit',
+                    ];
+                }, $lowStock),
+                'financial' => [
+                    'total_income' => round($totalIncome, 2),
+                    'total_expense' => round($totalExpense, 2),
+                    'net_profit' => round($totalIncome - $totalExpense, 2),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Logger::error('Failed to get dashboard summary', ['error' => $e->getMessage()]);
+            return Response::error('Failed to get summary', 'SUMMARY_ERROR', 500);
+        }
+    }
+
+    /**
      * Get dashboard overview
      * GET /api/dashboard/overview?farm_id={id}
      */

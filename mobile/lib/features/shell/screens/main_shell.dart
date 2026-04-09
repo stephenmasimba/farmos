@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/providers/auth_provider.dart';
+import '../../farm/screens/farm_switcher.dart';
 
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.child});
@@ -27,6 +30,25 @@ class MainShell extends StatelessWidget {
     final index = _currentIndex(context);
     return Scaffold(
       body: child,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(56),
+              child: Consumer(
+                builder: (_, ref, __) {
+                  final user = ref.watch(authProvider).user;
+                  return AppBar(
+                    title: const Text('FarmOS Mobile'),
+                    actions: [
+                      if (user != null)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Center(child: FarmSwitcher()),
+                        ),
+                    ],
+                    elevation: 0,
+                  );
+                },
+              ),
+            ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: index,
         onDestinationSelected: (i) => context.go(_tabs[i].path),

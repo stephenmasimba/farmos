@@ -70,12 +70,8 @@ async function generateReport(type, format) {
     }
 
     const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
-    const API_BASE_URL = '<?php echo api_base_url(); ?>';
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'X-Tenant-ID': '1'
-    };
+    const API_BASE_URL = window.AppApi.baseUrl;
+    const headers = window.AppApi.jsonHeaders();
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/reports/generate`, {

@@ -22,7 +22,11 @@ class AuthService {
       'password': password,
     });
     await _persistSession(data);
-    return User.fromJson(data['user'] as Map<String, dynamic>);
+    try {
+      return await getMe();
+    } catch (_) {
+      return User.fromJson((data['user'] as Map<String, dynamic>?) ?? const {});
+    }
   }
 
   Future<User> register({
@@ -38,7 +42,11 @@ class AuthService {
       if (lastName != null) 'last_name': lastName,
     });
     await _persistSession(data);
-    return User.fromJson(data['user'] as Map<String, dynamic>);
+    try {
+      return await getMe();
+    } catch (_) {
+      return User.fromJson((data['user'] as Map<String, dynamic>?) ?? const {});
+    }
   }
 
   Future<User> getMe() async {

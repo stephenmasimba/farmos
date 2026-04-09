@@ -16,6 +16,7 @@ class Livestock extends Model
         'name',
         'species',
         'breed',
+        'quantity',
         'birth_date',
         'gender',
         'weight',
@@ -32,6 +33,7 @@ class Livestock extends Model
     protected static array $casts = [
         'id' => 'int',
         'farm_id' => 'int',
+        'quantity' => 'int',
         'birth_date' => 'datetime',
         'acquisition_date' => 'datetime',
         'weight' => 'float',
@@ -125,13 +127,13 @@ class Livestock extends Model
     /**
      * Add event to livestock
      */
-    public function addEvent(Database $db, string $eventType, string $description, string $date = null): bool
+    public function addEvent(Database $db, string $eventType, string $description, string $date = null, ?float $cost = null): bool
     {
         $date = $date ?: date('Y-m-d H:i:s');
 
         return (bool) $db->execute(
-            'INSERT INTO animal_events (livestock_id, event_type, description, date) VALUES (?, ?, ?, ?)',
-            [$this->attributes['id'], $eventType, $description, $date]
+            'INSERT INTO animal_events (livestock_id, event_type, description, date, cost) VALUES (?, ?, ?, ?, ?)',
+            [$this->attributes['id'], $eventType, $description, $date, $cost]
         );
     }
 

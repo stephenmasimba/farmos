@@ -24,7 +24,7 @@ class Field extends Equatable {
   final String? soilType;
 
   factory Field.fromJson(Map<String, dynamic> j) => Field(
-        id: j['id'] as int,
+        id: int.tryParse((j['id'] ?? '0').toString()) ?? 0,
         name: j['name'] as String? ?? '',
         status: j['status'] as String? ?? 'fallow',
         areaSizeHa: _parseDouble(j['area_size']),

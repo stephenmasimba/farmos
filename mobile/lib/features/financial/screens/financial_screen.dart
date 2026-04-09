@@ -26,6 +26,11 @@ final _monthlyProvider =
   return ref.read(financialServiceProvider).getMonthlyReport();
 });
 
+final _accountingSnapshotProvider =
+    FutureProvider.autoDispose<Map<String, dynamic>>((ref) {
+  return ref.read(financialServiceProvider).getAccountingSnapshot();
+});
+
 class FinancialScreen extends ConsumerStatefulWidget {
   const FinancialScreen({super.key});
 
@@ -53,6 +58,7 @@ class _FinancialScreenState extends ConsumerState<FinancialScreen>
   Widget build(BuildContext context) {
     final pendingChanges =
         ref.watch(pendingModuleChangesProvider(ApiEndpoints.financialRecords));
+    final accountingSnapshot = ref.watch(_accountingSnapshotProvider);
     final cacheStatus = latestOfflineStatus(
       ref.watch(cacheStatusServiceProvider),
       const [
@@ -98,6 +104,31 @@ class _FinancialScreenState extends ConsumerState<FinancialScreen>
                     ),
                   )
                 : const SizedBox.shrink(),
+          ),
+          accountingSnapshot.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (snapshot) => Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Card(
+                child: ListTile(
+                  leading: Icon(
+                    (snapshot['is_balanced'] == true)
+                        ? Icons.balance_rounded
+                        : Icons.warning_amber_rounded,
+                    color: (snapshot['is_balanced'] == true)
+                        ? AppColors.success
+                        : AppColors.warning,
+                  ),
+                  title: const Text('Accounting Platform'),
+                  subtitle: Text(
+                    'Trial balance: ${(snapshot['is_balanced'] == true) ? 'Balanced' : 'Unbalanced'} · '
+                    'AR Open: ${snapshot['open_receivables']} · '
+                    'AP Open: ${snapshot['open_payables']}',
+                  ),
+                ),
+              ),
+            ),
           ),
           Expanded(
             child: TabBarView(

@@ -5,7 +5,7 @@ if (empty($_SESSION['user'])) {
 }
 
 $records = [];
-$res = call_api('/api/breeding/');
+$res = call_api('/api/breeding');
 if ($res['status'] === 200) {
     $records = $res['data'];
 }
@@ -108,9 +108,9 @@ function closeModal() {
 }
 
 const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
-const API_BASE_URL = '<?php echo api_base_url(); ?>';
-const API_KEY = '<?php echo getenv('API_KEY') ?: 'local-dev-key'; ?>';
-const TENANT_ID = '<?php echo getenv('TENANT_ID') ?: '1'; ?>';
+const API_BASE_URL = window.AppApi.baseUrl;
+const API_KEY = window.AppApi.apiKey;
+const TENANT_ID = window.AppApi.tenantId;
 
 const headers = {
     'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
     const data = Object.fromEntries(formData.entries());
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/breeding/`, {
+        const response = await fetch(`${API_BASE_URL}/api/breeding`, {
             method: 'POST',
             headers,
             body: JSON.stringify(data)

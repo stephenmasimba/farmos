@@ -7,6 +7,7 @@ This index is the primary entry point for project documentation after consolidat
 - [Project Overview](../README.md)
 - [Quick Start](../QUICK_START.md)
 - [System Analysis](../SYSTEM_ANALYSIS_ISSUES_AND_IMPROVEMENTS.md)
+- [Web App Implementation Board](./WEB_APP_IMPLEMENTATION_BOARD.md)
 - [Developer Guide](./DEVELOPER_GUIDE.md)
 - [User Manual](./USER_MANUAL.md)
 

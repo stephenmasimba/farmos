@@ -150,7 +150,7 @@ require __DIR__ . '/../components/header.php';
 </div>
 
 <script>
-const API_BASE_URL = '<?php echo api_base_url(); ?>';
+const API_BASE_URL = window.AppApi.baseUrl;
 document.getElementById('calculatorForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -163,11 +163,7 @@ document.getElementById('calculatorForm').addEventListener('submit', async (e) =
     try {
         const response = await fetch(`${API_BASE_URL}/api/feed-formulation/calculate`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer <?php echo $_SESSION['access_token']; ?>',
-                'X-Tenant-ID': '1'
-            },
+            headers: window.AppApi.jsonHeaders(),
             body: JSON.stringify(data)
         });
 

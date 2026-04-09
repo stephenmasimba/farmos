@@ -1,8 +1,10 @@
 const CACHE_NAME = 'farmos-v1';
 const urlsToCache = [
-  '/farmos/begin_pyphp/frontend/public/',
-  '/farmos/begin_pyphp/frontend/public/index.php',
-  '/farmos/begin_pyphp/frontend/public/js/preferences.js',
+  '/farmos/app/frontend/public/',
+  '/farmos/app/frontend/public/index.php',
+  '/farmos/app/frontend/public/js/preferences.js',
+  '/farmos/app/frontend/public/js/offline-sync.js',
+  '/farmos/app/frontend/public/js/offline.service.js',
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/chart.js'
 ];

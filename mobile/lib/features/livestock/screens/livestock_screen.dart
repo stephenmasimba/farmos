@@ -23,6 +23,11 @@ final livestockStatsProvider =
   return ref.read(livestockServiceProvider).getStats();
 });
 
+final _livestockPlatformProvider =
+    FutureProvider.autoDispose<Map<String, dynamic>>((ref) {
+  return ref.read(livestockServiceProvider).getPlatformSnapshot();
+});
+
 class LivestockScreen extends ConsumerStatefulWidget {
   const LivestockScreen({super.key});
 
@@ -34,6 +39,8 @@ class _LivestockScreenState extends ConsumerState<LivestockScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
   final _filters = ['all', 'active', 'sold', 'harvested'];
+  bool _selectionMode = false;
+  final Set<int> _selectedIds = {};
 
   @override
   void initState() {
@@ -47,9 +54,92 @@ class _LivestockScreenState extends ConsumerState<LivestockScreen>
     super.dispose();
   }
 
+  void _exitSelectionMode() {
+    setState(() {
+      _selectionMode = false;
+      _selectedIds.clear();
+    });
+  }
+
+  Future<void> _batchDelete() async {
+    if (_selectedIds.isEmpty) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Delete batches?'),
+        content: Text('Delete ${_selectedIds.length} batch(es)? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final service = ref.read(livestockServiceProvider);
+    for (final id in _selectedIds) {
+      await service.delete(id);
+    }
+    _exitSelectionMode();
+    for (final f in _filters) {
+      ref.invalidate(livestockListProvider({'status': f == 'all' ? null : f}));
+    }
+    ref.invalidate(livestockStatsProvider);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Batches deleted.')),
+      );
+    }
+  }
+
+  Future<void> _batchHarvest() async {
+    if (_selectedIds.isEmpty) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Mark as harvested?'),
+        content: Text('Mark ${_selectedIds.length} batch(es) as harvested?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Harvest'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final service = ref.read(livestockServiceProvider);
+    for (final id in _selectedIds) {
+      await service.update(id, {'status': 'harvested'});
+    }
+    _exitSelectionMode();
+    for (final f in _filters) {
+      ref.invalidate(livestockListProvider({'status': f == 'all' ? null : f}));
+    }
+    ref.invalidate(livestockStatsProvider);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Batches marked as harvested.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final stats = ref.watch(livestockStatsProvider);
+    final platform = ref.watch(_livestockPlatformProvider);
     final pendingChanges =
         ref.watch(pendingModuleChangesProvider(ApiEndpoints.livestock));
     final cacheStatus = latestOfflineStatus(
@@ -75,6 +165,20 @@ class _LivestockScreenState extends ConsumerState<LivestockScreen>
           onTap: (_) => setState(() {}),
         ),
         actions: [
+          IconButton(
+            icon: Icon(_selectionMode ? Icons.close : Icons.checklist_rounded),
+            tooltip: _selectionMode ? 'Exit selection' : 'Select multiple',
+            onPressed: () {
+              setState(() {
+                if (_selectionMode) {
+                  _selectionMode = false;
+                  _selectedIds.clear();
+                } else {
+                  _selectionMode = true;
+                }
+              });
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.bar_chart_rounded),
             tooltip: 'Stats',
@@ -104,26 +208,88 @@ class _LivestockScreenState extends ConsumerState<LivestockScreen>
                   )
                 : const SizedBox.shrink(),
           ),
+          platform.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (snapshot) => Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Card(
+                child: ListTile(
+                  leading: const Icon(Icons.health_and_safety_rounded),
+                  title: const Text('Livestock Platform'),
+                  subtitle: Text(
+                    'Health: ${snapshot['health_records']} · '
+                    'Repro: ${snapshot['reproduction_cycles']} · '
+                    'Vaccinations scheduled: ${snapshot['scheduled_vaccinations']}',
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (_selectionMode && _selectedIds.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _batchHarvest,
+                      icon: const Icon(Icons.agriculture_rounded),
+                      label: Text('Harvest (${_selectedIds.length})'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _batchDelete,
+                      icon: const Icon(Icons.delete_outline_rounded),
+                      label: Text('Delete (${_selectedIds.length})'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             child: TabBarView(
               controller: _tabs,
               children: _filters.map((f) {
                 final params = f == 'all' ? <String, dynamic>{} : {'status': f};
-                return _LivestockList(filterParams: params);
+                return _LivestockList(
+                  filterParams: params,
+                  selectionMode: _selectionMode,
+                  selectedIds: _selectedIds,
+                  onSelectionChanged: (id, selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedIds.add(id);
+                      } else {
+                        _selectedIds.remove(id);
+                      }
+                    });
+                  },
+                );
               }).toList(),
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          await context.push('/livestock/add');
-          ref.invalidate(livestockListProvider);
-          ref.invalidate(livestockStatsProvider);
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Add Batch'),
-      ),
+      floatingActionButton: _selectionMode
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () async {
+                await context.push('/livestock/add');
+                for (final f in _filters) {
+                  ref.invalidate(livestockListProvider(
+                      {'status': f == 'all' ? null : f}));
+                }
+                ref.invalidate(livestockStatsProvider);
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Add Batch'),
+            ),
     );
   }
 
@@ -183,9 +349,17 @@ class _LivestockScreenState extends ConsumerState<LivestockScreen>
 }
 
 class _LivestockList extends ConsumerWidget {
-  const _LivestockList({required this.filterParams});
+  const _LivestockList({
+    required this.filterParams,
+    required this.selectionMode,
+    required this.selectedIds,
+    required this.onSelectionChanged,
+  });
 
   final Map<String, dynamic> filterParams;
+  final bool selectionMode;
+  final Set<int> selectedIds;
+  final void Function(int id, bool selected) onSelectionChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -217,7 +391,12 @@ class _LivestockList extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             itemCount: list.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (ctx, i) => _LivestockCard(item: list[i]),
+            itemBuilder: (ctx, i) => _LivestockCard(
+              item: list[i],
+              selectionMode: selectionMode,
+              isSelected: selectedIds.contains(list[i].id),
+              onToggle: (selected) => onSelectionChanged(list[i].id, selected),
+            ),
           ),
         );
       },
@@ -226,62 +405,83 @@ class _LivestockList extends ConsumerWidget {
 }
 
 class _LivestockCard extends StatelessWidget {
-  const _LivestockCard({required this.item});
+  const _LivestockCard({
+    required this.item,
+    required this.selectionMode,
+    required this.isSelected,
+    required this.onToggle,
+  });
 
   final Livestock item;
+  final bool selectionMode;
+  final bool isSelected;
+  final void Function(bool) onToggle;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: InkWell(
-        onTap: () => context.push('/livestock/${item.id}'),
+        onTap: selectionMode
+            ? () => onToggle(!isSelected)
+            : () => context.push('/livestock/${item.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      item.batchCode,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
+              if (selectionMode)
+                Checkbox(
+                  value: isSelected,
+                  onChanged: (v) => onToggle(v ?? false),
+                ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.batchCode,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        StatusBadge(status: item.status),
+                      ],
                     ),
-                  ),
-                  StatusBadge(status: item.status),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '${item.animalType} · ${item.breed}',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const Divider(height: 16),
-              Row(
-                children: [
-                  _Stat(
-                    label: 'Current',
-                    value: item.currentQuantity.toString(),
-                    icon: Icons.pets_rounded,
-                  ),
-                  const SizedBox(width: 16),
-                  _Stat(
-                    label: 'Initial',
-                    value: item.initialQuantity.toString(),
-                    icon: Icons.numbers_rounded,
-                  ),
-                  const Spacer(),
-                  if (item.expectedHarvestDate != null)
-                    _Stat(
-                      label: 'Harvest',
-                      value: Fmt.date(item.expectedHarvestDate),
-                      icon: Icons.event_rounded,
+                    const SizedBox(height: 4),
+                    Text(
+                      '${item.animalType} · ${item.breed}',
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                ],
+                    const Divider(height: 16),
+                    Row(
+                      children: [
+                        _Stat(
+                          label: 'Current',
+                          value: item.currentQuantity.toString(),
+                          icon: Icons.pets_rounded,
+                        ),
+                        const SizedBox(width: 16),
+                        _Stat(
+                          label: 'Initial',
+                          value: item.initialQuantity.toString(),
+                          icon: Icons.numbers_rounded,
+                        ),
+                        const Spacer(),
+                        if (item.expectedHarvestDate != null)
+                          _Stat(
+                            label: 'Harvest',
+                            value: Fmt.date(item.expectedHarvestDate),
+                            icon: Icons.event_rounded,
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

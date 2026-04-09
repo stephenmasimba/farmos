@@ -5,6 +5,7 @@ namespace FarmOS\Middleware;
 use FarmOS\{Request, Response, Logger, RateLimiter, Security};
 use FarmOS\Models\User;
 use FarmOS\Database;
+use FarmOS\Services\AccessControlService;
 
 /**
  * Base Middleware class
@@ -147,9 +148,51 @@ class AdminMiddleware extends Middleware
         }
 
         $userModel = User::find($user['user_id'], $this->db);
+        if (!$userModel || !$userModel->isActive()) {
+            return Response::unauthorized('User account inactive')->setStatusCode(401);
+        }
 
-        if (!$userModel || !$userModel->isAdmin()) {
+        $access = new AccessControlService($this->db);
+        $farmId = (int) ($this->request->getQuery('farm_id', 1) ?: 1);
+        if (!$access->userHasPermission($user, 'admin.access', $farmId)) {
             return Response::forbidden('Administrator access required')->setStatusCode(403);
+        }
+
+        return true;
+    }
+}
+
+/**
+ * Permission Middleware
+ * Verifies JWT auth and a required named permission.
+ */
+class PermissionMiddleware extends Middleware
+{
+    private string $permission;
+
+    public function __construct(Request $request, Database $db, string $permission)
+    {
+        parent::__construct($request, $db);
+        $this->permission = $permission;
+    }
+
+    public function handle()
+    {
+        $auth = new AuthMiddleware($this->request, $this->db);
+        $authResult = $auth->handle();
+        if ($authResult !== true) {
+            return $authResult;
+        }
+
+        $claims = $this->request->getUser();
+        if (!$claims || empty($claims['user_id'])) {
+            return Response::unauthorized('Authentication required')->setStatusCode(401);
+        }
+
+        $farmId = (int) ($this->request->getQuery('farm_id', 1) ?: 1);
+        $access = new AccessControlService($this->db);
+        if (!$access->userHasPermission($claims, $this->permission, $farmId)) {
+            return Response::forbidden('Missing permission: ' . $this->permission)->setStatusCode(403);
         }
 
         return true;

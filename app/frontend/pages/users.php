@@ -9,7 +9,7 @@ if (empty($_SESSION['user'])) {
 // For now, we assume if they can access the page, they see what the API returns.
 
 $users = [];
-$res = call_api('/api/users/');
+$res = call_api('/api/users');
 if ($res['status'] === 200) {
     $users = $res['data'];
 } elseif ($res['status'] === 403) {
@@ -78,18 +78,25 @@ require __DIR__ . '/../components/header.php';
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <?php
-                                $statusClass = match($user['status']) {
-                                    'active' => 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
-                                    'inactive' => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300',
-                                    'suspended' => 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
-                                    default => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
-                                };
+                                $statusClass = 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+                                switch ($user['status']) {
+                                    case 'active':
+                                        $statusClass = 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300';
+                                        break;
+                                    case 'inactive':
+                                        $statusClass = 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+                                        break;
+                                    case 'suspended':
+                                        $statusClass = 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300';
+                                        break;
+                                }
                                 ?>
                                 <span class="px-2 py-1 text-xs rounded-full <?php echo $statusClass; ?>">
                                     <?php echo htmlspecialchars(ucfirst($user['status'])); ?>
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button onclick="openAccessModal(<?php echo htmlspecialchars(json_encode($user)); ?>)" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">Access</button>
                                 <button onclick="openEditUserModal(<?php echo htmlspecialchars(json_encode($user)); ?>)" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 mr-3">Edit</button>
                                 <button onclick="deleteUser(<?php echo $user['id']; ?>)" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Delete</button>
                             </td>
@@ -126,9 +133,16 @@ require __DIR__ . '/../components/header.php';
                 <div>
                     <label for="userRole" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
                     <select name="role" id="userRole" required class="block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm p-2.5">
-                        <option value="worker">Worker</option>
-                        <option value="manager">Manager</option>
+                        <option value="super_admin">Super Admin</option>
                         <option value="admin">Admin</option>
+                        <option value="manager">Manager</option>
+                        <option value="finance_manager">Finance Manager</option>
+                        <option value="inventory_manager">Inventory Manager</option>
+                        <option value="livestock_manager">Livestock Manager</option>
+                        <option value="auditor">Auditor</option>
+                        <option value="worker">Worker</option>
+                        <option value="field_worker">Field Worker</option>
+                        <option value="user">User</option>
                     </select>
                 </div>
                 <div>
@@ -155,15 +169,60 @@ require __DIR__ . '/../components/header.php';
     </div>
 </div>
 
+<!-- Access Modal -->
+<div id="accessModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center" aria-labelledby="access-modal-title" role="dialog" aria-modal="true">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-3xl w-full p-6 border border-gray-100 dark:border-gray-700 m-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white" id="access-modal-title">Manage Access</h3>
+                <p id="accessUserMeta" class="text-sm text-gray-500 dark:text-gray-400"></p>
+            </div>
+            <button onclick="closeAccessModal()" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <form id="accessForm">
+            <input type="hidden" id="accessUserId">
+            <div class="mb-4">
+                <label for="accessRole" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+                <select id="accessRole" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm dark:bg-gray-700 dark:text-white sm:text-sm p-2.5">
+                    <option value="super_admin">Super Admin</option>
+                    <option value="admin">Admin</option>
+                    <option value="manager">Manager</option>
+                    <option value="finance_manager">Finance Manager</option>
+                    <option value="inventory_manager">Inventory Manager</option>
+                    <option value="livestock_manager">Livestock Manager</option>
+                    <option value="auditor">Auditor</option>
+                    <option value="worker">Worker</option>
+                    <option value="field_worker">Field Worker</option>
+                    <option value="user">User</option>
+                </select>
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Permission Overrides</label>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Allow or deny specific permissions for this user</span>
+                </div>
+                <div id="permissionOverrides" class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-80 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="button" onclick="closeAccessModal()" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
+                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-lg hover:bg-indigo-700">Save Access</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 const token = "<?php echo $_SESSION['access_token'] ?? ''; ?>";
-const API_BASE_URL = '<?php echo api_base_url(); ?>';
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-    'X-API-Key': 'local-dev-key',
-    'X-Tenant-ID': '1'
-};
+const API_BASE_URL = window.AppApi.baseUrl;
+const headers = window.AppApi.jsonHeaders();
+
+let accessCatalogCache = null;
 
 function openAddUserModal() {
     document.getElementById('modalTitle').innerText = 'Add User';
@@ -188,6 +247,80 @@ function openEditUserModal(user) {
 
 function closeUserModal() {
     document.getElementById('userModal').classList.add('hidden');
+}
+
+function closeAccessModal() {
+    document.getElementById('accessModal').classList.add('hidden');
+}
+
+async function loadAccessCatalog() {
+    if (accessCatalogCache) return accessCatalogCache;
+    const res = await fetch(`${API_BASE_URL}/api/access/catalog`, { headers });
+    if (!res.ok) {
+        throw new Error('Failed to load access catalog');
+    }
+    accessCatalogCache = await res.json();
+    return accessCatalogCache;
+}
+
+function renderPermissionOverrides(catalog, rolePermissions, effectivePermissions) {
+    const wrapper = document.getElementById('permissionOverrides');
+    wrapper.innerHTML = '';
+
+    const roleSet = new Set(rolePermissions || []);
+    const effectiveSet = new Set(effectivePermissions || []);
+
+    (catalog || []).forEach((permission) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between rounded-md border border-gray-200 dark:border-gray-700 px-3 py-2';
+
+        const inherited = roleSet.has(permission);
+        const effective = effectiveSet.has(permission);
+
+        row.innerHTML = `
+            <div>
+                <p class="text-xs font-medium text-gray-900 dark:text-white">${permission}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">${inherited ? 'Inherited from role' : 'Not in role template'}</p>
+            </div>
+            <select class="permission-effect rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-xs" data-permission="${permission}">
+                <option value="">Inherit</option>
+                <option value="allow" ${effective && !inherited ? 'selected' : ''}>Allow</option>
+                <option value="deny" ${!effective && inherited ? 'selected' : ''}>Deny</option>
+            </select>
+        `;
+        wrapper.appendChild(row);
+    });
+}
+
+async function openAccessModal(user) {
+    try {
+        const catalogPayload = await loadAccessCatalog();
+        const profileRes = await fetch(`${API_BASE_URL}/api/users/${user.id}/access`, { headers });
+        if (!profileRes.ok) {
+            alert('Failed to load user access profile');
+            return;
+        }
+        const profilePayload = await profileRes.json();
+
+        const profile = profilePayload || {};
+        const rolePermissions = profile.role_permissions || [];
+        const effectivePermissions = profile.effective_permissions || [];
+
+        document.getElementById('accessUserId').value = String(user.id);
+        document.getElementById('accessRole').value = user.role || 'user';
+        document.getElementById('accessUserMeta').innerText = `${user.name} (${user.email})`;
+
+        renderPermissionOverrides(
+            catalogPayload.permissions || [],
+            rolePermissions,
+            effectivePermissions
+        );
+
+        document.getElementById('accessModal').classList.remove('hidden');
+    } catch (err) {
+        console.error(err);
+        alert('Failed to load access data');
+    }
 }
 
 async function deleteUser(id) {
@@ -240,6 +373,51 @@ document.getElementById('userForm').addEventListener('submit', async (e) => {
         console.error(err);
         alert('Error saving user');
     }
+});
+
+document.getElementById('accessForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const userId = document.getElementById('accessUserId').value;
+    const role = document.getElementById('accessRole').value;
+
+    const roleRes = await fetch(`${API_BASE_URL}/api/users/${userId}/role`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ role })
+    });
+
+    if (!roleRes.ok) {
+        let msg = 'Failed to update role';
+        try {
+            const err = await roleRes.json();
+            msg = err?.error?.message || msg;
+        } catch (parseErr) {}
+        alert(msg);
+        return;
+    }
+
+    const permissions = Array.from(document.querySelectorAll('.permission-effect'))
+        .map((el) => ({ permission: el.dataset.permission, effect: el.value }))
+        .filter((it) => it.effect === 'allow' || it.effect === 'deny');
+
+    const permRes = await fetch(`${API_BASE_URL}/api/users/${userId}/permissions`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ permissions })
+    });
+
+    if (!permRes.ok) {
+        let msg = 'Failed to update permission overrides';
+        try {
+            const err = await permRes.json();
+            msg = err?.error?.message || msg;
+        } catch (parseErr) {}
+        alert(msg);
+        return;
+    }
+
+    window.location.reload();
 });
 </script>
 </body>

@@ -157,6 +157,24 @@ class InventoryService {
     }
   }
 
+  Future<Map<String, dynamic>> getPlatformSnapshot() async {
+    final warehouses = await _api.getList(ApiEndpoints.inventoryPlatformWarehouses);
+    final valuation = await _api.get(ApiEndpoints.inventoryPlatformValuation);
+    final reorder = await _api.get(ApiEndpoints.inventoryPlatformReorder);
+
+    final recommendations =
+        (reorder['reorder_recommendations'] as List<dynamic>?) ??
+            const <dynamic>[];
+
+    return {
+      'warehouse_count': warehouses.length,
+      'total_inventory_value':
+          double.tryParse((valuation['total_inventory_value'] ?? '0').toString()) ??
+              0.0,
+      'reorder_count': recommendations.length,
+    };
+  }
+
   Future<InventoryItem> adjustStock(int id, StockAdjustment adj) async {
     try {
       final data = await _api.post(ApiEndpoints.inventoryAdjust(id),

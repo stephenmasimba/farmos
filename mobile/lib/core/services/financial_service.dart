@@ -151,6 +151,33 @@ class FinancialService {
     return list.map((e) => e.toString()).toList();
   }
 
+  Future<Map<String, dynamic>> getAccountingSnapshot() async {
+    final trial = await _api.get(ApiEndpoints.accountingTrialBalance);
+    final receivables = await _api.get(ApiEndpoints.accountingReceivables);
+    final payables = await _api.get(ApiEndpoints.accountingPayables);
+
+    final arItems =
+        (receivables['items'] as List<dynamic>?) ?? const <dynamic>[];
+    final apItems = (payables['items'] as List<dynamic>?) ?? const <dynamic>[];
+
+    int countOpen(List<dynamic> items) {
+      return items.where((e) {
+        if (e is! Map) return false;
+        return (e['status']?.toString().toLowerCase() ?? 'open') == 'open';
+      }).length;
+    }
+
+    return {
+      'is_balanced': trial['is_balanced'] == true,
+      'total_debits':
+          double.tryParse((trial['total_debits'] ?? '0').toString()) ?? 0.0,
+      'total_credits':
+          double.tryParse((trial['total_credits'] ?? '0').toString()) ?? 0.0,
+      'open_receivables': countOpen(arItems),
+      'open_payables': countOpen(apItems),
+    };
+  }
+
   bool _shouldQueue(ApiException e) => e.statusCode == null;
 
   Future<List<Transaction>> _applyQueuedChanges(

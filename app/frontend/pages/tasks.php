@@ -40,12 +40,22 @@ require __DIR__ . '/../components/header.php';
                         </div>
                         <div class="ml-2 flex-shrink-0 flex">
                             <?php
-                                $statusColor = match(strtolower($task['status'])) {
-                                    'completed' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-                                    'in_progress', 'ongoing' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-                                    'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-                                    default => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                                };
+                                $status = strtolower((string) ($task['status'] ?? ''));
+                                switch ($status) {
+                                    case 'completed':
+                                        $statusColor = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+                                        break;
+                                    case 'in_progress':
+                                    case 'ongoing':
+                                        $statusColor = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+                                        break;
+                                    case 'pending':
+                                        $statusColor = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+                                        break;
+                                    default:
+                                        $statusColor = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+                                        break;
+                                }
                             ?>
                             <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-full <?php echo $statusColor; ?>">
                                 <?php echo htmlspecialchars($task['status']); ?>
@@ -75,6 +85,7 @@ require __DIR__ . '/../components/header.php';
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-700">
         <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Add New Task</h3>
         <form id="addTaskForm">
+            <input type="hidden" name="farm_id" value="1">
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
                 <input type="text" name="title" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
@@ -90,9 +101,10 @@ require __DIR__ . '/../components/header.php';
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
                 <select name="priority" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
                 </select>
             </div>
             <div class="flex justify-end space-x-3">
@@ -104,12 +116,18 @@ require __DIR__ . '/../components/header.php';
 </div>
 
 <script>
-    const API_BASE_URL = '<?php echo api_base_url(); ?>';
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + '<?php echo $_SESSION['access_token'] ?? ''; ?>',
-        'X-Tenant-ID': '1'
-    };
+    const API_BASE_URL = window.AppApi.baseUrl;
+    const TENANT_ID = window.AppApi.tenantId;
+    const headers = window.AppApi.jsonHeaders();
+
+    async function completeTask(taskId) {
+        try {
+            await window.AppApi.post(`/api/tasks/${taskId}/complete`, null);
+            window.location.reload();
+        } catch (e) {
+            alert('Failed to complete task');
+        }
+    }
 
     async function renderTasks(items) {
         const list = document.querySelector('ul[role="list"]');
@@ -120,11 +138,13 @@ require __DIR__ . '/../components/header.php';
                                (s === 'in_progress' || s === 'ongoing') ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
                                (s === 'pending') ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
                                'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+            const showComplete = s !== 'completed' && s !== 'cancelled';
             return `
             <li class="px-4 py-4 sm:px-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                 <div class="flex items-center justify-between">
                     <div class="text-sm font-medium text-primary-600 dark:text-primary-400 truncate">${task.title}</div>
-                    <div class="ml-2 flex-shrink-0 flex">
+                    <div class="ml-2 flex-shrink-0 flex items-center gap-2">
+                        ${showComplete ? `<button type="button" onclick="completeTask(${task.id})" class="px-3 py-1 rounded-md bg-green-600 text-white text-xs font-medium hover:bg-green-700">Complete</button>` : ''}
                         <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-full ${statusColor}">${task.status}</span>
                     </div>
                 </div>
@@ -142,14 +162,11 @@ require __DIR__ . '/../components/header.php';
             const cached = await window.OfflineService.getCachedData('/tasks/', 'tasks');
             if (cached && cached.data) renderTasks(cached.data);
             if (navigator.onLine) {
-                const resp = await fetch(`${API_BASE_URL}/api/tasks/`, { headers });
-                if (resp.ok) {
-                    const payload = await resp.json();
-                    const tasks = payload?.tasks || [];
-                    renderTasks(tasks);
-                    if (Array.isArray(tasks)) {
-                        for (const t of tasks) await window.OfflineService.storeData('tasks', t);
-                    }
+                const payload = await window.AppApi.get(`/api/tasks?farm_id=${TENANT_ID}`, { showError: false });
+                const tasks = payload?.tasks || [];
+                renderTasks(tasks);
+                if (Array.isArray(tasks)) {
+                    for (const t of tasks) await window.OfflineService.storeData('tasks', t);
                 }
             }
         } catch (e) {}
@@ -166,12 +183,8 @@ require __DIR__ . '/../components/header.php';
         
         try {
             if (navigator.onLine) {
-                const res = await fetch(`${API_BASE_URL}/api/tasks/`, { method: 'POST', headers, body: JSON.stringify(data) });
-                if (res.ok) {
-                    window.location.reload();
-                } else {
-                    alert('Failed to create task');
-                }
+                await window.AppApi.post('/api/tasks', data);
+                window.location.reload();
             } else {
                 await window.OfflineService.queueForSync({
                     endpoint: '/tasks/',

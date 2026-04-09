@@ -26,6 +26,11 @@ final _lowStockProvider =
   return ref.read(inventoryServiceProvider).getLowStockAlerts();
 });
 
+final _inventoryPlatformProvider =
+    FutureProvider.autoDispose<Map<String, dynamic>>((ref) {
+  return ref.read(inventoryServiceProvider).getPlatformSnapshot();
+});
+
 class InventoryScreen extends ConsumerStatefulWidget {
   const InventoryScreen({super.key});
 
@@ -36,6 +41,8 @@ class InventoryScreen extends ConsumerStatefulWidget {
 class _InventoryScreenState extends ConsumerState<InventoryScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
+  bool _selectionMode = false;
+  final Set<int> _selectedIds = {};
 
   @override
   void initState() {
@@ -49,9 +56,76 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
     super.dispose();
   }
 
+  void _exitSelectionMode() {
+    setState(() {
+      _selectionMode = false;
+      _selectedIds.clear();
+    });
+  }
+
+  Future<void> _batchDelete() async {
+    if (_selectedIds.isEmpty) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Delete items?'),
+        content: Text('Delete ${_selectedIds.length} item(s)? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final service = ref.read(inventoryServiceProvider);
+    for (final id in _selectedIds) {
+      await service.delete(id);
+    }
+    _exitSelectionMode();
+    ref.invalidate(_inventoryProvider);
+    ref.invalidate(_inventoryStatsProvider);
+    ref.invalidate(_lowStockProvider);
+  }
+
+  Future<void> _batchAdjustStock({required double delta}) async {
+    if (_selectedIds.isEmpty) return;
+    final service = ref.read(inventoryServiceProvider);
+    for (final id in _selectedIds) {
+      final item = await service.getById(id);
+      final newQty = item.quantity + delta;
+      if (newQty < 0) continue;
+      await service.update(id, {'quantity': newQty});
+    }
+    _exitSelectionMode();
+    ref.invalidate(_inventoryProvider);
+    ref.invalidate(_inventoryStatsProvider);
+    ref.invalidate(_lowStockProvider);
+  }
+
+  Future<void> _batchSetReorderLevel(double level) async {
+    if (_selectedIds.isEmpty) return;
+    final service = ref.read(inventoryServiceProvider);
+    for (final id in _selectedIds) {
+      await service.update(id, {'reorder_level': level});
+    }
+    _exitSelectionMode();
+    ref.invalidate(_inventoryProvider);
+    ref.invalidate(_inventoryStatsProvider);
+    ref.invalidate(_lowStockProvider);
+  }
+
   @override
   Widget build(BuildContext context) {
     final stats = ref.watch(_inventoryStatsProvider);
+    final platform = ref.watch(_inventoryPlatformProvider);
     final pendingChanges =
         ref.watch(pendingModuleChangesProvider(ApiEndpoints.inventory));
     final cacheStatus = latestOfflineStatus(
@@ -86,6 +160,22 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: Icon(_selectionMode ? Icons.close : Icons.checklist_rounded),
+            tooltip: _selectionMode ? 'Exit selection' : 'Select multiple',
+            onPressed: () {
+              setState(() {
+                if (_selectionMode) {
+                  _selectionMode = false;
+                  _selectedIds.clear();
+                } else {
+                  _selectionMode = true;
+                }
+              });
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -109,27 +199,97 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
                   )
                 : const SizedBox.shrink(),
           ),
+          platform.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (snapshot) => Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Card(
+                child: ListTile(
+                  leading: const Icon(Icons.warehouse_rounded),
+                  title: const Text('Inventory Platform'),
+                  subtitle: Text(
+                    'Warehouses: ${snapshot['warehouse_count']} · '
+                    'Reorder: ${snapshot['reorder_count']} · '
+                    'Value: ${Fmt.currency((snapshot['total_inventory_value'] as num?)?.toDouble() ?? 0)}',
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (_selectionMode && _selectedIds.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => _batchAdjustStock(delta: 10),
+                    icon: const Icon(Icons.add_circle_outline),
+                    label: const Text('+10 Qty'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () => _batchAdjustStock(delta: -10),
+                    icon: const Icon(Icons.remove_circle_outline),
+                    label: const Text('-10 Qty'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      final level = await _showReorderLevelDialog();
+                      if (level != null) {
+                        await _batchSetReorderLevel(level);
+                      }
+                    },
+                    icon: const Icon(Icons.tune_rounded),
+                    label: const Text('Set Reorder Level'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: _batchDelete,
+                    icon: const Icon(Icons.delete_outline_rounded),
+                    label: Text('Delete (${_selectedIds.length})'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.error,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             child: TabBarView(
               controller: _tabs,
-              children: const [
-                _AllInventory(),
-                _LowStockList(),
+              children: [
+                _AllInventory(
+                  selectionMode: _selectionMode,
+                  selectedIds: _selectedIds,
+                  onSelectionChanged: (id, selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedIds.add(id);
+                      } else {
+                        _selectedIds.remove(id);
+                      }
+                    });
+                  },
+                ),
+                _LowStockList(selectionMode: _selectionMode),
               ],
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          await _showAddDialog(context, ref);
-          ref.invalidate(_inventoryProvider);
-          ref.invalidate(_inventoryStatsProvider);
-          ref.invalidate(_lowStockProvider);
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Add Item'),
-      ),
+      floatingActionButton: _selectionMode
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () async {
+                await _showAddDialog(context, ref);
+                ref.invalidate(_inventoryProvider);
+                ref.invalidate(_inventoryStatsProvider);
+                ref.invalidate(_lowStockProvider);
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Add Item'),
+            ),
     );
   }
 
@@ -140,10 +300,49 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
       builder: (_) => _AddInventorySheet(),
     );
   }
+
+  Future<double?> _showReorderLevelDialog() async {
+    final controller = TextEditingController();
+    return showDialog<double>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Set reorder level'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Reorder level',
+            hintText: 'e.g., 10',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final value = double.tryParse(controller.text.trim());
+              if (value != null) Navigator.pop(context, value);
+            },
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _AllInventory extends ConsumerWidget {
-  const _AllInventory();
+  const _AllInventory({
+    required this.selectionMode,
+    required this.selectedIds,
+    required this.onSelectionChanged,
+  });
+
+  final bool selectionMode;
+  final Set<int> selectedIds;
+  final void Function(int id, bool selected) onSelectionChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -169,6 +368,9 @@ class _AllInventory extends ConsumerWidget {
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (_, i) => _InventoryCard(
               item: list[i],
+              selectionMode: selectionMode,
+              isSelected: selectedIds.contains(list[i].id),
+              onToggle: (selected) => onSelectionChanged(list[i].id, selected),
               onAdjust: () => _adjustStock(context, ref, list[i]),
             ),
           ),
@@ -191,7 +393,9 @@ class _AllInventory extends ConsumerWidget {
 }
 
 class _LowStockList extends ConsumerWidget {
-  const _LowStockList();
+  const _LowStockList({required this.selectionMode});
+
+  final bool selectionMode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -214,6 +418,9 @@ class _LowStockList extends ConsumerWidget {
           separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (_, i) => _InventoryCard(
             item: list[i],
+            selectionMode: false,
+            isSelected: false,
+            onToggle: (_) {},
             onAdjust: () {},
             highlight: true,
           ),
@@ -226,11 +433,17 @@ class _LowStockList extends ConsumerWidget {
 class _InventoryCard extends StatelessWidget {
   const _InventoryCard({
     required this.item,
+    required this.selectionMode,
+    required this.isSelected,
+    required this.onToggle,
     required this.onAdjust,
     this.highlight = false,
   });
 
   final InventoryItem item;
+  final bool selectionMode;
+  final bool isSelected;
+  final void Function(bool) onToggle;
   final VoidCallback onAdjust;
   final bool highlight;
 
@@ -244,12 +457,19 @@ class _InventoryCard extends StatelessWidget {
             : BorderSide.none,
       ),
       child: InkWell(
-        onTap: () => context.push('/inventory/${item.id}'),
+        onTap: selectionMode
+            ? () => onToggle(!isSelected)
+            : () => context.push('/inventory/${item.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
+              if (selectionMode)
+                Checkbox(
+                  value: isSelected,
+                  onChanged: (v) => onToggle(v ?? false),
+                ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

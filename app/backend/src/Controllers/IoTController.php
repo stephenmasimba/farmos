@@ -11,6 +11,8 @@ class IoTController
     private static bool $devicesTableEnsured = false;
     private static bool $sensorDataTableEnsured = false;
     private static bool $alertsTableEnsured = false;
+    private static bool $energyStatusTableEnsured = false;
+    private static bool $energyLoadsTableEnsured = false;
 
     public function __construct(Database $db, Request $request)
     {
@@ -169,6 +171,218 @@ class IoTController
         );
 
         self::$alertsTableEnsured = true;
+    }
+
+    private function ensureEnergyStatusTable(): void
+    {
+        if (self::$energyStatusTableEnsured) {
+            return;
+        }
+
+        $this->db->execute(
+            "CREATE TABLE IF NOT EXISTS energy_status_logs (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                farm_id INT NOT NULL,
+                battery_percentage DECIMAL(5,2) NOT NULL DEFAULT 0,
+                battery_voltage DECIMAL(6,2) NOT NULL DEFAULT 0,
+                solar_generation_watts DECIMAL(10,2) NOT NULL DEFAULT 0,
+                total_consumption_watts DECIMAL(10,2) NOT NULL DEFAULT 0,
+                active_loads INT NOT NULL DEFAULT 0,
+                load_shedding_active BOOLEAN NOT NULL DEFAULT FALSE,
+                essential_loads_only BOOLEAN NOT NULL DEFAULT FALSE,
+                non_essential_cutoff_v DECIMAL(6,2) NOT NULL DEFAULT 48.0,
+                critical_cutoff_v DECIMAL(6,2) NOT NULL DEFAULT 46.5,
+                last_event VARCHAR(255) NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_farm_created (farm_id, created_at)
+            )"
+        );
+
+        self::$energyStatusTableEnsured = true;
+    }
+
+    private function ensureEnergyLoadsTable(): void
+    {
+        if (self::$energyLoadsTableEnsured) {
+            return;
+        }
+
+        $this->db->execute(
+            "CREATE TABLE IF NOT EXISTS energy_loads (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                farm_id INT NOT NULL,
+                name VARCHAR(150) NOT NULL,
+                location VARCHAR(150) NULL,
+                priority INT NOT NULL DEFAULT 1,
+                is_essential BOOLEAN NOT NULL DEFAULT FALSE,
+                power_watts DECIMAL(10,2) NOT NULL DEFAULT 0,
+                status VARCHAR(20) NOT NULL DEFAULT 'off',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_farm_priority (farm_id, priority),
+                INDEX idx_farm_status (farm_id, status)
+            )"
+        );
+
+        self::$energyLoadsTableEnsured = true;
+    }
+
+    public function energyStatus(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $farmId = (int) ($this->request->getQuery()['farm_id'] ?? 0);
+            if (!$farmId) {
+                return Response::success([
+                    'battery_percentage' => 0,
+                    'battery_voltage' => 0,
+                    'solar_generation_watts' => 0,
+                    'total_consumption_watts' => 0,
+                    'active_loads' => 0,
+                    'load_shedding_active' => false,
+                    'essential_loads_only' => false,
+                    'non_essential_cutoff_v' => 48.0,
+                    'critical_cutoff_v' => 46.5,
+                    'last_event' => 'No recent events',
+                    'timestamp' => date('c'),
+                ]);
+            }
+
+            $this->ensureEnergyStatusTable();
+
+            $row = $this->db->queryOne(
+                'SELECT battery_percentage, battery_voltage, solar_generation_watts, total_consumption_watts, active_loads, load_shedding_active, essential_loads_only, non_essential_cutoff_v, critical_cutoff_v, last_event, created_at
+                 FROM energy_status_logs
+                 WHERE farm_id = ?
+                 ORDER BY created_at DESC
+                 LIMIT 1',
+                [$farmId]
+            );
+
+            if (!$row) {
+                return Response::success([
+                    'battery_percentage' => 0,
+                    'battery_voltage' => 0,
+                    'solar_generation_watts' => 0,
+                    'total_consumption_watts' => 0,
+                    'active_loads' => 0,
+                    'load_shedding_active' => false,
+                    'essential_loads_only' => false,
+                    'non_essential_cutoff_v' => 48.0,
+                    'critical_cutoff_v' => 46.5,
+                    'last_event' => 'No recent events',
+                    'timestamp' => date('c'),
+                ]);
+            }
+
+            $payload = [
+                'battery_percentage' => (float) ($row['battery_percentage'] ?? 0),
+                'battery_voltage' => (float) ($row['battery_voltage'] ?? 0),
+                'solar_generation_watts' => (float) ($row['solar_generation_watts'] ?? 0),
+                'total_consumption_watts' => (float) ($row['total_consumption_watts'] ?? 0),
+                'active_loads' => (int) ($row['active_loads'] ?? 0),
+                'load_shedding_active' => !empty($row['load_shedding_active']),
+                'essential_loads_only' => !empty($row['essential_loads_only']),
+                'non_essential_cutoff_v' => (float) ($row['non_essential_cutoff_v'] ?? 48.0),
+                'critical_cutoff_v' => (float) ($row['critical_cutoff_v'] ?? 46.5),
+                'last_event' => (string) ($row['last_event'] ?? 'No recent events'),
+                'timestamp' => !empty($row['created_at']) ? date('c', strtotime((string) $row['created_at'])) : date('c'),
+            ];
+
+            Logger::info('Retrieved energy status', [
+                'user_id' => $user['user_id'],
+                'farm_id' => $farmId,
+            ]);
+
+            return Response::success($payload);
+        } catch (\Exception $e) {
+            Logger::error('Failed to get energy status', ['error' => $e->getMessage()]);
+            return Response::error('Failed to get energy status', 'ENERGY_STATUS_ERROR', 500);
+        }
+    }
+
+    public function energyLoads(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $farmId = (int) ($this->request->getQuery()['farm_id'] ?? 0);
+            if (!$farmId) {
+                return Response::success([]);
+            }
+
+            $this->ensureEnergyLoadsTable();
+            $rows = $this->db->query(
+                'SELECT name, location, priority, is_essential, power_watts, status
+                 FROM energy_loads
+                 WHERE farm_id = ?
+                 ORDER BY is_essential DESC, priority ASC, id ASC',
+                [$farmId]
+            );
+
+            $loads = array_map(static function (array $row): array {
+                return [
+                    'name' => (string) ($row['name'] ?? ''),
+                    'location' => (string) ($row['location'] ?? ''),
+                    'priority' => (int) ($row['priority'] ?? 1),
+                    'is_essential' => !empty($row['is_essential']),
+                    'power_watts' => (float) ($row['power_watts'] ?? 0),
+                    'status' => (string) ($row['status'] ?? 'off'),
+                ];
+            }, $rows);
+
+            return Response::success($loads);
+        } catch (\Exception $e) {
+            Logger::error('Failed to get energy loads', ['error' => $e->getMessage()]);
+            return Response::error('Failed to get energy loads', 'ENERGY_LOADS_ERROR', 500);
+        }
+    }
+
+    public function energyHistory(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $farmId = (int) ($this->request->getQuery()['farm_id'] ?? 0);
+            if (!$farmId) {
+                return Response::success([]);
+            }
+
+            $this->ensureEnergyStatusTable();
+            $rows = $this->db->query(
+                'SELECT created_at, battery_percentage, solar_generation_watts, total_consumption_watts, load_shedding_active
+                 FROM energy_status_logs
+                 WHERE farm_id = ?
+                 ORDER BY created_at DESC
+                 LIMIT 24',
+                [$farmId]
+            );
+
+            $history = array_map(static function (array $row): array {
+                return [
+                    'timestamp' => !empty($row['created_at']) ? date('c', strtotime((string) $row['created_at'])) : date('c'),
+                    'battery_percentage' => (float) ($row['battery_percentage'] ?? 0),
+                    'solar_generation_watts' => (float) ($row['solar_generation_watts'] ?? 0),
+                    'total_consumption_watts' => (float) ($row['total_consumption_watts'] ?? 0),
+                    'load_shedding_active' => !empty($row['load_shedding_active']),
+                ];
+            }, $rows);
+
+            return Response::success($history);
+        } catch (\Exception $e) {
+            Logger::error('Failed to get energy history', ['error' => $e->getMessage()]);
+            return Response::error('Failed to get energy history', 'ENERGY_HISTORY_ERROR', 500);
+        }
     }
 
     public function latestSensors(): Response

@@ -5,7 +5,7 @@ if (empty($_SESSION['user'])) {
 }
 
 $notifications = [];
-$res = call_api('/api/notifications/');
+$res = call_api('/api/notifications');
 if ($res['status'] === 200) {
     $notifications = $res['data'];
 }
@@ -58,16 +58,8 @@ require __DIR__ . '/../components/header.php';
 </main>
 
 <script>
-    const API_BASE_URL = '<?php echo api_base_url(); ?>';
-    const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
-    
-    // Centralized API headers
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'X-API-Key': 'local-dev-key',
-        'X-Tenant-ID': '1'
-    };
+    const API_BASE_URL = window.AppApi.baseUrl;
+    const headers = window.AppApi.jsonHeaders();
 
     document.getElementById('markAllReadBtn').addEventListener('click', async () => {
         try {

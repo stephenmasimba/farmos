@@ -1,0 +1,11 @@
+{
+  "name": "FarmOS Mobile",
+  "short_name": "FarmOS",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#2D7A4F",
+  "description": "FarmOS Mobile — Smart Farm Management",
+  "orientation": "portrait-primary",
+  "icons": []
+}

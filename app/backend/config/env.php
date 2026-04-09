@@ -60,8 +60,8 @@ $defaults = [
     
     // CORS
     'CORS_ORIGIN' => 'http://localhost',
-    'CORS_METHODS' => 'GET,POST,PUT,DELETE,OPTIONS',
-    'CORS_HEADERS' => 'Content-Type,Authorization',
+    'CORS_METHODS' => 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+    'CORS_HEADERS' => 'Content-Type,Authorization,Accept,X-API-Key,X-Tenant-ID,X-Requested-With,X-Request-ID',
     
     // Logging
     'LOG_DIR' => __DIR__ . '/../storage/logs',

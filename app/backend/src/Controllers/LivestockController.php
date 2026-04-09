@@ -22,6 +22,28 @@ class LivestockController
         $this->request = $request;
     }
 
+    private function ensureAnimalEventsTable(): void
+    {
+        $this->db->execute(
+            'CREATE TABLE IF NOT EXISTS animal_events (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                livestock_id INT NOT NULL,
+                event_type VARCHAR(100) NOT NULL,
+                description TEXT NOT NULL,
+                date DATETIME NOT NULL,
+                cost DECIMAL(10,2) NULL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_animal_events_livestock (livestock_id, date),
+                INDEX idx_animal_events_type (event_type)
+            )'
+        );
+
+        try {
+            $this->db->execute('ALTER TABLE animal_events ADD COLUMN cost DECIMAL(10,2) NULL DEFAULT 0');
+        } catch (\Throwable $e) {
+        }
+    }
+
     /**
      * List livestock for a farm
      * GET /api/livestock?farm_id={id}&page={page}&per_page={per_page}&status={status}&species={species}
@@ -316,6 +338,7 @@ class LivestockController
                 return Response::notFound('Livestock not found');
             }
 
+            $this->ensureAnimalEventsTable();
             $events = $livestock->getEvents($this->db);
 
             Logger::info('Retrieved livestock events', [
@@ -361,6 +384,13 @@ class LivestockController
             $eventType = Validation::sanitizeString($input['event_type']);
             $description = Validation::sanitizeString($input['description']);
             $date = $input['date'] ?? null;
+            $cost = null;
+            if (isset($input['cost']) && $input['cost'] !== '') {
+                if (!is_numeric($input['cost']) || (float) $input['cost'] < 0) {
+                    return Response::validationError(['cost' => 'Cost must be a positive number']);
+                }
+                $cost = (float) $input['cost'];
+            }
 
             if ($date && !Validation::validateDate($date, 'Y-m-d H:i:s')) {
                 if (!Validation::validateDate($date, 'Y-m-d')) {
@@ -369,7 +399,8 @@ class LivestockController
                 $date = $date . ' 00:00:00';
             }
 
-            $livestock->addEvent($this->db, $eventType, $description, $date);
+            $this->ensureAnimalEventsTable();
+            $livestock->addEvent($this->db, $eventType, $description, $date, $cost);
 
             Logger::info('Added livestock event', [
                 'user_id' => $user['user_id'],
@@ -428,6 +459,124 @@ class LivestockController
         } catch (\Exception $e) {
             Logger::error('Failed to retrieve livestock statistics', ['error' => $e->getMessage()]);
             return Response::error('Failed to retrieve statistics', 'STATS_ERROR', 500);
+        }
+    }
+
+    private function getFarmIdFromRequest(): int
+    {
+        $input = $this->request->getBody();
+        if (!empty($input['farm_id'])) {
+            return (int) $input['farm_id'];
+        }
+
+        $query = $this->request->getQuery();
+        return (int) ($query['farm_id'] ?? 1);
+    }
+
+    private function ensureBreedingTable(): void
+    {
+        $this->db->execute(
+            'CREATE TABLE IF NOT EXISTS livestock_breeding_records (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                farm_id INT NOT NULL,
+                dam_batch_id INT NOT NULL,
+                sire_batch_id INT NOT NULL,
+                breeding_date DATE NOT NULL,
+                expected_birth_date DATE NULL,
+                notes TEXT NULL,
+                created_by INT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_livestock_breeding_farm (farm_id, breeding_date)
+            )'
+        );
+    }
+
+    public function breeding(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $this->ensureBreedingTable();
+            $farmId = $this->getFarmIdFromRequest();
+
+            if ($this->request->getMethod() === 'GET') {
+                $rows = $this->db->query(
+                    'SELECT dam_batch_id, sire_batch_id, breeding_date, expected_birth_date, notes
+                     FROM livestock_breeding_records
+                     WHERE farm_id = ?
+                     ORDER BY breeding_date DESC, id DESC
+                     LIMIT 200',
+                    [$farmId]
+                );
+                return Response::success($rows);
+            }
+
+            $input = $this->request->getBody();
+            $damBatchId = (int) ($input['dam_batch_id'] ?? 0);
+            $sireBatchId = (int) ($input['sire_batch_id'] ?? 0);
+            $breedingDate = (string) ($input['breeding_date'] ?? '');
+            $expectedBirthDate = (string) ($input['expected_birth_date'] ?? '');
+            $notes = trim((string) ($input['notes'] ?? ''));
+
+            $errors = [];
+            if ($damBatchId <= 0) {
+                $errors['dam_batch_id'] = 'Dam batch ID is required';
+            }
+            if ($sireBatchId <= 0) {
+                $errors['sire_batch_id'] = 'Sire batch ID is required';
+            }
+            if (!Validation::validateDate($breedingDate, 'Y-m-d')) {
+                $errors['breeding_date'] = 'Breeding date is required';
+            }
+            if ($expectedBirthDate !== '' && !Validation::validateDate($expectedBirthDate, 'Y-m-d')) {
+                $errors['expected_birth_date'] = 'Expected birth date is invalid';
+            }
+            if (!empty($errors)) {
+                return Response::validationError($errors);
+            }
+
+            $this->db->execute(
+                'INSERT INTO livestock_breeding_records (farm_id, dam_batch_id, sire_batch_id, breeding_date, expected_birth_date, notes, created_by)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $farmId,
+                    $damBatchId,
+                    $sireBatchId,
+                    $breedingDate,
+                    $expectedBirthDate !== '' ? $expectedBirthDate : null,
+                    $notes !== '' ? Validation::sanitizeString($notes) : null,
+                    (int) $user['user_id'],
+                ]
+            );
+
+            return Response::success(['id' => (int) $this->db->lastInsertId()], 'Breeding record created', 201);
+        } catch (\Exception $e) {
+            Logger::error('Failed to handle livestock breeding', ['error' => $e->getMessage()]);
+            return Response::error('Failed to handle breeding records', 'LIVESTOCK_BREEDING_ERROR', 500);
+        }
+    }
+
+    public function addEventByBatch(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $input = $this->request->getBody();
+            $batchId = (int) ($input['batch_id'] ?? 0);
+            if ($batchId <= 0) {
+                return Response::validationError(['batch_id' => 'Batch ID is required']);
+            }
+
+            return $this->addEvent($batchId);
+        } catch (\Exception $e) {
+            Logger::error('Failed to log livestock event by batch', ['error' => $e->getMessage()]);
+            return Response::error('Failed to log livestock event', 'LIVESTOCK_EVENT_LOG_ERROR', 500);
         }
     }
 }

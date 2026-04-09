@@ -113,6 +113,122 @@ if ($user_role && in_array($user_role, ['worker', 'field_worker'], true)) {
     <script src="/farmos/app/frontend/public/js/offline.service.js"></script>
     <script src="/farmos/app/frontend/public/js/websocket-client.js"></script>
     <script>
+        window.AppApi = (function initAppApi() {
+            const baseUrl = <?php echo json_encode(api_base_url()); ?>;
+            const apiKey = <?php echo json_encode((string) (getenv('API_KEY') ?: 'local-dev-key')); ?>;
+            const tenantId = <?php echo json_encode((string) ($_SESSION['farm_id'] ?? $_SESSION['user']['farm_id'] ?? (getenv('TENANT_ID') ?: '1'))); ?>;
+            const sessionToken = <?php echo json_encode((string) ($_SESSION['access_token'] ?? '')); ?>;
+
+            function getToken() {
+                try {
+                    return sessionToken || localStorage.getItem('token') || '';
+                } catch (error) {
+                    return sessionToken || '';
+                }
+            }
+
+            function normalizePath(path = '') {
+                if (!path) {
+                    return '';
+                }
+                if (/^https?:\/\//i.test(path)) {
+                    return path;
+                }
+                return path.startsWith('/') ? path : `/${path}`;
+            }
+
+            function headers(extra = {}) {
+                const merged = {
+                    'Accept': 'application/json',
+                    'X-API-Key': apiKey,
+                    'X-Tenant-ID': tenantId,
+                    ...extra,
+                };
+                const token = getToken();
+                if (token && !Object.prototype.hasOwnProperty.call(merged, 'Authorization')) {
+                    merged.Authorization = `Bearer ${token}`;
+                }
+                return merged;
+            }
+
+            function jsonHeaders(extra = {}) {
+                return headers({
+                    'Content-Type': 'application/json',
+                    ...extra,
+                });
+            }
+
+            async function request(path = '', options = {}) {
+                const {
+                    method = 'GET',
+                    data,
+                    body,
+                    headers: extraHeaders = {},
+                    showError = true,
+                } = options;
+
+                const requestBody = body !== undefined ? body : data;
+                const isFormData = typeof FormData !== 'undefined' && requestBody instanceof FormData;
+                const requestHeaders = isFormData ? headers(extraHeaders) : jsonHeaders(extraHeaders);
+
+                const response = await fetch(url(path), {
+                    method,
+                    headers: requestHeaders,
+                    body: requestBody == null ? undefined : (isFormData || typeof requestBody === 'string' ? requestBody : JSON.stringify(requestBody)),
+                });
+
+                const contentType = String(response.headers.get('content-type') || '').toLowerCase();
+                const payload = contentType.includes('application/json') ? await response.json() : await response.text();
+
+                if (!response.ok) {
+                    const message =
+                        (payload && typeof payload === 'object' && (payload?.error?.message || payload?.message))
+                            ? (payload.error?.message || payload.message)
+                            : `Request failed (${response.status})`;
+                    const err = new Error(String(message));
+                    err.status = response.status;
+                    err.payload = payload;
+                    if (showError && window.AppNotice && typeof window.AppNotice.error === 'function') {
+                        window.AppNotice.error(message);
+                    }
+                    throw err;
+                }
+
+                return payload;
+            }
+
+            function get(path = '', options = {}) {
+                return request(path, { ...options, method: 'GET' });
+            }
+
+            function post(path = '', data = null, options = {}) {
+                return request(path, { ...options, method: 'POST', data });
+            }
+
+            function put(path = '', data = null, options = {}) {
+                return request(path, { ...options, method: 'PUT', data });
+            }
+
+            return {
+                baseUrl,
+                apiKey,
+                tenantId,
+                sessionToken,
+                token: getToken,
+                url(path = '') {
+                    const normalized = normalizePath(path);
+                    return normalized.startsWith('http') ? normalized : `${baseUrl}${normalized}`;
+                },
+                headers,
+                jsonHeaders,
+                request,
+                get,
+                post,
+                put,
+            };
+        })();
+    </script>
+    <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/farmos/app/frontend/public/service-worker.js');
@@ -290,3 +406,4 @@ if ($user_role && in_array($user_role, ['worker', 'field_worker'], true)) {
 
         <!-- Main Content Area (Scrollable) -->
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6">
+            <div id="global-app-notice" class="hidden mb-4 rounded-lg border px-4 py-3 text-sm"></div>

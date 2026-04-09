@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:io';
 import '../../../core/providers/service_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/utils/validators.dart';
+import '../widgets/attachment_picker.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
@@ -21,6 +23,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   String _category = 'Sales';
   String _paymentMethod = 'cash';
   DateTime _date = DateTime.now();
+  File? _receiptImage;
   bool _loading = false;
 
   static const _incomeCategories = [
@@ -45,7 +48,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     if (!_form.currentState!.validate()) return;
     setState(() => _loading = true);
     try {
-      await ref.read(financialServiceProvider).create({
+      final tx = await ref.read(financialServiceProvider).create({
         'transaction_type': _type,
         'category': _category,
         'amount': double.parse(_amountCtrl.text.trim()),
@@ -53,6 +56,23 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         'payment_method': _paymentMethod,
         'transaction_date': _date.toIso8601String(),
       });
+
+      if (_receiptImage != null && tx.id > 0) {
+        try {
+          await ref
+              .read(fileUploadServiceProvider)
+              .uploadReceiptPhoto(tx.id, _receiptImage!);
+        } catch (_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Transaction saved, but receipt upload failed.'),
+              ),
+            );
+          }
+        }
+      }
+
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
       if (mounted) {
@@ -162,6 +182,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   minimumSize: const Size.fromHeight(48),
                   alignment: Alignment.centerLeft,
                 ),
+              ),
+              const SizedBox(height: 12),
+              AttachmentPicker(
+                onImagePicked: (file) => setState(() => _receiptImage = file),
               ),
               const SizedBox(height: 24),
               ElevatedButton(

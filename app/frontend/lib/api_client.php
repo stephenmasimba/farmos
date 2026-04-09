@@ -3,6 +3,8 @@
  * Enhanced API Client with Better Error Handling and Offline Support
  */
 
+require_once __DIR__ . '/../../backend/config/env.php';
+
 function api_base_url() {
     $explicit = getenv('PHP_API_BASE_URL') ?: getenv('API_BASE_URL');
     if (!empty($explicit)) {
@@ -28,10 +30,16 @@ function api_base_url() {
     return "{$scheme}://{$host}{$base}/backend";
 }
 
+function api_key(): string {
+    return (string) (getenv('API_KEY') ?: 'local-dev-key');
+}
+
 function api_headers() {
     $headers = [
         'Content-Type: application/json',
-        'X-Tenant-ID: ' . (getenv('TENANT_ID') ?: '1')
+        'Accept: application/json',
+        'X-Tenant-ID: ' . current_farm_id(),
+        'X-API-Key: ' . api_key(),
     ];
     if (!empty($_SESSION['access_token'])) {
         $headers[] = 'Authorization: Bearer ' . $_SESSION['access_token'];
@@ -39,7 +47,51 @@ function api_headers() {
     return $headers;
 }
 
+function current_farm_id(): int {
+    if (!empty($_SESSION['farm_id'])) {
+        return (int) $_SESSION['farm_id'];
+    }
+    if (!empty($_SESSION['user']['farm_id'])) {
+        return (int) $_SESSION['user']['farm_id'];
+    }
+    return 1;
+}
+
 function call_api($path, $method = 'GET', $data = null, $retry_count = 2) {
+    $path = (string) $path;
+    if ($path === '' || $path[0] !== '/') {
+        $path = '/' . $path;
+    }
+    if ($path !== '/') {
+        $path = rtrim($path, '/');
+    }
+
+    $methodUpper = strtoupper((string) $method);
+    $farmId = current_farm_id();
+    $needsFarmId = (
+        strpos($path, '/api/dashboard') === 0 ||
+        strpos($path, '/api/livestock') === 0 ||
+        strpos($path, '/api/inventory') === 0 ||
+        strpos($path, '/api/financial') === 0 ||
+        strpos($path, '/api/tasks') === 0 ||
+        strpos($path, '/api/weather') === 0 ||
+        strpos($path, '/api/energy') === 0 ||
+        strpos($path, '/api/marketplace') === 0 ||
+        strpos($path, '/api/sales-crm') === 0
+    );
+
+    if ($needsFarmId) {
+        if ($methodUpper === 'GET') {
+            if (strpos($path, 'farm_id=') === false) {
+                $path .= (strpos($path, '?') === false ? '?' : '&') . 'farm_id=' . $farmId;
+            }
+        } else {
+            if (is_array($data) && !isset($data['farm_id'])) {
+                $data['farm_id'] = $farmId;
+            }
+        }
+    }
+
     $url = api_base_url() . $path;
     
     for ($attempt = 1; $attempt <= $retry_count; $attempt++) {
@@ -51,14 +103,14 @@ function call_api($path, $method = 'GET', $data = null, $retry_count = 2) {
         curl_setopt($ch, CURLOPT_TIMEOUT, 8);
         curl_setopt($ch, CURLOPT_FAILONERROR, false);
         
-        switch (strtoupper($method)) {
+        switch ($methodUpper) {
             case 'POST':
                 curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data ?: []));
                 break;
             case 'PUT':
             case 'PATCH':
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $methodUpper);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data ?: []));
                 break;
             default:
@@ -108,7 +160,7 @@ function call_api($path, $method = 'GET', $data = null, $retry_count = 2) {
 function get_fallback_data($path, $error) {
     // Provide fallback data for critical dashboard endpoints
     $fallback_data = [
-        '/api/dashboard/summary' => [
+        '/api/dashboard/overview' => [
             'alerts' => 0,
             'tasks_due' => 0,
             'livestock_batches' => 0,

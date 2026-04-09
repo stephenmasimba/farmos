@@ -263,6 +263,15 @@ class InventoryController
                 }
                 $inventory->cost_per_unit = (float) $input['cost_per_unit'];
             }
+            if (isset($input['quantity'])) {
+                if (!is_numeric($input['quantity']) || $input['quantity'] < 0) {
+                    return Response::validationError(['quantity' => 'Quantity must be non-negative']);
+                }
+                $inventory->quantity = (float) $input['quantity'];
+            }
+            if (!empty($input['unit'])) {
+                $inventory->unit = Validation::sanitizeString($input['unit']);
+            }
             if (!empty($input['supplier'])) {
                 $inventory->supplier = Validation::sanitizeString($input['supplier']);
             }

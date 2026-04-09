@@ -91,21 +91,16 @@ require __DIR__ . '/../components/header.php';
 </div>
 
 <script>
+const API_BASE_URL = window.AppApi.baseUrl;
 document.getElementById('addSupplierForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const formData = new FormData(this);
     const data = Object.fromEntries(formData.entries());
     
-    const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'X-API-Key': 'local-dev-key',
-        'X-Tenant-ID': '1'
-    };
+    const headers = window.AppApi.jsonHeaders();
 
     try {
-        const response = await fetch('/api/suppliers/suppliers', {
+        const response = await fetch(`${API_BASE_URL}/api/suppliers`, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(data)

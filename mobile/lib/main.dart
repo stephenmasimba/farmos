@@ -5,11 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/providers/service_providers.dart';
 import 'core/router/app_router.dart';
+import 'core/services/background_sync.dart';
+import 'core/services/push_notification_service.dart';
 import 'core/services/sync_service.dart';
+import 'core/services/vaccination_reminder_service.dart';
 import 'core/theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize background scheduler before app bootstrap.
+  await BackgroundSync.init();
+
   runApp(const ProviderScope(child: FarmOSMobileApp()));
 }
 
@@ -24,12 +31,21 @@ class _FarmOSMobileAppState extends ConsumerState<FarmOSMobileApp>
     with WidgetsBindingObserver {
   StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
   StreamSubscription<SyncNotice>? _syncNoticeSub;
+  StreamSubscription<Map<String, dynamic>>? _pushTapSub;
   final _messengerKey = GlobalKey<ScaffoldMessengerState>();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // Initialize push notifications once app UI is mounted.
+    Future<void>.microtask(() async {
+      final push = ref.read(pushNotificationServiceProvider);
+      await push.init();
+      await VaccinationReminderService.init();
+      _pushTapSub = push.tapEvents.listen(_handlePushNavigation);
+    });
 
     // Attempt to flush queued writes immediately after app starts.
     Future<void>.microtask(_syncPending);
@@ -60,7 +76,69 @@ class _FarmOSMobileAppState extends ConsumerState<FarmOSMobileApp>
     WidgetsBinding.instance.removeObserver(this);
     _connectivitySub?.cancel();
     _syncNoticeSub?.cancel();
+    _pushTapSub?.cancel();
     super.dispose();
+  }
+
+  void _handlePushNavigation(Map<String, dynamic> data) {
+    final router = ref.read(routerProvider);
+    final route = _resolvePushRoute(data);
+    if (route == null || route.isEmpty) return;
+
+    const allowedRoutes = <String>{
+      '/dashboard',
+      '/tasks',
+      '/notifications',
+      '/weather',
+      '/weather-alerts',
+      '/inventory',
+      '/livestock',
+      '/financial',
+      '/sync',
+    };
+
+    final isDetailRoute =
+        route.startsWith('/inventory/') || route.startsWith('/livestock/');
+    if (!allowedRoutes.contains(route) && !isDetailRoute) return;
+    if (isDetailRoute) {
+      router.push(route);
+      return;
+    }
+    router.go(route);
+  }
+
+  String? _resolvePushRoute(Map<String, dynamic> data) {
+    final direct = (data['route'] ?? data['path'])?.toString();
+    if (direct != null && direct.isNotEmpty) {
+      return direct;
+    }
+
+    final module = (data['module'] ?? data['entity'] ?? data['type'])
+        ?.toString()
+        .toLowerCase();
+    final idRaw = data['id'] ?? data['entity_id'] ?? data['item_id'];
+    final id = int.tryParse((idRaw ?? '').toString());
+
+    switch (module) {
+      case 'inventory':
+        return id != null ? '/inventory/$id' : '/inventory';
+      case 'livestock':
+        return id != null ? '/livestock/$id' : '/livestock';
+      case 'task':
+      case 'tasks':
+        return '/tasks';
+      case 'weather':
+      case 'weather_alert':
+      case 'weather-alert':
+        return '/weather-alerts';
+      case 'notification':
+      case 'notifications':
+        return '/notifications';
+      case 'sync':
+        return '/sync';
+      default:
+        return null;
+    }
   }
 
   @override

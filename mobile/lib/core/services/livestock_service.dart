@@ -191,6 +191,29 @@ class LivestockService {
     }
   }
 
+  Future<Map<String, dynamic>> getPlatformSnapshot() async {
+    final health = await _api.getList(ApiEndpoints.livestockPlatformHealth);
+    final reproduction =
+        await _api.getList(ApiEndpoints.livestockPlatformReproduction);
+    final production = await _api.getList(ApiEndpoints.livestockPlatformProduction);
+    final vaccinations =
+        await _api.getList(ApiEndpoints.livestockPlatformVaccinations);
+
+    int countByStatus(List<dynamic> list, String status) {
+      return list.where((e) {
+        if (e is! Map) return false;
+        return (e['status']?.toString().toLowerCase() ?? '') == status;
+      }).length;
+    }
+
+    return {
+      'health_records': health.length,
+      'reproduction_cycles': reproduction.length,
+      'production_logs': production.length,
+      'scheduled_vaccinations': countByStatus(vaccinations, 'scheduled'),
+    };
+  }
+
   bool _shouldQueue(ApiException e) => e.statusCode == null;
 
   Future<List<Livestock>> _applyQueuedChanges(

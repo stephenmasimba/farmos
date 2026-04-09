@@ -11,9 +11,9 @@ if ($res['status'] === 200) {
 }
 
 $logs = [];
-$resLogs = call_api('/api/weather/logs');
+$resLogs = call_api('/api/weather/history');
 if ($resLogs['status'] === 200) {
-    $logs = $resLogs['data'];
+    $logs = $resLogs['data']['observations'] ?? [];
 }
 
 $page_title = 'Weather - Begin Masimba';
@@ -37,7 +37,7 @@ require __DIR__ . '/../components/header.php';
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Conditions</dt>
-                    <dd class="mt-1 text-xl font-semibold text-gray-900 dark:text-white"><?php echo $current_weather['conditions'] ?? '--'; ?></dd>
+                    <dd class="mt-1 text-xl font-semibold text-gray-900 dark:text-white"><?php echo $current_weather['condition'] ?? '--'; ?></dd>
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Wind Speed</dt>
@@ -71,10 +71,10 @@ require __DIR__ . '/../components/header.php';
                 <?php else: ?>
                     <?php foreach ($logs as $log): ?>
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($log['timestamp']); ?></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($log['observation_date']); ?></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white"><?php echo htmlspecialchars($log['temperature']); ?></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white"><?php echo htmlspecialchars($log['humidity']); ?></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white"><?php echo htmlspecialchars($log['conditions']); ?></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white"><?php echo htmlspecialchars($log['condition']); ?></td>
                     </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -120,13 +120,8 @@ require __DIR__ . '/../components/header.php';
 
 <script>
 const token = "<?php echo $_SESSION['access_token'] ?? ''; ?>";
-const API_BASE_URL = '<?php echo api_base_url(); ?>';
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-    'X-API-Key': 'local-dev-key',
-    'X-Tenant-ID': '1'
-};
+const API_BASE_URL = window.AppApi.baseUrl;
+const headers = window.AppApi.jsonHeaders();
 
 function openWeatherModal() { document.getElementById('weatherModal').classList.remove('hidden'); }
 function closeWeatherModal() { document.getElementById('weatherModal').classList.add('hidden'); }
@@ -137,13 +132,15 @@ document.getElementById('weatherForm').addEventListener('submit', async (e) => {
     data.temperature = parseFloat(data.temperature);
     data.humidity = parseFloat(data.humidity);
     if(data.wind_speed) data.wind_speed = parseFloat(data.wind_speed);
+    data.condition = (data.conditions || '').toLowerCase();
+    delete data.conditions;
     
     // Auto-fill timestamp if not provided (backend handles it usually, but good to be explicit or let backend do it)
     // Here we let backend handle it or send current time
     // data.timestamp = new Date().toISOString(); 
 
     try {
-        const res = await fetch(`${API_BASE_URL}/api/weather/logs`, {
+        const res = await fetch(`${API_BASE_URL}/api/weather/observation`, {
             method: 'POST',
             headers,
             body: JSON.stringify(data)

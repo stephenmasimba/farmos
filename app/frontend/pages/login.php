@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../simple_auth.php';
 
 $error = null;
 
@@ -22,25 +21,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   
   if ($api_response['status'] === 200 && !empty($api_response['data']['access_token'])) {
     $_SESSION['access_token'] = $api_response['data']['access_token'];
+        $_SESSION['refresh_token'] = $api_response['data']['refresh_token'] ?? null;
     $_SESSION['user'] = $api_response['data']['user'];
+        if (empty($_SESSION['user']['name'])) {
+                $_SESSION['user']['name'] = $_SESSION['user']['email'] ?? 'User';
+        }
     
     header('Location: ../public/index.php?page=dashboard');
     exit;
   }
 
-  $user = authenticate_user($email, $password);
-  if ($user) {
-    $_SESSION['user'] = [
-        'id' => $user['id'],
-        'name' => $user['name'],
-        'email' => $user['email'],
-        'role' => $user['role']
-    ];
-    header('Location: ../public/index.php?page=dashboard');
-    exit;
-  }
-
-  $error = 'Invalid email or password';
+    $error = $api_response['error'] ?? 'Invalid email or password';
 }
 ?>
 <!DOCTYPE html>

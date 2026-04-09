@@ -67,16 +67,8 @@ require __DIR__ . '/../components/header.php';
 document.getElementById('processPaymentForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const amount = document.getElementById('amount').value;
-    const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
-    const API_BASE_URL = '<?php echo api_base_url(); ?>';
-    
-    // Centralized API headers
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'X-API-Key': 'local-dev-key',
-        'X-Tenant-ID': '1'
-    };
+    const API_BASE_URL = window.AppApi.baseUrl;
+    const headers = window.AppApi.jsonHeaders();
     
     try {
         const response = await fetch(`${API_BASE_URL}/api/payments/process`, {

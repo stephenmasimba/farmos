@@ -5,7 +5,7 @@ if (empty($_SESSION['user'])) {
 }
 
 $fields = [];
-$res = call_api('/api/fields/');
+$res = call_api('/api/fields');
 if ($res['status'] === 200) {
     $fields = $res['data'];
 }
@@ -297,13 +297,8 @@ require __DIR__ . '/../components/header.php';
 <script>
 let currentFieldId = null;
 const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
-const API_BASE_URL = '<?php echo api_base_url(); ?>';
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-    'x-api-key': 'begin-api-key',
-    'X-Tenant-ID': '1'
-};
+const API_BASE_URL = window.AppApi.baseUrl;
+const headers = window.AppApi.jsonHeaders();
 
 function openAddFieldModal() { document.getElementById('addFieldModal').classList.remove('hidden'); }
 function closeAddFieldModal() { document.getElementById('addFieldModal').classList.add('hidden'); }

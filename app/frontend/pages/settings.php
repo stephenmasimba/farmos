@@ -6,14 +6,14 @@ if (empty($_SESSION['user'])) {
 
 // Fetch System Settings
 $settings = [];
-$resSettings = call_api('/api/system/');
+$resSettings = call_api('/api/system');
 if ($resSettings['status'] === 200) {
     $settings = $resSettings['data'];
 }
 
 // Fetch Tenants (if admin)
 $tenants = [];
-$resTenants = call_api('/api/tenants/');
+$resTenants = call_api('/api/tenants');
 if ($resTenants['status'] === 200) {
     $tenants = $resTenants['data'];
 }
@@ -152,13 +152,8 @@ require __DIR__ . '/../components/header.php';
 
 <script>
 const token = "<?php echo $_SESSION['access_token'] ?? ''; ?>";
-const API_BASE_URL = '<?php echo api_base_url(); ?>';
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-    'X-API-Key': 'local-dev-key',
-    'X-Tenant-ID': '1'
-};
+const API_BASE_URL = window.AppApi.baseUrl;
+const headers = window.AppApi.jsonHeaders();
 
 function openSettingsModal() {
     document.getElementById('settingsModal').classList.remove('hidden');
@@ -173,7 +168,7 @@ document.getElementById('settingsForm').addEventListener('submit', async (e) => 
     data.maintenance_mode = data.maintenance_mode === 'true';
     
     try {
-        const res = await fetch(`${API_BASE_URL}/api/system/`, {
+        const res = await fetch(`${API_BASE_URL}/api/system`, {
             method: 'PUT',
             headers: headers,
             body: JSON.stringify(data)

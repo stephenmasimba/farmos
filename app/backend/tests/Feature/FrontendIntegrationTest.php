@@ -129,15 +129,18 @@ final class FrontendIntegrationTest extends ApiTestCase
 
     private static function pickPort(): int
     {
-        $base = 8800 + (int) (microtime(true) * 1000) % 500;
-        for ($i = 0; $i < 50; $i++) {
-            $port = $base + $i;
-            $sock = @fsockopen('127.0.0.1', $port);
-            if ($sock === false) {
-                return $port;
+        $socket = @stream_socket_server('tcp://127.0.0.1:0', $errno, $errstr);
+        if (is_resource($socket)) {
+            $name = stream_socket_get_name($socket, false);
+            fclose($socket);
+            if (is_string($name) && strpos($name, ':') !== false) {
+                $port = (int) substr($name, strrpos($name, ':') + 1);
+                if ($port > 0) {
+                    return $port;
+                }
             }
-            fclose($sock);
         }
+
         return 8999;
     }
 

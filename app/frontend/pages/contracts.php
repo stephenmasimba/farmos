@@ -6,7 +6,7 @@ if (empty($_SESSION['user'])) {
 
 // Fetch Contracts
 $contracts = [];
-$res_contracts = call_api('/api/contracts/contracts', 'GET');
+$res_contracts = call_api('/api/contracts', 'GET');
 if ($res_contracts['status'] === 200) $contracts = $res_contracts['data'];
 
 $page_title = 'Contract Farming - Begin Masimba';
@@ -123,13 +123,8 @@ function closeModal(modalId) {
     document.getElementById(modalId).classList.add('hidden');
 }
 
-const token = '<?php echo $_SESSION['access_token']; ?>';
-const API_BASE_URL = '<?php echo api_base_url(); ?>';
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-    'X-Tenant-ID': '1'
-};
+const API_BASE_URL = window.AppApi.baseUrl;
+const headers = window.AppApi.jsonHeaders();
 
 document.getElementById('contractForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -141,7 +136,7 @@ document.getElementById('contractForm').addEventListener('submit', async (e) => 
     data.agreed_price_per_kg = parseFloat(data.agreed_price_per_kg);
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/contracts/contracts`, {
+        const response = await fetch(`${API_BASE_URL}/api/contracts`, {
             method: 'POST',
             headers,
             body: JSON.stringify(data)

@@ -5,7 +5,7 @@ if (empty($_SESSION['user'])) {
 }
 
 $timesheets = [];
-$res = call_api('/api/timesheets/');
+$res = call_api('/api/timesheets');
 if ($res['status'] === 200) {
     $timesheets = $res['data'];
 }
@@ -66,12 +66,14 @@ require __DIR__ . '/../components/header.php';
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($sheet['task_description']); ?></td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <?php
-                                $statusClass = match($sheet['status']) {
-                                    'Approved' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-                                    'Pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-                                    'Rejected' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-                                    default => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                                };
+                                $statusClass = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+                                if ($sheet['status'] === 'Approved') {
+                                    $statusClass = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+                                } elseif ($sheet['status'] === 'Pending') {
+                                    $statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+                                } elseif ($sheet['status'] === 'Rejected') {
+                                    $statusClass = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+                                }
                             ?>
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $statusClass; ?>">
                                 <?php echo htmlspecialchars($sheet['status']); ?>
@@ -126,12 +128,8 @@ require __DIR__ . '/../components/header.php';
 
 <script>
 const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-    'X-API-Key': 'local-dev-key',
-    'X-Tenant-ID': '1'
-};
+const API_BASE_URL = window.AppApi.baseUrl;
+const headers = window.AppApi.jsonHeaders();
 
 document.getElementById('logHoursForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -139,7 +137,7 @@ document.getElementById('logHoursForm').addEventListener('submit', async functio
     const data = Object.fromEntries(formData.entries());
     
     try {
-        const response = await fetch('/api/timesheets/log', {
+        const response = await fetch(`${API_BASE_URL}/api/timesheets/log`, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(data)
@@ -160,7 +158,7 @@ async function updateStatus(id, status) {
     if (!confirm(`Are you sure you want to mark this timesheet as ${status}?`)) return;
 
     try {
-        const response = await fetch(`/api/timesheets/${id}/status`, {
+        const response = await fetch(`${API_BASE_URL}/api/timesheets/${id}/status`, {
             method: 'PUT',
             headers: headers,
             body: JSON.stringify({ status: status })

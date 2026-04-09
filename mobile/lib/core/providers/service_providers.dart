@@ -14,6 +14,22 @@ import '../services/iot_service.dart';
 import '../services/sync_service.dart';
 import '../services/analytics_service.dart';
 import '../services/reports_service.dart';
+import '../services/user_access_service.dart';
+import '../services/notifications_service.dart';
+import '../services/timesheets_service.dart';
+import '../services/veterinary_service.dart';
+import '../services/hr_service.dart';
+import '../services/feed_service.dart';
+import '../services/fields_service.dart';
+import '../services/farm_service.dart';
+import '../services/file_upload_service.dart';
+import '../services/activity_service.dart';
+import '../services/weather_alert_service.dart';
+import '../services/field_map_service.dart';
+import '../services/cost_analysis_service.dart';
+import '../services/barcode_service.dart';
+import '../services/push_notification_service.dart';
+import '../services/weight_tracking_service.dart';
 
 final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
   return const FlutterSecureStorage(
@@ -111,4 +127,92 @@ final analyticsServiceProvider = Provider<AnalyticsService>((ref) {
 
 final reportsServiceProvider = Provider<ReportsService>((ref) {
   return ReportsService(ref.read(apiClientProvider));
+});
+
+final userAccessServiceProvider = Provider<UserAccessService>((ref) {
+  return UserAccessService(ref.read(apiClientProvider));
+});
+
+final notificationsServiceProvider = Provider<NotificationsService>((ref) {
+  return NotificationsService(ref.read(apiClientProvider));
+});
+
+final timesheetsServiceProvider = Provider<TimesheetsService>((ref) {
+  return TimesheetsService(ref.read(apiClientProvider));
+});
+
+final veterinaryServiceProvider = Provider<VeterinaryService>((ref) {
+  return VeterinaryService(ref.read(apiClientProvider));
+});
+
+final hrServiceProvider = Provider<HrService>((ref) {
+  return HrService(ref.read(apiClientProvider));
+});
+
+final feedServiceProvider = Provider<FeedService>((ref) {
+  return FeedService(ref.read(apiClientProvider));
+});
+
+final fieldsServiceProvider = Provider<FieldsService>((ref) {
+  return FieldsService(ref.read(apiClientProvider));
+});
+
+final farmServiceProvider = Provider<FarmService>((ref) {
+  return FarmService(
+    ref.read(apiClientProvider),
+    ref.read(syncServiceProvider),
+    ref.read(cacheStatusServiceProvider.notifier),
+  );
+});
+
+final fileUploadServiceProvider = Provider<FileUploadService>((ref) {
+  return FileUploadService(ref.read(apiClientProvider));
+});
+
+final activityServiceProvider = Provider<ActivityService>((ref) {
+  return ActivityService(
+    ref.read(apiClientProvider),
+    ref.read(syncServiceProvider),
+    ref.read(cacheStatusServiceProvider.notifier),
+  );
+});
+
+final weatherAlertServiceProvider = Provider<WeatherAlertService>((ref) {
+  return WeatherAlertService(
+    ref.read(apiClientProvider),
+    ref.read(syncServiceProvider),
+    ref.read(cacheStatusServiceProvider.notifier),
+  );
+});
+
+final fieldMapServiceProvider = Provider<FieldMapService>((ref) {
+  return FieldMapService(
+    ref.read(apiClientProvider),
+    ref.read(syncServiceProvider),
+    ref.read(cacheStatusServiceProvider.notifier),
+  );
+});
+
+final costAnalysisServiceProvider = Provider<CostAnalysisService>((ref) {
+  return CostAnalysisService(
+    ref.read(apiClientProvider),
+    ref.read(syncServiceProvider),
+    ref.read(cacheStatusServiceProvider.notifier),
+  );
+});
+
+final barcodeServiceProvider = Provider<BarcodeService>((ref) {
+  return BarcodeService(
+    ref.read(apiClientProvider),
+    ref.read(syncServiceProvider),
+    ref.read(cacheStatusServiceProvider.notifier),
+  );
+});
+
+final pushNotificationServiceProvider = Provider<PushNotificationService>((ref) {
+  return PushNotificationService(ref.read(apiClientProvider));
+});
+
+final weightTrackingServiceProvider = Provider<WeightTrackingService>((ref) {
+  return WeightTrackingService(ref.read(apiClientProvider));
 });

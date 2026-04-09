@@ -27,7 +27,7 @@ $active_page = 'data_import';
   <div id="result" style="margin-top:16px;"></div>
 </div>
 <script>
-  const apiBase = '/api/import';
+  const apiBase = window.AppApi.url('/api/import');
   const typeEl = document.getElementById('import-type');
   const tmplBtn = document.getElementById('download-template');
   const formEl = document.getElementById('import-form');
@@ -37,7 +37,7 @@ $active_page = 'data_import';
   tmplBtn.addEventListener('click', async () => {
     const type = typeEl.value;
     const res = await fetch(`${apiBase}/${type}/template`, {
-      headers: { 'x-api-key': 'begin-api-key', 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+      headers: window.AppApi.headers()
     });
     const text = await res.text();
     const blob = new Blob([text], { type: 'text/csv' });
@@ -68,11 +68,7 @@ $active_page = 'data_import';
         const rows = XLSX.utils.sheet_to_json(ws);
         const res = await fetch(`${apiBase}/${type}`, {
           method: 'POST',
-          headers: { 
-            'x-api-key': 'begin-api-key', 
-            'Authorization': 'Bearer ' + localStorage.getItem('token'),
-            'Content-Type': 'application/json'
-          },
+          headers: window.AppApi.jsonHeaders(),
           body: JSON.stringify({ rows })
         });
         const data = await res.json();
@@ -89,7 +85,7 @@ $active_page = 'data_import';
         fd.append('file', file);
         const res = await fetch(`${apiBase}/${type}`, {
           method: 'POST',
-          headers: { 'x-api-key': 'begin-api-key', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+          headers: window.AppApi.headers(),
           body: fd
         });
         const data = await res.json();

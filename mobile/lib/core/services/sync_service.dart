@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sqflite/sqflite.dart';
 import '../api/api_client.dart';
 import 'local_db_service.dart';
@@ -73,6 +74,14 @@ class CacheDiagnosticItem {
 
 class SyncService {
   SyncService(this._api);
+
+  static Future<SyncService> create() async {
+    const storage = FlutterSecureStorage(
+      aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    );
+    final apiClient = ApiClient(storage: storage);
+    return SyncService(apiClient);
+  }
 
   final ApiClient _api;
   static final StreamController<SyncNotice> _noticesController =

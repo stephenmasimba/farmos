@@ -506,4 +506,250 @@ class FinancialController
             return Response::error('Failed to retrieve categories', 'RETRIEVE_ERROR', 500);
         }
     }
+
+    private function getFarmIdFromInputOrQuery(): int
+    {
+        $input = $this->request->getBody();
+        if (!empty($input['farm_id'])) {
+            return (int) $input['farm_id'];
+        }
+
+        $query = $this->request->getQuery();
+        return (int) ($query['farm_id'] ?? 1);
+    }
+
+    private function ensureBudgetsAndInvoicesTables(): void
+    {
+        $this->db->execute(
+            'CREATE TABLE IF NOT EXISTS financial_budgets (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                farm_id INT NOT NULL,
+                category VARCHAR(191) NOT NULL,
+                period ENUM(\'monthly\', \'yearly\') NOT NULL,
+                year INT NOT NULL,
+                month TINYINT NULL,
+                limit_amount DECIMAL(12,2) NOT NULL,
+                created_by INT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NULL,
+                INDEX idx_financial_budgets_farm (farm_id, year, period, month),
+                INDEX idx_financial_budgets_category (farm_id, category)
+            )'
+        );
+
+        $this->db->execute(
+            'CREATE TABLE IF NOT EXISTS financial_invoices (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                farm_id INT NOT NULL,
+                invoice_number VARCHAR(64) NOT NULL,
+                customer_name VARCHAR(255) NOT NULL,
+                items TEXT NULL,
+                amount DECIMAL(12,2) NOT NULL,
+                due_date DATE NOT NULL,
+                status ENUM(\'unpaid\', \'paid\', \'overdue\', \'cancelled\') NOT NULL DEFAULT \'unpaid\',
+                created_by INT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NULL,
+                INDEX idx_financial_invoices_farm (farm_id, created_at),
+                INDEX idx_financial_invoices_status (farm_id, status),
+                UNIQUE KEY uniq_financial_invoices_number (invoice_number)
+            )'
+        );
+    }
+
+    public function budgets(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $this->ensureBudgetsAndInvoicesTables();
+            $farmId = (int) ($this->request->getQuery()['farm_id'] ?? 0);
+            if (!$farmId) {
+                $farmId = $this->getFarmIdFromInputOrQuery();
+            }
+            if (!$farmId) {
+                return Response::validationError(['farm_id' => 'Farm ID is required']);
+            }
+
+            if ($this->request->getMethod() === 'GET') {
+                $year = (int) ($this->request->getQuery()['year'] ?? (int) date('Y'));
+                $month = (int) ($this->request->getQuery()['month'] ?? (int) date('n'));
+                $year = $year ?: (int) date('Y');
+                $month = $month ?: (int) date('n');
+
+                $budgets = $this->db->query(
+                    'SELECT id, category, period, year, month, limit_amount
+                     FROM financial_budgets
+                     WHERE farm_id = ? AND year = ?
+                     ORDER BY category ASC, period ASC, month ASC, id DESC',
+                    [$farmId, $year]
+                );
+
+                $budgetsWithSpent = array_map(function (array $b) use ($farmId, $month): array {
+                    $period = (string) $b['period'];
+                    $year = (int) $b['year'];
+                    $budgetMonth = (int) ($b['month'] ?? 0);
+                    $effectiveMonth = $period === 'monthly' ? ($budgetMonth ?: $month) : 0;
+
+                    if ($period === 'monthly') {
+                        $start = sprintf('%04d-%02d-01', $year, $effectiveMonth);
+                        $end = date('Y-m-t', strtotime($start));
+                    } else {
+                        $start = sprintf('%04d-01-01', $year);
+                        $end = sprintf('%04d-12-31', $year);
+                    }
+
+                    $row = $this->db->query(
+                        'SELECT COALESCE(SUM(amount), 0) AS spent
+                         FROM ' . FinancialRecord::table() . '
+                         WHERE farm_id = ? AND type = \'expense\' AND category = ? AND date >= ? AND date <= ?',
+                        [$farmId, (string) $b['category'], $start, $end . ' 23:59:59']
+                    );
+                    $spent = isset($row[0]['spent']) ? (float) $row[0]['spent'] : 0.0;
+
+                    return [
+                        'id' => (int) $b['id'],
+                        'category' => (string) $b['category'],
+                        'period' => $period,
+                        'year' => $year,
+                        'month' => $period === 'monthly' ? $effectiveMonth : null,
+                        'limit' => (float) $b['limit_amount'],
+                        'spent' => round($spent, 2),
+                    ];
+                }, $budgets);
+
+                return Response::success(['budgets' => $budgetsWithSpent]);
+            }
+
+            $input = $this->request->getBody();
+            $category = Validation::sanitizeString((string) ($input['category'] ?? ''));
+            $limit = $input['limit'] ?? null;
+            $period = (string) ($input['period'] ?? 'monthly');
+            $year = (int) ($input['year'] ?? (int) date('Y'));
+
+            $errors = [];
+            if ($category === '') {
+                $errors['category'] = 'Category is required';
+            }
+            if (!is_numeric($limit) || (float) $limit <= 0) {
+                $errors['limit'] = 'Limit must be a positive number';
+            }
+            if (!Validation::validateEnum($period, ['monthly', 'yearly'])) {
+                $errors['period'] = 'Period must be monthly or yearly';
+            }
+            if ($year <= 1900 || $year >= 2100) {
+                $errors['year'] = 'Invalid year';
+            }
+            if (!empty($errors)) {
+                return Response::validationError($errors);
+            }
+
+            $month = null;
+            if ($period === 'monthly') {
+                $month = (int) date('n');
+            }
+
+            $this->db->execute(
+                'INSERT INTO financial_budgets (farm_id, category, period, year, month, limit_amount, created_by, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $farmId,
+                    $category,
+                    $period,
+                    $year,
+                    $month,
+                    (float) $limit,
+                    (int) $user['user_id'],
+                    date('Y-m-d H:i:s'),
+                ]
+            );
+
+            return Response::success(['id' => (int) $this->db->lastInsertId()], 'Budget created', 201);
+        } catch (\Exception $e) {
+            Logger::error('Failed to handle budgets', ['error' => $e->getMessage()]);
+            return Response::error('Failed to handle budgets', 'BUDGETS_ERROR', 500);
+        }
+    }
+
+    public function invoices(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $this->ensureBudgetsAndInvoicesTables();
+            $farmId = (int) ($this->request->getQuery()['farm_id'] ?? 0);
+            if (!$farmId) {
+                $farmId = $this->getFarmIdFromInputOrQuery();
+            }
+            if (!$farmId) {
+                return Response::validationError(['farm_id' => 'Farm ID is required']);
+            }
+
+            if ($this->request->getMethod() === 'GET') {
+                $invoices = $this->db->query(
+                    'SELECT id, invoice_number, customer_name, items, amount, due_date, status, created_at
+                     FROM financial_invoices
+                     WHERE farm_id = ?
+                     ORDER BY created_at DESC, id DESC
+                     LIMIT 200',
+                    [$farmId]
+                );
+
+                return Response::success(['invoices' => $invoices]);
+            }
+
+            $input = $this->request->getBody();
+            $customerName = Validation::sanitizeString((string) ($input['customer_name'] ?? ''));
+            $items = Validation::sanitizeString((string) ($input['items'] ?? ''));
+            $amount = $input['amount'] ?? null;
+            $dueDate = (string) ($input['due_date'] ?? '');
+            $status = (string) ($input['status'] ?? 'unpaid');
+
+            $errors = [];
+            if ($customerName === '') {
+                $errors['customer_name'] = 'Customer name is required';
+            }
+            if (!is_numeric($amount) || (float) $amount <= 0) {
+                $errors['amount'] = 'Amount must be a positive number';
+            }
+            if (!Validation::validateDate($dueDate, 'Y-m-d')) {
+                $errors['due_date'] = 'Due date is required (YYYY-MM-DD)';
+            }
+            if (!Validation::validateEnum($status, ['unpaid', 'paid', 'overdue', 'cancelled'])) {
+                $errors['status'] = 'Invalid status';
+            }
+            if (!empty($errors)) {
+                return Response::validationError($errors);
+            }
+
+            $invoiceNumber = 'INV-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(4)));
+
+            $this->db->execute(
+                'INSERT INTO financial_invoices (farm_id, invoice_number, customer_name, items, amount, due_date, status, created_by, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $farmId,
+                    $invoiceNumber,
+                    $customerName,
+                    $items !== '' ? $items : null,
+                    (float) $amount,
+                    $dueDate,
+                    $status,
+                    (int) $user['user_id'],
+                    date('Y-m-d H:i:s'),
+                ]
+            );
+
+            return Response::success(['id' => (int) $this->db->lastInsertId(), 'invoice_number' => $invoiceNumber], 'Invoice created', 201);
+        } catch (\Exception $e) {
+            Logger::error('Failed to handle invoices', ['error' => $e->getMessage()]);
+            return Response::error('Failed to handle invoices', 'INVOICES_ERROR', 500);
+        }
+    }
 }

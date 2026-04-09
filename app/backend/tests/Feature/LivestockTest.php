@@ -188,4 +188,61 @@ class LivestockTest extends ApiTestCase
         $this->assertCount(2, $response['body']['livestock']);
         $this->assertEquals(1, $response['body']['pagination']['page']);
     }
+
+    public function testAddLivestockEventByBatchEndpoint(): void
+    {
+        $this->testCreateLivestock();
+
+        $data = [
+            'batch_id' => $this->livestockId,
+            'event_type' => 'vaccination',
+            'description' => 'Routine vaccination',
+            'date' => date('Y-m-d'),
+            'cost' => 12.50,
+        ];
+
+        $response = $this->apiCall('POST', '/api/livestock/events', $data);
+        $this->assertEquals(201, $response['status']);
+
+        $events = $this->apiCall('GET', '/api/livestock/' . $this->livestockId . '/events');
+        $this->assertEquals(200, $events['status']);
+        $this->assertArrayHasKey('events', $events['body']);
+        $this->assertNotEmpty($events['body']['events']);
+        $this->assertArrayHasKey('cost', $events['body']['events'][0]);
+    }
+
+    public function testLivestockBreedingCreateAndList(): void
+    {
+        $dam = $this->apiCall('POST', '/api/livestock', [
+            'farm_id' => $this->farmId,
+            'name' => 'Dam Batch',
+            'species' => 'cattle',
+            'status' => 'active',
+        ]);
+        $this->assertEquals(201, $dam['status']);
+        $damId = (int) $dam['body']['id'];
+
+        $sire = $this->apiCall('POST', '/api/livestock', [
+            'farm_id' => $this->farmId,
+            'name' => 'Sire Batch',
+            'species' => 'cattle',
+            'status' => 'active',
+        ]);
+        $this->assertEquals(201, $sire['status']);
+        $sireId = (int) $sire['body']['id'];
+
+        $create = $this->apiCall('POST', '/api/livestock/breeding', [
+            'farm_id' => $this->farmId,
+            'dam_batch_id' => $damId,
+            'sire_batch_id' => $sireId,
+            'breeding_date' => date('Y-m-d'),
+            'expected_birth_date' => date('Y-m-d', strtotime('+280 days')),
+            'notes' => 'Test breeding record',
+        ]);
+        $this->assertEquals(201, $create['status']);
+
+        $list = $this->apiCall('GET', '/api/livestock/breeding?farm_id=' . $this->farmId);
+        $this->assertEquals(200, $list['status']);
+        $this->assertIsArray($list['body']);
+    }
 }
