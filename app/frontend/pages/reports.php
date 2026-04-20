@@ -69,32 +69,20 @@ async function generateReport(type, format) {
         btn.disabled = true;
     }
 
-    const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
-    const API_BASE_URL = window.AppApi.baseUrl;
-    const headers = window.AppApi.jsonHeaders();
-
     try {
-        const response = await fetch(`${API_BASE_URL}/api/reports/generate`, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify({ type, format }),
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            if (data.url) {
-                 const url = (data.url.startsWith('http://') || data.url.startsWith('https://')) ? data.url : `${API_BASE_URL}${data.url}`;
-                 window.open(url, '_blank');
-            } else {
-                alert(data.message || 'Report generated');
-            }
+        const data = await window.AppApi.post('/api/reports/generate', { type, format }, { showError: false });
+        if (data && data.url) {
+            const url = (data.url.startsWith('http://') || data.url.startsWith('https://'))
+                ? data.url
+                : window.AppApi.url(data.url);
+            window.open(url, '_blank');
         } else {
-            const errorData = await response.json().catch(() => ({}));
-            alert('Failed to generate report: ' + (errorData.detail || response.statusText));
+            alert('Report generated successfully.');
         }
     } catch (err) {
         console.error(err);
-        alert('Error generating report');
+        const message = err?.payload?.error?.message || err?.message || 'Error generating report';
+        alert(message);
     } finally {
         if (btn && btn.tagName === 'BUTTON') {
             btn.innerText = originalText;

@@ -263,7 +263,6 @@ function closeDeviceModal() { document.getElementById('deviceModal').classList.a
 function openWaterModal() { document.getElementById('waterModal').classList.remove('hidden'); }
 function closeWaterModal() { document.getElementById('waterModal').classList.add('hidden'); }
 
-const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
 const API_BASE_URL = window.AppApi.baseUrl;
 const headers = window.AppApi.jsonHeaders();
 
@@ -458,20 +457,17 @@ document.getElementById('deviceForm').addEventListener('submit', async (e) => {
     const data = Object.fromEntries(formData.entries());
     
     try {
-        const response = await fetch(`${API_BASE_URL}/api/iot/devices`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(data)
-        });
-        
-        if (response.ok) {
-            window.location.reload();
+        const result = await window.AppApi.write('/api/iot/devices', { method: 'POST', data, showError: false });
+        if (result?.queued) {
+            alert('You are offline. Device registration has been queued for sync.');
+            closeDeviceModal();
+            e.target.reset();
         } else {
-            alert('Failed to add device');
+            window.location.reload();
         }
     } catch (err) {
         console.error(err);
-        alert('Error adding device');
+        alert(err?.payload?.error?.message || err?.message || 'Error adding device');
     }
 });
 
@@ -486,20 +482,17 @@ document.getElementById('waterForm').addEventListener('submit', async (e) => {
     data.turbidity = parseFloat(data.turbidity);
     
     try {
-        const response = await fetch(`${API_BASE_URL}/api/iot/water-quality`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(data)
-        });
-        
-        if (response.ok) {
-            window.location.reload();
+        const result = await window.AppApi.write('/api/iot/water-quality', { method: 'POST', data, showError: false });
+        if (result?.queued) {
+            alert('You are offline. Water quality log has been queued for sync.');
+            closeWaterModal();
+            e.target.reset();
         } else {
-            alert('Failed to save log');
+            window.location.reload();
         }
     } catch (err) {
         console.error(err);
-        alert('Error saving log');
+        alert(err?.payload?.error?.message || err?.message || 'Error saving log');
     }
 });
 </script>

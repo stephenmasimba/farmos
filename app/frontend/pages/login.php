@@ -2,14 +2,17 @@
 
 $error = null;
 
-// Start session if not already started
+// Start session and require API client (which loads JWT Manager)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if user is already logged in
-if (isset($_SESSION['user'])) {
-    header('Location: ../public/index.php?page=dashboard');
+require_once __DIR__ . '/../lib/api_client.php';
+
+// Check if user is already logged in (via JWT Manager)
+global $jwt_manager;
+if ($jwt_manager->isAuthenticated()) {
+    header('Location: index.php?page=dashboard');
     exit;
 }
 
@@ -20,14 +23,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $api_response = call_api('/api/auth/login', 'POST', ['email' => $email, 'password' => $password]);
   
   if ($api_response['status'] === 200 && !empty($api_response['data']['access_token'])) {
-    $_SESSION['access_token'] = $api_response['data']['access_token'];
-        $_SESSION['refresh_token'] = $api_response['data']['refresh_token'] ?? null;
-    $_SESSION['user'] = $api_response['data']['user'];
-        if (empty($_SESSION['user']['name'])) {
-                $_SESSION['user']['name'] = $_SESSION['user']['email'] ?? 'User';
-        }
+    // Store tokens via JWT Manager
+    $userData = $api_response['data']['user'] ?? [];
+    $jwt_manager->setTokens(
+        $api_response['data']['access_token'],
+        $api_response['data']['refresh_token'] ?? '',
+        $api_response['data']['expires_in'] ?? 3600,
+        $userData['id'] ?? 0,
+        $userData['farm_id'] ?? 1
+    );
     
-    header('Location: ../public/index.php?page=dashboard');
+    // Also update session for backward compatibility
+    $_SESSION['user'] = $userData;
+    if (empty($_SESSION['user']['name'])) {
+        $_SESSION['user']['name'] = $_SESSION['user']['email'] ?? 'User';
+    }
+    
+    header('Location: index.php?page=dashboard');
     exit;
   }
 

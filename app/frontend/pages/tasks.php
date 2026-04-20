@@ -116,13 +116,15 @@ require __DIR__ . '/../components/header.php';
 </div>
 
 <script>
-    const API_BASE_URL = window.AppApi.baseUrl;
     const TENANT_ID = window.AppApi.tenantId;
-    const headers = window.AppApi.jsonHeaders();
 
     async function completeTask(taskId) {
         try {
-            await window.AppApi.post(`/api/tasks/${taskId}/complete`, null);
+            const result = await window.AppApi.write(`/api/tasks/${taskId}/complete`, { method: 'POST', data: null, showError: false });
+            if (result?.queued) {
+                alert('You are offline. Task completion has been queued for sync.');
+                return;
+            }
             window.location.reload();
         } catch (e) {
             alert('Failed to complete task');
@@ -182,21 +184,17 @@ require __DIR__ . '/../components/header.php';
         const data = Object.fromEntries(formData.entries());
         
         try {
-            if (navigator.onLine) {
-                await window.AppApi.post('/api/tasks', data);
-                window.location.reload();
-            } else {
-                await window.OfflineService.queueForSync({
-                    endpoint: '/tasks/',
-                    method: 'POST',
-                    data
-                });
+            const result = await window.AppApi.write('/api/tasks', { method: 'POST', data, showError: false });
+            if (result?.queued) {
                 document.getElementById('addTaskModal').classList.add('hidden');
-                alert('Queued for sync');
+                e.target.reset();
+                alert('You are offline. Task has been queued for sync.');
+            } else {
+                window.location.reload();
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred');
+            alert(error?.payload?.error?.message || error?.message || 'An error occurred');
         }
     });
 </script>

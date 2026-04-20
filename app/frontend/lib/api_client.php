@@ -1,9 +1,16 @@
 <?php
 /**
  * Enhanced API Client with Better Error Handling and Offline Support
+ * Now using JWT Manager for stateless authentication
  */
 
 require_once __DIR__ . '/../../backend/config/env.php';
+require_once __DIR__ . '/jwt_manager.php';
+
+// Initialize session for backward compatibility
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 function api_base_url() {
     $explicit = getenv('PHP_API_BASE_URL') ?: getenv('API_BASE_URL');
@@ -35,25 +42,37 @@ function api_key(): string {
 }
 
 function api_headers() {
+    global $jwt_manager;
+    
     $headers = [
         'Content-Type: application/json',
         'Accept: application/json',
         'X-Tenant-ID: ' . current_farm_id(),
         'X-API-Key: ' . api_key(),
     ];
-    if (!empty($_SESSION['access_token'])) {
-        $headers[] = 'Authorization: Bearer ' . $_SESSION['access_token'];
-    }
-    return $headers;
+    
+    // Use JWT Manager for authorization header
+    $authHeaders = $jwt_manager->getAuthHeaders();
+    return array_merge($headers, $authHeaders);
 }
 
 function current_farm_id(): int {
+    global $jwt_manager;
+    
+    // Primary: JWT Manager
+    $farmId = $jwt_manager->getFarmId();
+    if ($farmId > 0) {
+        return $farmId;
+    }
+    
+    // Fallback: Session
     if (!empty($_SESSION['farm_id'])) {
         return (int) $_SESSION['farm_id'];
     }
     if (!empty($_SESSION['user']['farm_id'])) {
         return (int) $_SESSION['user']['farm_id'];
     }
+    
     return 1;
 }
 

@@ -1,6 +1,5 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
 
     # Prevent direct access to files
     RewriteCond %{REQUEST_FILENAME} !-f

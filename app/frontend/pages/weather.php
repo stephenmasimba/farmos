@@ -119,10 +119,6 @@ require __DIR__ . '/../components/header.php';
 </div>
 
 <script>
-const token = "<?php echo $_SESSION['access_token'] ?? ''; ?>";
-const API_BASE_URL = window.AppApi.baseUrl;
-const headers = window.AppApi.jsonHeaders();
-
 function openWeatherModal() { document.getElementById('weatherModal').classList.remove('hidden'); }
 function closeWeatherModal() { document.getElementById('weatherModal').classList.add('hidden'); }
 
@@ -139,20 +135,37 @@ document.getElementById('weatherForm').addEventListener('submit', async (e) => {
     // Here we let backend handle it or send current time
     // data.timestamp = new Date().toISOString(); 
 
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/weather/observation`, {
+    if (!navigator.onLine && window.OfflineService) {
+        await window.OfflineService.queueForSync({
+            endpoint: '/weather/observation',
             method: 'POST',
-            headers,
-            body: JSON.stringify(data)
+            data,
         });
-        if (res.ok) {
-            window.location.reload();
-        } else {
-            alert('Failed to add log');
+        alert('You are offline. Weather log has been queued for sync.');
+        closeWeatherModal();
+        e.target.reset();
+        return;
+    }
+
+    try {
+        await window.AppApi.post('/api/weather/observation', data, { showError: false });
+        window.location.reload();
+    } catch (error) {
+        // Queue network failures for later sync to match mobile offline behavior.
+        if (window.OfflineService && (!navigator.onLine || !error.status)) {
+            await window.OfflineService.queueForSync({
+                endpoint: '/weather/observation',
+                method: 'POST',
+                data,
+            });
+            alert('Connection issue detected. Weather log has been queued for sync.');
+            closeWeatherModal();
+            e.target.reset();
+            return;
         }
-    } catch (e) {
-        console.error(e);
-        alert('Error adding log');
+
+        const message = error?.payload?.error?.message || error?.message || 'Failed to add log';
+        alert(message);
     }
 });
 </script>

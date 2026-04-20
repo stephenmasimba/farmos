@@ -1,8 +1,7 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /farmos/begin_pyphp/frontend/
-    
-    # Redirect to public folder
+    RewriteBase /farmos/app/frontend/
     RewriteRule ^$ public/ [L]
-    RewriteRule ^(.+)$ public/$1 [L]
+    RewriteCond %{REQUEST_URI} !^/farmos/app/frontend/public/
+    RewriteRule ^(.+)$ public/$1 [L,QSA]
 </IfModule>

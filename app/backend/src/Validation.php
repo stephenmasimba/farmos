@@ -51,8 +51,7 @@ class Validation
         return strlen($password) >= 8
             && preg_match('/[[:upper:]]/', $password)
             && preg_match('/[[:lower:]]/', $password)
-            && preg_match('/[0-9]/', $password)
-            && preg_match('/[!@#$%^&*()_+\-=\[\]{};:\'",.<>?\/\\|`~]/', $password);
+            && preg_match('/[0-9]/', $password);
     }
 
     /**

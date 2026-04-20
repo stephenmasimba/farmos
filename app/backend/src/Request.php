@@ -69,6 +69,20 @@ class Request
             }
         }
 
+        if (!isset($headers['content-type']) && isset($_SERVER['CONTENT_TYPE'])) {
+            $headers['content-type'] = $_SERVER['CONTENT_TYPE'];
+        }
+        if (!isset($headers['content-length']) && isset($_SERVER['CONTENT_LENGTH'])) {
+            $headers['content-length'] = $_SERVER['CONTENT_LENGTH'];
+        }
+        if (!isset($headers['authorization'])) {
+            if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+                $headers['authorization'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+            } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+                $headers['authorization'] = $_SERVER['HTTP_AUTHORIZATION'];
+            }
+        }
+
         return $headers;
     }
 

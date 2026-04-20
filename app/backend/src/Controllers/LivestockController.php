@@ -462,6 +462,123 @@ class LivestockController
         }
     }
 
+    /**
+     * Get livestock cost analysis
+     * GET /api/livestock/cost-analysis?farm_id={id}&start_date=YYYY-MM-DD&end_date=YYYY-MM-DD
+     */
+    public function costAnalysis(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $query = $this->request->getQuery();
+            $farmId = (int) ($query['farm_id'] ?? 0);
+            if ($farmId <= 0) {
+                return Response::validationError(['farm_id' => 'Farm ID is required']);
+            }
+
+            $startDate = Validation::sanitizeString((string) ($query['start_date'] ?? date('Y-m-d', strtotime('-30 days'))));
+            $endDate = Validation::sanitizeString((string) ($query['end_date'] ?? date('Y-m-d')));
+
+            if (!Validation::validateDate($startDate, 'Y-m-d')) {
+                return Response::validationError(['start_date' => 'Invalid date format']);
+            }
+            if (!Validation::validateDate($endDate, 'Y-m-d')) {
+                return Response::validationError(['end_date' => 'Invalid date format']);
+            }
+
+            $this->ensureAnimalEventsTable();
+
+            $acquisition = $this->db->queryOne(
+                'SELECT
+                    COUNT(*) AS livestock_count,
+                    COALESCE(SUM(COALESCE(acquisition_cost, 0)), 0) AS acquisition_total
+                 FROM ' . Livestock::table() . '
+                 WHERE farm_id = ?',
+                [$farmId]
+            ) ?: [];
+
+            $eventRows = $this->db->query(
+                'SELECT
+                    ae.event_type,
+                    COUNT(*) AS event_count,
+                    COALESCE(SUM(COALESCE(ae.cost, 0)), 0) AS total_cost
+                 FROM animal_events ae
+                 INNER JOIN ' . Livestock::table() . ' l ON l.id = ae.livestock_id
+                 WHERE l.farm_id = ?
+                   AND DATE(ae.date) >= ?
+                   AND DATE(ae.date) <= ?
+                 GROUP BY ae.event_type
+                 ORDER BY total_cost DESC, event_count DESC',
+                [$farmId, $startDate, $endDate]
+            );
+
+            $livestockRows = $this->db->query(
+                'SELECT
+                    l.id,
+                    l.name,
+                    l.species,
+                    COUNT(ae.id) AS event_count,
+                    COALESCE(SUM(COALESCE(ae.cost, 0)), 0) AS event_cost_total
+                 FROM ' . Livestock::table() . ' l
+                 LEFT JOIN animal_events ae
+                    ON ae.livestock_id = l.id
+                    AND DATE(ae.date) >= ?
+                    AND DATE(ae.date) <= ?
+                 WHERE l.farm_id = ?
+                 GROUP BY l.id, l.name, l.species
+                 ORDER BY event_cost_total DESC, event_count DESC
+                 LIMIT 20',
+                [$startDate, $endDate, $farmId]
+            );
+
+            $eventTotalCost = 0.0;
+            $eventTotalCount = 0;
+            foreach ($eventRows as $row) {
+                $eventTotalCost += (float) ($row['total_cost'] ?? 0);
+                $eventTotalCount += (int) ($row['event_count'] ?? 0);
+            }
+
+            $acquisitionTotal = (float) ($acquisition['acquisition_total'] ?? 0);
+
+            return Response::success([
+                'period' => [
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                ],
+                'summary' => [
+                    'livestock_count' => (int) ($acquisition['livestock_count'] ?? 0),
+                    'acquisition_total' => $acquisitionTotal,
+                    'event_cost_total' => $eventTotalCost,
+                    'event_count' => $eventTotalCount,
+                    'total_cost' => $acquisitionTotal + $eventTotalCost,
+                ],
+                'event_breakdown' => array_map(static function (array $row): array {
+                    return [
+                        'event_type' => (string) ($row['event_type'] ?? 'unknown'),
+                        'event_count' => (int) ($row['event_count'] ?? 0),
+                        'total_cost' => (float) ($row['total_cost'] ?? 0),
+                    ];
+                }, $eventRows),
+                'livestock_breakdown' => array_map(static function (array $row): array {
+                    return [
+                        'id' => (int) ($row['id'] ?? 0),
+                        'name' => (string) ($row['name'] ?? ''),
+                        'species' => (string) ($row['species'] ?? ''),
+                        'event_count' => (int) ($row['event_count'] ?? 0),
+                        'event_cost_total' => (float) ($row['event_cost_total'] ?? 0),
+                    ];
+                }, $livestockRows),
+            ]);
+        } catch (\Exception $e) {
+            Logger::error('Failed to retrieve livestock cost analysis', ['error' => $e->getMessage()]);
+            return Response::error('Failed to retrieve livestock cost analysis', 'LIVESTOCK_COST_ANALYSIS_ERROR', 500);
+        }
+    }
+
     private function getFarmIdFromRequest(): int
     {
         $input = $this->request->getBody();

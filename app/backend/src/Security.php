@@ -40,9 +40,6 @@ class Security
         if (!preg_match('/[0-9]/', $password)) {
             throw new \Exception('Password must contain digits');
         }
-        if (!preg_match('/[!@#$%^&*()_+\-=\[\]{};:\'",.<>?\/\\|`~]/', $password)) {
-            throw new \Exception('Password must contain special characters');
-        }
 
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
     }

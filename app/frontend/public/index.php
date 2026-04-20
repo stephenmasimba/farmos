@@ -6,11 +6,25 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../lib/api_client.php';
 
+global $jwt_manager;
+
 // Get page parameter from URL
 $page = $_GET['page'] ?? 'dashboard';
 
+// Hydrate a minimal session payload from JWT so legacy page guards/components keep working.
+$jwtAuthenticated = $jwt_manager->isAuthenticated();
+if ($jwtAuthenticated && empty($_SESSION['user'])) {
+  $_SESSION['user'] = [
+    'id' => $jwt_manager->getUserId() ?? 0,
+    'farm_id' => $jwt_manager->getFarmId(),
+    'name' => 'User',
+  ];
+  $_SESSION['farm_id'] = $jwt_manager->getFarmId();
+  $_SESSION['access_token'] = $jwt_manager->getAccessToken() ?? '';
+}
+
 // If user is not logged in and not on login page, redirect to login
-if (!isset($_SESSION['user']) && $page !== 'login') {
+if (!$jwtAuthenticated && !isset($_SESSION['user']) && $page !== 'login') {
     header('Location: index.php?page=login');
     exit;
 }
@@ -135,9 +149,10 @@ switch ($page) {
     require __DIR__ . '/../pages/field_mode.php';
     break;
   case 'logout':
+    $jwt_manager->clearTokens();
     $_SESSION = [];
     session_destroy();
-    header('Location: /farmos/app/frontend/public/index.php?page=login');
+    header('Location: index.php?page=login');
     exit;
   default:
     http_response_code(404);

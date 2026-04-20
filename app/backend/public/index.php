@@ -1871,6 +1871,21 @@ try {
             $livestockController->getStats()->send();
             break;
 
+        case (preg_match('/^\/api\/livestock\/cost-analysis$/', $path) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $livestockController->costAnalysis()->send();
+            break;
+
         case (preg_match('/^\/api\/livestock\/(\d+)$/', $path, $matches) ? true : false):
             if (!in_array($method, ['GET', 'PUT', 'DELETE'])) {
                 Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();

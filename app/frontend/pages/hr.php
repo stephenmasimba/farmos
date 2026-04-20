@@ -372,7 +372,6 @@ require __DIR__ . '/../components/header.php';
 </div>
 
 <script>
-const API_BASE_URL = window.AppApi.baseUrl;
 const headers = window.AppApi.jsonHeaders();
 
 // Simple Tab Switching
@@ -422,34 +421,29 @@ function openRunSOPModal(id, title) {
 
 async function loadSOPExecutions() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/hr/sops/executions`, {
-            headers
-        });
-        if (response.ok) {
-            const executions = await response.json();
-            const tbody = document.getElementById('sopExecutionsBody');
-            if (tbody) {
-                tbody.innerHTML = '';
-                if (executions.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No executions recorded.</td></tr>';
-                    return;
-                }
-                executions.forEach(exec => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors';
-                    tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${exec.sop_id}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${exec.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}">
-                                ${exec.status.charAt(0).toUpperCase() + exec.status.slice(1)}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${exec.executed_at}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${exec.notes || '-'}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+        const executions = await window.AppApi.get('/api/hr/sops/executions', { showError: false });
+        const tbody = document.getElementById('sopExecutionsBody');
+        if (tbody) {
+            tbody.innerHTML = '';
+            if (!Array.isArray(executions) || executions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No executions recorded.</td></tr>';
+                return;
             }
+            executions.forEach(exec => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${exec.sop_id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${exec.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}">
+                            ${exec.status.charAt(0).toUpperCase() + exec.status.slice(1)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${exec.executed_at}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${exec.notes || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
     } catch (e) {
         console.error('Failed to load SOP executions', e);
@@ -461,19 +455,17 @@ document.getElementById('sopForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target));
     try {
-        const res = await fetch(`${API_BASE_URL}/api/hr/sops`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(data)
-        });
-        if (res.ok) {
-            window.location.reload();
+        const result = await window.AppApi.write('/api/hr/sops', { method: 'POST', data, showError: false });
+        if (result?.queued) {
+            alert('You are offline. SOP has been queued for sync.');
+            closeModal('sopModal');
+            e.target.reset();
         } else {
-            alert('Failed to create SOP');
+            window.location.reload();
         }
     } catch (error) {
         console.error(error);
-        alert('Error creating SOP');
+        alert(error?.payload?.error?.message || error?.message || 'Error creating SOP');
     }
 });
 
@@ -482,19 +474,17 @@ document.getElementById('taskForm').addEventListener('submit', async (e) => {
     const data = Object.fromEntries(new FormData(e.target));
     data.assigned_to = parseInt(data.assigned_to);
     try {
-        const res = await fetch(`${API_BASE_URL}/api/hr/tasks`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(data)
-        });
-        if (res.ok) {
-            window.location.reload();
+        const result = await window.AppApi.write('/api/hr/tasks', { method: 'POST', data, showError: false });
+        if (result?.queued) {
+            alert('You are offline. Task has been queued for sync.');
+            closeModal('taskModal');
+            e.target.reset();
         } else {
-            alert('Failed to create task');
+            window.location.reload();
         }
     } catch (error) {
         console.error(error);
-        alert('Error creating task');
+        alert(error?.payload?.error?.message || error?.message || 'Error creating task');
     }
 });
 
@@ -503,19 +493,17 @@ document.getElementById('scheduleForm').addEventListener('submit', async (e) => 
     const data = Object.fromEntries(new FormData(e.target));
     data.user_id = parseInt(data.user_id);
     try {
-        const res = await fetch(`${API_BASE_URL}/api/hr/schedules`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(data)
-        });
-        if (res.ok) {
-            window.location.reload();
+        const result = await window.AppApi.write('/api/hr/schedules', { method: 'POST', data, showError: false });
+        if (result?.queued) {
+            alert('You are offline. Schedule has been queued for sync.');
+            closeModal('scheduleModal');
+            e.target.reset();
         } else {
-            alert('Failed to create schedule');
+            window.location.reload();
         }
     } catch (error) {
         console.error(error);
-        alert('Error creating schedule');
+        alert(error?.payload?.error?.message || error?.message || 'Error creating schedule');
     }
 });
 
@@ -524,19 +512,17 @@ document.getElementById('runSOPForm').addEventListener('submit', async (e) => {
     const data = Object.fromEntries(new FormData(e.target));
     data.sop_id = parseInt(data.sop_id);
     try {
-        const res = await fetch(`${API_BASE_URL}/api/hr/sops/run`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(data)
-        });
-        if (res.ok) {
-            window.location.reload();
+        const result = await window.AppApi.write('/api/hr/sops/run', { method: 'POST', data, showError: false });
+        if (result?.queued) {
+            alert('You are offline. SOP execution has been queued for sync.');
+            closeModal('runSOPModal');
+            e.target.reset();
         } else {
-            alert('Failed to record execution');
+            window.location.reload();
         }
     } catch (error) {
         console.error(error);
-        alert('Error recording execution');
+        alert(error?.payload?.error?.message || error?.message || 'Error recording execution');
     }
 });
 

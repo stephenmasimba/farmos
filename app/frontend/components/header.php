@@ -158,6 +158,21 @@ if ($user_role && in_array($user_role, ['worker', 'field_worker'], true)) {
                 });
             }
 
+            function normalizePayload(payload) {
+                if (payload && typeof payload === 'object' && Object.prototype.hasOwnProperty.call(payload, 'data') && !Object.prototype.hasOwnProperty.call(payload, 'error')) {
+                    return payload.data;
+                }
+                return payload;
+            }
+
+            function toOfflineEndpoint(path = '') {
+                const normalized = normalizePath(path);
+                if (normalized.startsWith('/api/')) {
+                    return normalized.slice(4);
+                }
+                return normalized;
+            }
+
             async function request(path = '', options = {}) {
                 const {
                     method = 'GET',
@@ -194,7 +209,51 @@ if ($user_role && in_array($user_role, ['worker', 'field_worker'], true)) {
                     throw err;
                 }
 
-                return payload;
+                return normalizePayload(payload);
+            }
+
+            async function write(path = '', options = {}) {
+                const {
+                    method = 'POST',
+                    data = null,
+                    body,
+                    queueOnOffline = true,
+                    showError = true,
+                    headers: extraHeaders = {},
+                } = options;
+
+                const methodUpper = String(method || 'POST').toUpperCase();
+                const shouldQueue = queueOnOffline && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(methodUpper);
+                const queuePayload = body !== undefined ? body : data;
+
+                if (shouldQueue && window.OfflineService && !navigator.onLine) {
+                    await window.OfflineService.queueForSync({
+                        endpoint: toOfflineEndpoint(path),
+                        method: methodUpper,
+                        data: queuePayload || {},
+                    });
+                    return { queued: true, offline: true };
+                }
+
+                try {
+                    return await request(path, {
+                        method: methodUpper,
+                        data,
+                        body,
+                        headers: extraHeaders,
+                        showError,
+                    });
+                } catch (error) {
+                    if (shouldQueue && window.OfflineService && (!navigator.onLine || !error?.status)) {
+                        await window.OfflineService.queueForSync({
+                            endpoint: toOfflineEndpoint(path),
+                            method: methodUpper,
+                            data: queuePayload || {},
+                        });
+                        return { queued: true, offline: true, error: error?.message || 'Queued due to connectivity issue' };
+                    }
+                    throw error;
+                }
             }
 
             function get(path = '', options = {}) {
@@ -222,6 +281,7 @@ if ($user_role && in_array($user_role, ['worker', 'field_worker'], true)) {
                 headers,
                 jsonHeaders,
                 request,
+                write,
                 get,
                 post,
                 put,
