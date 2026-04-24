@@ -1,0 +1,3996 @@
+-- MySQL dump 10.13  Distrib 8.0.31, for Win64 (x86_64)
+--
+-- Host: localhost    Database: gutakura_app1
+-- ------------------------------------------------------
+-- Server version	8.0.31
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Current Database: `gutakura_app1`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `gutakura_app1` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `gutakura_app1`;
+
+--
+-- Table structure for table `access_levels`
+--
+
+DROP TABLE IF EXISTS `access_levels`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `access_levels` (
+  `access_id` int NOT NULL AUTO_INCREMENT,
+  `access_role_id` int DEFAULT NULL,
+  `access_name` varchar(255) NOT NULL,
+  `access_right` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`access_id`),
+  KEY `access_id` (`access_id`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `access_levels`
+--
+
+LOCK TABLES `access_levels` WRITE;
+/*!40000 ALTER TABLE `access_levels` DISABLE KEYS */;
+/*!40000 ALTER TABLE `access_levels` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `accounts`
+--
+
+DROP TABLE IF EXISTS `accounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `accounts` (
+  `acc_id` int NOT NULL AUTO_INCREMENT,
+  `acc_company` int DEFAULT NULL,
+  `acc_name` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `acc_bank` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `acc_number` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `acc_branch` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `acc_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`acc_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `accounts`
+--
+
+LOCK TABLES `accounts` WRITE;
+/*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
+INSERT INTO `accounts` VALUES (1,1,'GUTAKURA TRADINGS Pty Ltd','FIRST NATIONAL BANK (FNB)','62416497198','250130','2024-02-21 10:17:53'),(2,2,'RAMTHEL PTY LTD','STANDARD BANK','10127739856','12645','2024-02-21 10:17:53'),(3,3,'PNG Havilah Group Pty Ltd','ABSA','4106758620','632005','2024-02-21 10:17:53');
+/*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `acquisition_items`
+--
+
+DROP TABLE IF EXISTS `acquisition_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `acquisition_items` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `acquisition_id` int NOT NULL,
+  `item_name` varchar(255) NOT NULL,
+  `item_quantity` int NOT NULL,
+  `item_price` decimal(10,2) NOT NULL,
+  `subtotal` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `acquisition_id` (`acquisition_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `acquisition_items`
+--
+
+LOCK TABLES `acquisition_items` WRITE;
+/*!40000 ALTER TABLE `acquisition_items` DISABLE KEYS */;
+/*!40000 ALTER TABLE `acquisition_items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `asset_accounts`
+--
+
+DROP TABLE IF EXISTS `asset_accounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `asset_accounts` (
+  `asset_account_id` int NOT NULL AUTO_INCREMENT,
+  `asset_id` int DEFAULT NULL,
+  `account_amount` decimal(10,2) DEFAULT NULL,
+  `warrant_expiry` date DEFAULT NULL,
+  `insurance_policy_number` varchar(50) DEFAULT NULL,
+  `insurance_provider` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`asset_account_id`),
+  KEY `asset_id` (`asset_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `asset_accounts`
+--
+
+LOCK TABLES `asset_accounts` WRITE;
+/*!40000 ALTER TABLE `asset_accounts` DISABLE KEYS */;
+/*!40000 ALTER TABLE `asset_accounts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `asset_assigned`
+--
+
+DROP TABLE IF EXISTS `asset_assigned`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `asset_assigned` (
+  `assignment_id` int NOT NULL AUTO_INCREMENT,
+  `asset_id` int DEFAULT NULL,
+  `company` int DEFAULT NULL,
+  `status` int DEFAULT NULL,
+  `assigned_to` varchar(100) DEFAULT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`assignment_id`),
+  KEY `asset_id` (`asset_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `asset_assigned`
+--
+
+LOCK TABLES `asset_assigned` WRITE;
+/*!40000 ALTER TABLE `asset_assigned` DISABLE KEYS */;
+/*!40000 ALTER TABLE `asset_assigned` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `asset_category`
+--
+
+DROP TABLE IF EXISTS `asset_category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `asset_category` (
+  `as_ca_id` int NOT NULL AUTO_INCREMENT,
+  `as_ca_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `as_ca_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`as_ca_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `asset_category`
+--
+
+LOCK TABLES `asset_category` WRITE;
+/*!40000 ALTER TABLE `asset_category` DISABLE KEYS */;
+INSERT INTO `asset_category` VALUES (1,'Printer','2023-09-22 07:51:12'),(2,'Vehicle','2023-09-22 07:51:35'),(3,'Furniture','2023-09-22 07:52:14'),(4,'Laptop','2023-09-22 07:52:52'),(5,'Material','2023-11-23 07:54:53'),(6,'Machines','2024-01-04 08:50:43'),(7,'Cables','2024-01-04 08:55:21');
+/*!40000 ALTER TABLE `asset_category` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `asset_company`
+--
+
+DROP TABLE IF EXISTS `asset_company`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `asset_company` (
+  `asset_company_id` int NOT NULL AUTO_INCREMENT,
+  `asset_id` int NOT NULL,
+  `guta` double DEFAULT NULL,
+  `ram` double DEFAULT NULL,
+  `png` double DEFAULT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`asset_company_id`),
+  KEY `asset_id` (`asset_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `asset_company`
+--
+
+LOCK TABLES `asset_company` WRITE;
+/*!40000 ALTER TABLE `asset_company` DISABLE KEYS */;
+/*!40000 ALTER TABLE `asset_company` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `asset_depreciation`
+--
+
+DROP TABLE IF EXISTS `asset_depreciation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `asset_depreciation` (
+  `depreciation_id` int NOT NULL AUTO_INCREMENT,
+  `asset_id` int DEFAULT NULL,
+  `depreciation_method` varchar(20) DEFAULT NULL,
+  `depreciation_rate` decimal(5,2) DEFAULT NULL,
+  `accumulated_depreciation` decimal(10,2) DEFAULT NULL,
+  `book_value` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`depreciation_id`),
+  KEY `asset_id` (`asset_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `asset_depreciation`
+--
+
+LOCK TABLES `asset_depreciation` WRITE;
+/*!40000 ALTER TABLE `asset_depreciation` DISABLE KEYS */;
+/*!40000 ALTER TABLE `asset_depreciation` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `asset_repair`
+--
+
+DROP TABLE IF EXISTS `asset_repair`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `asset_repair` (
+  `repair_id` int NOT NULL AUTO_INCREMENT,
+  `asset_id` int DEFAULT NULL,
+  `repair_date` date DEFAULT NULL,
+  `repair_description` text,
+  `repair_by` varchar(105) DEFAULT NULL,
+  `repair_cost` decimal(10,2) DEFAULT NULL,
+  `repair_notes` mediumtext,
+  `value_restored` decimal(10,2) DEFAULT NULL,
+  `re_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`repair_id`),
+  KEY `asset_id` (`asset_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='repair_by,  repair_notes';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `asset_repair`
+--
+
+LOCK TABLES `asset_repair` WRITE;
+/*!40000 ALTER TABLE `asset_repair` DISABLE KEYS */;
+/*!40000 ALTER TABLE `asset_repair` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `asset_status`
+--
+
+DROP TABLE IF EXISTS `asset_status`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `asset_status` (
+  `status_id` int NOT NULL AUTO_INCREMENT,
+  `asset_id` int DEFAULT NULL,
+  `current_status` varchar(20) DEFAULT NULL,
+  `status_reason` text,
+  PRIMARY KEY (`status_id`),
+  KEY `asset_id` (`asset_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `asset_status`
+--
+
+LOCK TABLES `asset_status` WRITE;
+/*!40000 ALTER TABLE `asset_status` DISABLE KEYS */;
+/*!40000 ALTER TABLE `asset_status` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `assets`
+--
+
+DROP TABLE IF EXISTS `assets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `assets` (
+  `as_id` int NOT NULL AUTO_INCREMENT,
+  `as_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `as_mode` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `as_serial` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `as_manufacturer` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `as_assigned` int NOT NULL,
+  `as_location` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `as_warrant_date` date NOT NULL,
+  `as_amount` double NOT NULL,
+  `as_purchase_date` date NOT NULL,
+  `card` int NOT NULL,
+  `category` int NOT NULL,
+  `description` longtext COLLATE utf8mb4_general_ci NOT NULL,
+  `status` int NOT NULL,
+  `ram` int NOT NULL,
+  `guta` int NOT NULL,
+  `png` int NOT NULL,
+  `as_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `as_update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `accumulate_depr` decimal(10,2) DEFAULT '0.00',
+  `depr_type_id` int DEFAULT NULL,
+  PRIMARY KEY (`as_id`),
+  UNIQUE KEY `serial` (`as_serial`),
+  KEY `category_id` (`category`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `assets`
+--
+
+LOCK TABLES `assets` WRITE;
+/*!40000 ALTER TABLE `assets` DISABLE KEYS */;
+INSERT INTO `assets` VALUES (1,'Canon i-sensys','Canon','MF237w','Canon',12,'143 Lilian Street Andeon, Pretoria','2023-08-29',4500,'2022-08-29',0,1,'Black Canon Printer',1,5,90,5,'2023-09-07 12:33:27','2024-01-25 04:18:58',0.00,NULL),(2,'Canon Maxify MB5440','Canon Maxify','AENF18681','Canon',11,'143 Lilian Street Andeon, Pretoria','0000-00-00',4005,'2023-09-20',0,1,'Colour Printer Canon Maxify MB5440',3,5,90,5,'2023-09-21 09:43:37','2024-01-25 04:18:58',0.00,NULL),(3,'Cable Pulling Sock','Tema','P017190 -01','E LINESMAN PTY LTD',4,'','0000-00-00',6302,'2023-11-22',0,5,'Cable Pulling Sock',1,5,90,5,'2023-11-23 07:56:43','2024-01-25 04:18:58',0.00,NULL),(4,'Cable Pulling Sock','Tema','P017190 - 02','',4,'','0000-00-00',6302,'2023-11-22',0,5,'Cable Pulling Sock',1,5,90,5,'2023-11-23 07:57:28','2024-01-25 04:18:58',0.00,NULL),(5,'Dynamometer','DL-R','BWH011','EBM South Africa',4,'3 LILLIAN STREET ANDEON AH PRETORIA','0000-00-00',15812.5,'2023-11-22',0,5,'Capacity: 5000kg, Division: 2kg',1,50,50,0,'2023-11-23 08:08:18','2024-01-05 10:36:36',0.00,NULL),(6,'Desk 01','Wood','DS001','',4,'','0000-00-00',1200,'2023-04-05',0,3,'Semi round Desk',1,5,90,5,'2024-01-05 08:22:44','2024-01-25 04:59:24',0.00,NULL);
+/*!40000 ALTER TABLE `assets` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `insert_asset_grp` AFTER INSERT ON `assets` FOR EACH ROW CALL insert_asset_grp(
+
+        NEW.as_id,
+
+        NEW.guta,
+
+        NEW.ram,
+
+        NEW.png
+
+    ) */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `update_asset_grp` AFTER UPDATE ON `assets` FOR EACH ROW CALL insert_asset_grp( NEW.as_id, NEW.guta, NEW.ram, NEW.png ) */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `assets_`
+--
+
+DROP TABLE IF EXISTS `assets_`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `assets_` (
+  `asset_id` int NOT NULL AUTO_INCREMENT,
+  `asset_name` varchar(100) DEFAULT NULL,
+  `asset_type` varchar(50) DEFAULT NULL,
+  `purchase_date` date DEFAULT NULL,
+  `purchase_price` decimal(10,2) DEFAULT NULL,
+  `serial_number` varchar(50) DEFAULT NULL,
+  `manufacturer` varchar(100) DEFAULT NULL,
+  `description` varchar(100) DEFAULT NULL,
+  `model_number` varchar(50) DEFAULT NULL,
+  `assets_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`asset_id`),
+  KEY `asset_type` (`asset_type`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `assets_`
+--
+
+LOCK TABLES `assets_` WRITE;
+/*!40000 ALTER TABLE `assets_` DISABLE KEYS */;
+/*!40000 ALTER TABLE `assets_` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `assign`
+--
+
+DROP TABLE IF EXISTS `assign`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `assign` (
+  `id` int DEFAULT NULL,
+  `asset_id` int DEFAULT NULL,
+  `emplo_id` int DEFAULT NULL,
+  `purpose` text COLLATE utf8mb4_general_ci,
+  `status` int DEFAULT NULL,
+  `date` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `assign`
+--
+
+LOCK TABLES `assign` WRITE;
+/*!40000 ALTER TABLE `assign` DISABLE KEYS */;
+/*!40000 ALTER TABLE `assign` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `attendants`
+--
+
+DROP TABLE IF EXISTS `attendants`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `attendants` (
+  `att_id` int NOT NULL AUTO_INCREMENT,
+  `emp_id` int DEFAULT NULL,
+  `expect_days` int DEFAULT NULL,
+  `attended_days` int DEFAULT NULL,
+  `rate_per_day` decimal(10,2) DEFAULT NULL,
+  `applied_leave` int DEFAULT NULL,
+  `finance_period` date DEFAULT NULL,
+  `att_date` date DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`att_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `attendants`
+--
+
+LOCK TABLES `attendants` WRITE;
+/*!40000 ALTER TABLE `attendants` DISABLE KEYS */;
+/*!40000 ALTER TABLE `attendants` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `backup_log`
+--
+
+DROP TABLE IF EXISTS `backup_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `backup_log` (
+  `backup_log_id` int NOT NULL AUTO_INCREMENT,
+  `backup_time` timestamp NULL DEFAULT NULL,
+  `backup_name` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `backup_update` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`backup_log_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='backup_time   , backup_name';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `backup_log`
+--
+
+LOCK TABLES `backup_log` WRITE;
+/*!40000 ALTER TABLE `backup_log` DISABLE KEYS */;
+INSERT INTO `backup_log` VALUES (1,'2024-04-18 10:51:58','grp_backup_2024-04-18-12-51-58.sql','2024-04-18 10:51:58','2024-04-18 10:51:58');
+/*!40000 ALTER TABLE `backup_log` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bank_flow_absa`
+--
+
+DROP TABLE IF EXISTS `bank_flow_absa`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bank_flow_absa` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `type` int NOT NULL,
+  `detail` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `in_amount` double NOT NULL,
+  `out_amount` double NOT NULL,
+  `date` date NOT NULL,
+  `balance` double NOT NULL,
+  `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bank_flow_absa`
+--
+
+LOCK TABLES `bank_flow_absa` WRITE;
+/*!40000 ALTER TABLE `bank_flow_absa` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bank_flow_absa` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bank_flow_fnb`
+--
+
+DROP TABLE IF EXISTS `bank_flow_fnb`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bank_flow_fnb` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `type` int NOT NULL,
+  `detail` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `in_amount` double NOT NULL,
+  `out_amount` double NOT NULL,
+  `date` date NOT NULL,
+  `balance` double NOT NULL,
+  `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bank_flow_fnb`
+--
+
+LOCK TABLES `bank_flow_fnb` WRITE;
+/*!40000 ALTER TABLE `bank_flow_fnb` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bank_flow_fnb` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bank_flow_standard`
+--
+
+DROP TABLE IF EXISTS `bank_flow_standard`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bank_flow_standard` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `type` int NOT NULL,
+  `detail` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `in_amount` double NOT NULL,
+  `out_amount` double NOT NULL,
+  `date` date NOT NULL,
+  `balance` double NOT NULL,
+  `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=400 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bank_flow_standard`
+--
+
+LOCK TABLES `bank_flow_standard` WRITE;
+/*!40000 ALTER TABLE `bank_flow_standard` DISABLE KEYS */;
+INSERT INTO `bank_flow_standard` VALUES (1,1,'STATEMENT OPENING BALANCE',528.81,0,'2023-03-01',528.81,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(2,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-03-09',328.81,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(3,2,'ISM\nIB PAYMENT TO',0,200,'2023-03-11',128.81,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(4,2,'SB CARD DC39826904886165230306\nDEBICHECK DEBIT ORDER RE-PRES',0,2573.36,'2023-03-15',-2444.55,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(5,1,'SB CARD DC39826904886165230306\nRTD-NOT PROVIDED FOR',2573.36,0,'2023-03-15',128.81,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(6,2,'UNPAID FEE DEBICHECK D/O\nUNPAID FEE DEBICHECK D/O',0,147,'2023-03-15',-18.19,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(7,1,'SALARY\nIB PAYMENT FROM',6000,0,'2023-03-16',5981.81,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(8,2,'MULTICHOICE-SA DSTV DSTV\nIB PAYMENT TO',0,600,'2023-03-16',5381.81,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(9,1,'SALARY\nIB PAYMENT FROM',5000,0,'2023-03-16',10381.81,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(10,2,'0813502336 11H29 161486487\nCELLPHONE INSTANTMON CASH TO',0,5000,'2023-03-16',5381.81,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(11,2,'0813502336 11H29 161486487\nFEE - INSTANT MONEY',0,13.5,'2023-03-16',5368.31,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(12,1,'CELLPHONE 11H29 16148648\nTRANSACTION REVERSAL CELLPHONE INSTANTMON CASH TO',5000,0,'2023-03-16',10368.31,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(13,1,'0813502336 11H29 161486487\nREVERSAL: BANK FEE FEE - INSTANT MONEY',13.5,0,'2023-03-16',10381.81,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(14,2,'0658138821 11H36 161487532\nCELLPHONE INSTANTMON CASH TO',0,5000,'2023-03-16',5381.81,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(15,2,'0658138821 11H36 161487532\nFEE - INSTANT MONEY',0,13.5,'2023-03-16',5368.31,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(16,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,400,'2023-03-20',4968.31,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(17,2,'TOTAL ALLEGRO 5326*4900 16 MAR\nCHEQUE CARD PURCHASE',0,95,'2023-03-20',4873.31,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(18,2,'C*CLTX MAHEM 5326*4900 17 MAR\nCHEQUE CARD PURCHASE',0,1000,'2023-03-22',3873.31,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(19,2,'*****0488616 23H00 *****4900\nIB TRANSFER TO',0,1000,'2023-03-25',2873.31,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(20,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-03-25',2673.31,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(21,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',10000,0,'2023-03-25',12673.31,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(22,2,'0639805619 17H15 162610878\nCELLPHONE INSTANTMON CASH TO',0,700,'2023-03-25',11973.31,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(23,2,'0639805619 17H15 162610878\nFEE - INSTANT MONEY',0,11.5,'2023-03-25',11961.81,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(24,2,'EXCESS INTEREST\nEXCESS INTEREST',0,0.01,'2023-03-25',11961.8,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(25,2,'0639805619 08H59 162656471\nCELLPHONE INSTANTMON CASH TO',0,700,'2023-03-27',11261.8,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(26,2,'0639805619 08H59 162656471\nFEE - INSTANT MONEY',0,11.5,'2023-03-27',11250.3,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(27,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-03-27',10950.3,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(28,2,'LEVELWIREL71419\nSERVICE AGREEMENT',0,349,'2023-03-27',10601.3,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(29,2,'BRAS N THINGS 5326*4900 24 MAR\nCHEQUE CARD PURCHASE',0,769.8,'2023-03-28',9831.5,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(30,2,'TOTAL ALZU C 5326*4900 24 MAR\nCHEQUE CARD PURCHASE',0,87.7,'2023-03-28',9743.8,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(31,2,'MTN PREPAID 0833533448\nPRE-PAID PAYMENT TO',0,99,'2023-03-28',9644.8,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(32,2,'SHELL U C UIT 5326*4900 27 MAR\nCHEQUE CARD PURCHASE',0,93.5,'2023-03-29',9551.3,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(33,2,'VIVA SCHOEMAN 5326*4900 27 MAR\nCHEQUE CARD PURCHASE',0,39.8,'2023-03-29',9511.5,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(34,2,'MTN PREPAID 0833533448\nPRE-PAID PAYMENT TO',0,180,'2023-03-29',9331.5,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(35,2,'88401159 BUSY COM ELECTRICAL\nIMMEDIATE PAYMENT',0,8258.25,'2023-03-29',1073.25,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(36,2,'FEE IMMEDIATE PAYMENT\nFEE IMMEDIATE PAYMENT',0,50,'2023-03-29',1023.25,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(37,1,'PAID\nIB TRANSFER FROM',4000,0,'2023-03-29',5023.25,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(38,2,'BUSY COM ELECTRICAL\nFEE: PAYMENT CONFIRM - EMAIL',0,1.1,'2023-03-29',5022.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(39,2,'88469047 C. CEBEKHULU\nIMMEDIATE PAYMENT',0,1500,'2023-03-30',3522.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(40,2,'FEE IMMEDIATE PAYMENT\nFEE IMMEDIATE PAYMENT',0,10,'2023-03-30',3512.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(41,2,'C*CHICKEN LIC 5326*4900 29 MAR\nCHEQUE CARD PURCHASE',0,48,'2023-03-30',3464.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(42,2,'C*CHICKEN LIC 5326*4900 29 MAR\nCHEQUE CARD PURCHASE',0,138,'2023-03-30',3326.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(43,2,'0635382993 08H49 163131708\nCELLPHONE INSTANTMON CASH TO',0,3000,'2023-03-30',326.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(44,2,'0635382993 08H49 163131708\nFEE - INSTANT MONEY',0,13.5,'2023-03-30',312.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(45,2,'SUDWALA GR NELSPRUIT ZAF 31-03-2023 12H43:26\nFEE- POS DECLINED INSUFF FUNDS',0,8.5,'2023-03-31',304.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(46,2,'FIXED MONTHLY FEE\nFIXED MONTHLY FEE',0,230,'2023-03-31',74.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(47,2,'SBMOBILE SF8102508\nSERVICE CHARGE',0,55,'2023-03-31',19.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(48,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',20000,0,'2023-04-01',20019.15,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(49,2,'EXACT EXACT ACCOUN\nIB PAYMENT TO',0,500,'2023-04-01',19519.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(50,2,'TRUWORTHS LTD\nIB PAYMENT TO',0,700,'2023-04-01',18819.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(51,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-04-03',18519.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(52,2,'0740608050 12H02 163644509\nCELLPHONE INSTANTMON CASH TO',0,1600,'2023-04-03',16919.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(53,2,'0740608050 12H02 163644509\nFEE - INSTANT MONEY',0,13.5,'2023-04-03',16905.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(54,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-04-03',16705.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(55,2,'UCOUNT\nMEMBERSHIP FEE',0,25,'2023-04-03',16680.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(56,2,'C*TOTAL PETRO 5326*4900 01 APR\nCHEQUE CARD PURCHASE',0,600,'2023-04-04',16080.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(57,2,'THEBOX ALUA29976A 230405\nDEBICHECK DEBIT ORDER',0,200,'2023-04-05',15880.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(58,2,'SBSA RCP 51630900011 230331\nDEBICHECK DEBIT ORDER',0,4391.95,'2023-04-05',11488.7,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(59,2,'SB CARD DC39826904886165230405\nDEBICHECK DEBIT ORDER',0,2448.78,'2023-04-05',9039.92,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(60,2,'INSURE PLA91004755859B 230405\nDEBICHECK DEBIT ORDER',0,420.73,'2023-04-05',8619.19,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(61,2,'WOOLWORTHS 5326*4900 03 APR\nCHEQUE CARD PURCHASE',0,178.45,'2023-04-05',8440.74,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(62,2,'C*TOTAL ALLEG 5326*4900 03 APR\nCHEQUE CARD PURCHASE',0,953.25,'2023-04-05',7487.49,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(63,2,'OLDMUTCOL 29717090320230405\nINSURANCE PREMIUM',0,286.86,'2023-04-05',7200.63,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(64,2,'OMMAXPERLS 29717171420230405\nINSURANCE PREMIUM',0,465.85,'2023-04-05',6734.78,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(65,2,'MSF DONATEMSF00000000004552918\nDEBIT TRANSFER',0,150,'2023-04-05',6584.78,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(66,2,'TOTAL ALLEGRO 5326*4900 03 APR\nCHEQUE CARD PURCHASE',0,31,'2023-04-06',6553.78,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(67,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-04-08',6253.78,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(68,2,'C*PNP CRP NOR 5326*4900 07 APR\nCHEQUE CARD PURCHASE',0,350.02,'2023-04-12',5903.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(69,2,'C*YOCO *KE 5326*4900 11 APR\nCHEQUE CARD PURCHASE',0,800,'2023-04-13',5103.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(70,2,'THE BELGIAN K 5326*4900 08 APR\nCHEQUE CARD PURCHASE',0,500,'2023-04-13',4603.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(71,2,'FLIGHTS ON BO 5326*4900 13 APR\nCHEQUE CARD PURCHASE',0,1273.02,'2023-04-14',3330.74,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(72,2,'DEBONAIRS 5326*4900 11 APR\nCHEQUE CARD PURCHASE',0,319.6,'2023-04-14',3011.14,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(73,2,'C*MUGG & BEAN 5326*4900 13 APR\nCHEQUE CARD PURCHASE',0,210,'2023-04-14',2801.14,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(74,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,35.01,'2023-04-14',2766.13,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(75,2,'FISHAWAYS 5326*4900 11 APR\nCHEQUE CARD PURCHASE',0,139.7,'2023-04-14',2626.43,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(76,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',10000,0,'2023-04-14',12626.43,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(77,2,'C*ACKERMANS W 5326*4900 13 APR\nCHEQUE CARD PURCHASE',0,508.8,'2023-04-15',12117.63,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(78,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-04-17',11817.63,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(79,2,'SCC PRETORIA 5326*4900 13 APR\nCHEQUE CARD PURCHASE',0,469.98,'2023-04-17',11347.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(80,2,'U*AIRLINES, L 5326*4900 14 APR\nCHEQUE CARD PURCHASE',0,1670,'2023-04-17',9677.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(81,2,'MULTICHOICE-SA DSTV DSTV\nIB PAYMENT TO',0,1000,'2023-04-17',8677.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(82,2,'91244185 R. MANGUTA\nIMMEDIATE PAYMENT',0,500,'2023-04-17',8177.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(83,2,'FEE IMMEDIATE PAYMENT\nFEE IMMEDIATE PAYMENT',0,10,'2023-04-17',8167.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(84,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,15.5,'2023-04-18',8152.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(85,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,61.68,'2023-04-18',8090.47,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(86,2,'SAVEMOR VAN D 5326*4900 14 APR\nCHEQUE CARD PURCHASE',0,641.86,'2023-04-18',7448.61,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(87,2,'TICKETS*FLIGH 5326*4900 15 APR\nCHEQUE CARD PURCHASE',0,2555.8,'2023-04-18',4892.81,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(88,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,70.28,'2023-04-18',4822.53,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(89,2,'AIRBNB * HMRA 5326*4900 15 APR\nCHEQUE CARD PURCHASE',0,2243,'2023-04-18',2579.53,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(90,2,'C*WIMPY PAVIL 5326*4900 17 APR\nCHEQUE CARD PURCHASE',0,320,'2023-04-18',2259.53,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(91,2,'CAR HIRE FROM 5326*4900 15 APR\nCHEQUE CARD PURCHASE',0,563.6,'2023-04-18',1695.93,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(92,2,'INTERNATIONAL 5326*4900 17 APR\nCHEQUE CARD PURCHASE',0,270,'2023-04-19',1425.93,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(93,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-04-20',1225.93,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(94,2,'MTN PREPAID 0833533448\nPRE-PAID PAYMENT TO',0,29,'2023-04-20',1196.93,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(95,1,'MTN\nTRANSACTION REVERSAL PRE-PAID PAYMENT TO',29,0,'2023-04-20',1225.93,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(96,2,'MTN PREPAID 0833533448\nPRE-PAID PAYMENT TO',0,79,'2023-04-20',1146.93,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(97,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',10000,0,'2023-04-20',11146.93,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(98,2,'SHELL GATEWAY 5326*4900 19 APR\nCHEQUE CARD PURCHASE',0,75.4,'2023-04-21',11071.53,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(99,2,'0792977724 12H22 165653143\nCELLPHONE INSTANTMON CASH TO',0,700,'2023-04-21',10371.53,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(100,2,'0792977724 12H22 165653143\nFEE - INSTANT MONEY',0,11.5,'2023-04-21',10360.03,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(101,2,'TENDAI RATISAI TENDAI LOAN\nIB PAYMENT TO',0,700,'2023-04-24',9660.03,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(102,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-04-24',9360.03,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(103,2,'WOOLWORTHS 5326*4900 21 APR\nCHEQUE CARD PURCHASE',0,276.97,'2023-04-24',9083.06,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(104,2,'M*TRAVELSTART 5326*4900 20 APR\nCHEQUE CARD PURCHASE',0,3719,'2023-04-24',5364.06,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(105,2,'PNP CRP WOODL 5326*4900 22 APR\nCHEQUE CARD PURCHASE',0,1386.27,'2023-04-25',3977.79,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(106,2,'REFINERY BROO 5326*4900 22 APR\nCHEQUE CARD PURCHASE',0,602,'2023-04-25',3375.79,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(107,2,'DISCHEM BROOK 5326*4900 22 APR\nCHEQUE CARD PURCHASE',0,432.84,'2023-04-25',2942.95,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(108,2,'SANLAM POLICY PREMIU\nIB PAYMENT TO',0,800,'2023-04-25',2142.95,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(109,2,'LEVELWIREL71419\nSERVICE AGREEMENT',0,349,'2023-04-25',1793.95,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(110,2,'COTTON ON KID 5326*4900 22 APR\nCHEQUE CARD PURCHASE',0,374.99,'2023-04-26',1418.96,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(111,2,'CLICKS WOODHI 5326*4900 22 APR\nCHEQUE CARD PURCHASE',0,693.99,'2023-04-26',724.97,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(112,2,'SBMOBILE SF8477350\nSERVICE CHARGE',0,55,'2023-04-29',669.97,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(113,2,'FIXED MONTHLY FEE\nFIXED MONTHLY FEE',0,230,'2023-04-29',439.97,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(114,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',40000,0,'2023-05-02',40439.97,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(115,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-05-02',40139.97,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(116,2,'UCOUNT\nMEMBERSHIP FEE',0,25,'2023-05-02',40114.97,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(117,2,'B VAN BILJON BALLET\nIB PAYMENT TO',0,1000,'2023-05-03',39114.97,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(118,2,'TOTALSPORTS C 5326*4900 01 MAY\nCHEQUE CARD PURCHASE',0,599.95,'2023-05-03',38515.02,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(119,2,'KFC JEAN VILL 5326*4900 01 MAY\nCHEQUE CARD PURCHASE',0,388.3,'2023-05-03',38126.72,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(120,2,'NICOLE MA23122ZA1518227\nMOBILE SWIFT PAYMENT',0,37086.4,'2023-05-03',1040.32,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(121,2,'NICOLE MA23122ZA1518227\nFEE-TELETRANSMISSION OUTWARD',0,293.43,'2023-05-03',746.89,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(122,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-05-04',546.89,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(123,2,'05034145TT30802305050653SC7106\nFEE-FOREIGN EXCHANGE - NO VAT',0,46.19,'2023-05-05',500.7,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(124,2,'MSF DONATEMSF00000000004589387\nDEBIT TRANSFER',0,150,'2023-05-05',350.7,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(125,2,'OLDMUTCOL 29717090320230505\nINSURANCE PREMIUM',0,286.86,'2023-05-05',63.84,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(126,1,'OLDMUTCOL 29717090320230505\nRTD-NOT PROVIDED FOR',286.86,0,'2023-05-05',350.7,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(127,2,'FEE-UNPAID ITEM\nFEE-UNPAID ITEM',0,147,'2023-05-05',203.7,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(128,2,'OMMAXPERLS 29717171420230505\nINSURANCE PREMIUM',0,465.85,'2023-05-05',-262.15,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(129,1,'OMMAXPERLS 29717171420230505\nRTD-NOT PROVIDED FOR',465.85,0,'2023-05-05',203.7,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(130,2,'FEE-UNPAID ITEM\nFEE-UNPAID ITEM',0,147,'2023-05-05',56.7,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(131,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',2000,0,'2023-05-06',2056.7,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(132,2,'THEBOX ALUA29976A 230505\nDEBICHECK DEBIT ORDER RE-PRES',0,423,'2023-05-06',1633.7,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(133,2,'INSURE PLA91004755859B 230505\nDEBICHECK DEBIT ORDER RE-PRES',0,420.73,'2023-05-06',1212.97,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(134,1,'SALARY\nCREDIT TRANSFER',8000,0,'2023-05-06',9212.97,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(135,2,'SB CARD DC39826904886165230505\nDEBICHECK DEBIT ORDER RE-PRES',0,2578.85,'2023-05-08',6634.12,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(136,2,'SBSA RCP 51630900011 230502\nDEBICHECK DEBIT ORDER RE-PRES',0,4391.95,'2023-05-08',2242.17,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(137,2,'C*LET US REPA 5326*4900 04 MAY\nCHEQUE CARD PURCHASE',0,130,'2023-05-08',2112.17,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(138,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',5000,0,'2023-05-11',7112.17,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(139,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,17.35,'2023-05-12',7094.82,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(140,2,'EDREAMS 5326*4900 10 MAY\nCHEQUE CARD PURCHASE',0,1458.2,'2023-05-12',5636.62,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(141,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,40.1,'2023-05-12',5596.52,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(142,2,'ET CAR HIRE 5326*4900 10 MAY\nCHEQUE CARD PURCHASE',0,630.91,'2023-05-12',4965.61,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(143,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-05-15',4665.61,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(144,2,'EXACT 001301000108\nIB PAYMENT TO',0,400,'2023-05-15',4265.61,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(145,2,'TRUWORTHS LTD 101011118911\nIB PAYMENT TO',0,500,'2023-05-15',3765.61,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(146,2,'SBSA 2023-05-16T12:34:38 5326*4900\nOTHER BANK ATM CASH WITHD. AT',0,100,'2023-05-16',3665.61,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(147,2,'220046859\nCASH WITHDRAWAL FEE',0,2.2,'2023-05-16',3663.41,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(148,1,'#INTL TRANS FE5326*4900\nELECTRONIC TRF-CREDIT CARD',18.85,0,'2023-05-16',3682.26,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(149,1,'EDREAMS 5326*4900\nELECTRONIC TRF-CREDIT CARD',685.33,0,'2023-05-16',4367.59,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(150,2,'DIS-CHEM I\'LA 5326*4900 16 MAY\nCHEQUE CARD PURCHASE',0,312.95,'2023-05-18',4054.64,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(151,2,'GAME ILLANGA 5326*4900 16 MAY\nCHEQUE CARD PURCHASE',0,178,'2023-05-18',3876.64,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(152,2,'WOOLWORTHS 5326*4900 16 MAY\nCHEQUE CARD PURCHASE',0,192.96,'2023-05-18',3683.68,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(153,2,'PANAROTTIS IL 5326*4900 16 MAY\nCHEQUE CARD PURCHASE',0,129.9,'2023-05-18',3553.78,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(154,2,'MUGG AND BEAN 5326*4900 16 MAY\nCHEQUE CARD PURCHASE',0,336,'2023-05-18',3217.78,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(155,2,'TOTAL ALZU C 5326*4900 16 MAY\nCHEQUE CARD PURCHASE',0,151.8,'2023-05-19',3065.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(156,2,'00002393 2023-05-20T20:20:08 5326*4900\nAUTOBANK CASH WITHDRAWAL AT',0,200,'2023-05-22',2865.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(157,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,1000,'2023-05-22',1865.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(158,2,'S#TRAC MACHADO5326*4900\nCHEQUE CARD PURCHASE',0,112,'2023-05-22',1753.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(159,2,'NANDOS NEWCAS 5326*4900 18 MAY\nCHEQUE CARD PURCHASE',0,209,'2023-05-22',1544.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(160,2,'IK *ADVENTURE 5326*4900 20 MAY\nCHEQUE CARD PURCHASE',0,55,'2023-05-23',1489.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(161,2,'ADVANCE MENLY 5326*4900 20 MAY\nCHEQUE CARD PURCHASE',0,10,'2023-05-24',1479.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(162,2,'0767237451 06H26 169575003\nCELLPHONE INSTANTMON CASH TO',0,100,'2023-05-25',1379.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(163,2,'0767237451 06H26 169575003\nFEE - INSTANT MONEY',0,9,'2023-05-25',1370.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(164,1,'SALARY\nMAGTAPE CREDIT',10000,0,'2023-05-25',11370.98,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(165,2,'LEVELWIREL71419\nSERVICE AGREEMENT',0,349,'2023-05-25',11021.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(166,2,'S#TRAC CULLINA5326*4900\nCHEQUE CARD PURCHASE',0,19,'2023-05-26',11002.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(167,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-05-27',10802.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(168,2,'AIRBNB * HMPY 5326*4900 27 MAY\nCHEQUE CARD PURCHASE',0,1300,'2023-05-29',9502.98,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(169,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,35.75,'2023-05-29',9467.23,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(170,1,'GRACE MAGAYA 62682314192\nREAL TIME TRANSFER FROM',6000,0,'2023-05-29',15467.23,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(171,2,'SBMOBILE SF8670960\nSERVICE CHARGE',0,55,'2023-05-31',15412.23,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(172,2,'FIXED MONTHLY FEE\nFIXED MONTHLY FEE',0,230,'2023-05-31',15182.23,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(173,2,'UCOUNT\nMEMBERSHIP FEE',0,25,'2023-06-01',15157.23,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(174,2,'TRUWORTHS LTD\nIB PAYMENT TO',0,500,'2023-06-02',14657.23,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(175,2,'EXACT EXACT ACCOUN\nIB PAYMENT TO',0,300,'2023-06-02',14357.23,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(176,2,'0833533448 23H45 170914662\nCELLPHONE INSTANTMON CASH TO',0,3000,'2023-06-03',11357.23,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(177,2,'0833533448 23H45 170914662\nFEE - INSTANT MONEY',0,13.5,'2023-06-03',11343.73,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(178,2,'SBSA RCP 51630900011 230531\nDEBICHECK DEBIT ORDER',0,4391.95,'2023-06-05',6951.78,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(179,2,'THEBOX ALUA29976A 230605\nDEBICHECK DEBIT ORDER',0,423,'2023-06-05',6528.78,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(180,2,'SB CARD DC39826904886165230605\nDEBICHECK DEBIT ORDER',0,2603.87,'2023-06-05',3924.91,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(181,2,'INSURE PLA91004755859B 230605\nDEBICHECK DEBIT ORDER',0,420.73,'2023-06-05',3504.18,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(182,2,'OLDMUTCOL 29717090320230605\nINSURANCE PREMIUM',0,286.86,'2023-06-05',3217.32,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(183,2,'OLDMUTCOL 30777442420230605\nINSURANCE PREMIUM',0,286.86,'2023-06-05',2930.46,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(184,2,'OMMAXPERLS 29717171420230605\nINSURANCE PREMIUM',0,465.85,'2023-06-05',2464.61,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(185,2,'OMMAXPERLS 30777442520230605\nINSURANCE PREMIUM',0,465.85,'2023-06-05',1998.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(186,2,'MSF DONATEMSF00000000004621857\nDEBIT TRANSFER',0,150,'2023-06-06',1848.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(187,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',5000,0,'2023-06-09',6848.76,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(188,1,'NICOLE FEES 4106758620\nREAL TIME TRANSFER FROM',25000,0,'2023-06-10',31848.76,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(189,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-06-10',31648.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(190,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-06-12',31348.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(191,2,'NICOLE MA23160ZA1553191\nMOBILE SWIFT PAYMENT',0,18801,'2023-06-12',12547.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(192,2,'NICOLE MA23160ZA1553191\nFEE-TELETRANSMISSION OUTWARD',0,259,'2023-06-12',12288.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(193,2,'TOTAL ALZU C 5326*4900 12 JUN\nCHEQUE CARD PURCHASE',0,74.9,'2023-06-14',12213.86,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(194,2,'06124145TT03472306140653SC2185\nFEE-FOREIGN EXCHANGE - NO VAT',0,46.96,'2023-06-14',12166.9,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(195,2,'WITS UNIVERSITY APPL\nIB PAYMENT TO',0,200,'2023-06-15',11966.9,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(196,2,'0767237451 07H55 172159586\nCELLPHONE INSTANTMON CASH TO',0,700,'2023-06-15',11266.9,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(197,2,'0767237451 07H55 172159586\nFEE - INSTANT MONEY',0,11.5,'2023-06-15',11255.4,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(198,2,'WITS UNIVERSITY APPL\nFEE: PAYMENT CONFIRM - EMAIL',0,1.1,'2023-06-15',11254.3,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(199,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-06-17',11054.3,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(200,2,'MULTICHOICE-SA DSTV DSTV\nIB PAYMENT TO',0,1000,'2023-06-17',10054.3,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(201,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,500,'2023-06-19',9554.3,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(202,2,'C*SPAR SONPAR 5326*4900 19 JUN\nCHEQUE CARD PURCHASE',0,193.44,'2023-06-20',9360.86,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(203,2,'AIRBNB * HM49 5326*4900 18 JUN\nCHEQUE CARD PURCHASE',0,1232.21,'2023-06-20',8128.65,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(204,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,33.89,'2023-06-20',8094.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(205,2,'SANLAM POLICY PREMIU\nIB PAYMENT TO',0,1000,'2023-06-20',7094.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(206,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-06-22',6894.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(207,2,'WITS TRANSCRIPT\nIB PAYMENT TO',0,100,'2023-06-23',6794.76,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(208,2,'WITS\nFEE: PAYMENT CONFIRM - EMAIL',0,1.1,'2023-06-23',6793.66,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(209,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,500,'2023-06-26',6293.66,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(210,2,'LEVELWIREL71419\nSERVICE AGREEMENT',0,349,'2023-06-26',5944.66,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(211,1,'SALARY\nCREDIT TRANSFER',40550,0,'2023-06-27',46494.66,'2023-09-14 08:20:39','2023-09-14 08:22:24'),(212,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-06-29',46294.66,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(213,2,'TENDAI RATISAI TENDAI LOAN\nIB PAYMENT TO',0,1000,'2023-06-30',45294.66,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(214,2,'SBMOBILE SF9055442\nSERVICE CHARGE',0,55,'2023-06-30',45239.66,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(215,2,'FIXED MONTHLY FEE\nFIXED MONTHLY FEE',0,230,'2023-06-30',45009.66,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(216,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-07-01',44809.66,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(217,2,'103585273 VJ VERGNE\nIMMEDIATE PAYMENT',0,1500,'2023-07-03',43309.66,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(218,2,'FEE IMMEDIATE PAYMENT\nFEE IMMEDIATE PAYMENT',0,10,'2023-07-03',43299.66,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(219,2,'UCOUNT\nMEMBERSHIP FEE',0,25,'2023-07-03',43274.66,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(220,2,'SB CARD DC39826904886165230705\nDEBICHECK DEBIT ORDER',0,2626.28,'2023-07-05',40648.38,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(221,2,'SBSA RCP 51630900011 230630\nDEBICHECK DEBIT ORDER',0,4391.95,'2023-07-05',36256.43,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(222,2,'THEBOX ALUA29976A 230705\nDEBICHECK DEBIT ORDER',0,423,'2023-07-05',35833.43,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(223,2,'INSURE PLA91004755859B 230705\nDEBICHECK DEBIT ORDER',0,420.73,'2023-07-05',35412.7,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(224,2,'SUPERSPAR LIF 5326*4900 03 JUL\nCHEQUE CARD PURCHASE',0,1712.24,'2023-07-05',33700.46,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(225,2,'OMMAXPERLS 29717171420230705\nINSURANCE PREMIUM',0,465.85,'2023-07-05',33234.61,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(226,2,'OLDMUTCOL 29717090320230705\nINSURANCE PREMIUM',0,286.86,'2023-07-05',32947.75,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(227,2,'WIMPY BALLITO 5326*4900 04 JUL\nCHEQUE CARD PURCHASE',0,860,'2023-07-06',32087.75,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(228,2,'ACKERMANS BAL 5326*4900 04 JUL\nCHEQUE CARD PURCHASE',0,226,'2023-07-06',31861.75,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(229,2,'C*NUMETRO BAL 5326*4900 06 JUL\nCHEQUE CARD PURCHASE',0,465,'2023-07-07',31396.75,'2023-09-14 08:20:39','2023-09-14 08:24:43'),(230,2,'KEY LARGO SPU 5326*4900 05 JUL\nCHEQUE CARD PURCHASE',0,184.9,'2023-07-07',31211.85,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(231,2,'CHECKERS BALL 5326*4900 04 JUL\nCHEQUE CARD PURCHASE',0,53.98,'2023-07-07',31157.87,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(232,2,'ELECTRIC AVEN 5326*4900 05 JUL\nCHEQUE CARD PURCHASE',0,450,'2023-07-07',30707.87,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(233,2,'WOOLWORTHS 5326*4900 05 JUL\nCHEQUE CARD PURCHASE',0,1065.89,'2023-07-07',29641.98,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(234,2,'CLICKS BALLIT 5326*4900 04 JUL\nCHEQUE CARD PURCHASE',0,263.83,'2023-07-07',29378.15,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(235,2,'IKH*22 JUMP S 5326*4900 06 JUL\nCHEQUE CARD PURCHASE',0,270,'2023-07-08',29108.15,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(236,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-07-10',28908.15,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(237,2,'THE THAI TOUC 5326*4900 06 JUL\nCHEQUE CARD PURCHASE',0,900,'2023-07-10',28008.15,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(238,2,'CHECKERS BALL 5326*4900 06 JUL\nCHEQUE CARD PURCHASE',0,180.05,'2023-07-10',27828.1,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(239,2,'IKH*GLENMORE 5326*4900 07 JUL\nCHEQUE CARD PURCHASE',0,180,'2023-07-10',27648.1,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(240,2,'C*NUMETRO BAL 5326*4900 08 JUL\nCHEQUE CARD PURCHASE',0,120,'2023-07-10',27528.1,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(241,2,'0839507063 13H52 175340494\nCELLPHONE INSTANTMON CASH TO',0,300,'2023-07-10',27228.1,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(242,2,'0839507063 13H52 175340494\nFEE - INSTANT MONEY',0,9,'2023-07-10',27219.1,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(243,2,'C*MUGG AND BE 5326*4900 08 JUL\nCHEQUE CARD PURCHASE',0,1000,'2023-07-11',26219.1,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(244,2,'CHECKERS BALL 5326*4900 08 JUL\nCHEQUE CARD PURCHASE',0,132.68,'2023-07-12',26086.42,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(245,2,'CHECKERS FOOD 5326*4900 09 JUL\nCHEQUE CARD PURCHASE',0,178.51,'2023-07-12',25907.91,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(246,2,'MIDWAY RESTAU 5326*4900 10 JUL\nCHEQUE CARD PURCHASE',0,31,'2023-07-12',25876.91,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(247,2,'0000J329 2023-07-12T16:26:28 5326*4900\nAUTOBANK CASH WITHDRAWAL AT',0,5000,'2023-07-12',20876.91,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(248,2,'0000J329 2023-07-13T08:59:13 5239*6165\nAUTOBANK CASH WITHDRAWAL AT',0,5000,'2023-07-13',15876.91,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(249,2,'220046859\nCASH WITHDRAWAL FEE',0,110,'2023-07-13',15766.91,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(250,2,'0000J329 2023-07-13T09:01:29 5326*4900\nAUTOBANK CASH WITHDRAWAL AT',0,5000,'2023-07-13',10766.91,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(251,2,'220046859\nCASH WITHDRAWAL FEE',0,110,'2023-07-13',10656.91,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(252,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',10000,0,'2023-07-13',20656.91,'2023-09-14 08:20:40','2023-09-14 08:22:24'),(253,2,'MSF DONATEMSF00000000004678095\nDEBIT TRANSFER',0,150,'2023-07-14',20506.91,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(254,2,'TOTAL ALZU C 5326*4900 13 JUL\nCHEQUE CARD PURCHASE',0,79.9,'2023-07-15',20427.01,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(255,2,'TOTAL ALZU C 5326*4900 13 JUL\nCHEQUE CARD PURCHASE',0,58.8,'2023-07-15',20368.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(256,2,'M ISRAEL BETHEL MATHS\nIB PAYMENT TO',0,1200,'2023-07-17',19168.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(257,2,'MULTICHOICE-SA DSTV DSTV\nIB PAYMENT TO',0,500,'2023-07-17',18668.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(258,2,'SHOPRITE DASP 5326*4900 19 JUL\nCHEQUE CARD PURCHASE',0,268.1,'2023-07-22',18400.11,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(259,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-07-24',18100.11,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(260,2,'C*THE BERLINE 5326*4900 23 JUL\nCHEQUE CARD PURCHASE',0,63.9,'2023-07-25',18036.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(261,2,'WOOLWORTHS 5326*4900 22 JUL\nCHEQUE CARD PURCHASE',0,632.45,'2023-07-25',17403.76,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(262,2,'LEVELWIREL71419\nSERVICE AGREEMENT',0,349,'2023-07-25',17054.76,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(263,2,'C*BOUNCE INC 5326*4900 22 JUL\nCHEQUE CARD PURCHASE',0,560,'2023-07-26',16494.76,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(264,2,'0726865964 07H48 177100218\nCELLPHONE INSTANTMON CASH TO',0,150,'2023-07-26',16344.76,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(265,2,'0726865964 07H48 177100218\nFEE - INSTANT MONEY',0,9,'2023-07-26',16335.76,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(266,2,'MTN PREPAID 0724512543\nPRE-PAID PAYMENT TO',0,99,'2023-07-28',16236.76,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(267,1,'SALARY\nCREDIT TRANSFER',40000,0,'2023-07-28',56236.76,'2023-09-14 08:20:40','2023-09-14 08:22:24'),(268,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,500,'2023-07-29',55736.76,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(269,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',150000,0,'2023-07-29',205736.76,'2023-09-14 08:20:40','2023-09-14 08:22:24'),(270,2,'CREDIT CARD\nIB TRANSFER TO',0,100000,'2023-07-29',105736.76,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(271,1,'DIVIDENTS\nIB PAYMENT FROM',80000,0,'2023-07-29',185736.76,'2023-09-14 08:20:40','2023-09-14 08:22:24'),(272,2,'SBMOBILE SF9617498\nSERVICE CHARGE',0,55,'2023-07-31',185681.76,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(273,2,'FIXED MONTHLY FEE\nFIXED MONTHLY FEE',0,230,'2023-07-31',185451.76,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(274,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,1280.95,'2023-08-01',184170.81,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(275,2,'FLYWIRE*S DAK 5326*4900 29 JUL\nCHEQUE CARD PURCHASE',0,46580,'2023-08-01',137590.81,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(276,2,'UCOUNT\nMEMBERSHIP FEE',0,25,'2023-08-01',137565.81,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(277,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-02',137365.81,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(278,2,'FLYWIRE*S DAK 5326*4900 31 JUL\nCHEQUE CARD PURCHASE',0,46930,'2023-08-02',90435.81,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(279,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,1290.58,'2023-08-02',89145.23,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(280,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-03',88945.23,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(281,2,'C*SHEBA ROCK 5326*4900 02 AUG\nCHEQUE CARD PURCHASE',0,600,'2023-08-03',88345.23,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(282,2,'SBSA RCP 51630900011 230801\nDEBICHECK DEBIT ORDER',0,4391.95,'2023-08-04',83953.28,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(283,2,'C*DR NSJ PHUK 5326*4900 31 JUL\nCHEQUE CARD PURCHASE',0,550,'2023-08-04',83403.28,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(284,2,'FLYWIRE*S DAK 5326*4900 01 AUG\nCHEQUE CARD PURCHASE',0,48123,'2023-08-04',35280.28,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(285,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,1323.38,'2023-08-04',33956.9,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(286,2,'SHELL U C MAA 5326*4900 02 AUG\nCHEQUE CARD PURCHASE',0,83.9,'2023-08-04',33873,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(287,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-05',33673,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(288,2,'THEBOX ALUA29976A 230805\nDEBICHECK DEBIT ORDER',0,423,'2023-08-05',33250,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(289,2,'INSURE PLA91004755859B 230805\nDEBICHECK DEBIT ORDER',0,420.73,'2023-08-05',32829.27,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(290,2,'WOOLWORTHS 5326*4900 03 AUG\nCHEQUE CARD PURCHASE',0,207.48,'2023-08-05',32621.79,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(291,1,'SALARY\nIB PAYMENT FROM',50000,0,'2023-08-05',82621.79,'2023-09-14 08:20:40','2023-09-14 08:22:24'),(292,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-07',82421.79,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(293,2,'00002423 2023-08-06T07:56:39 5326*4900\nAUTOBANK CASH WITHDRAWAL AT',0,1000,'2023-08-07',81421.79,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(294,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-07',81221.79,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(295,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-07',81021.79,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(296,2,'CELC PREPD 0742534133\nPRE-PAID PAYMENT TO',0,99,'2023-08-07',80922.79,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(297,2,'MSF DONATEMSF00000000005101160\nDEBIT TRANSFER',0,150,'2023-08-07',80772.79,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(298,2,'OLDMUTCOL 29717090320230805\nINSURANCE PREMIUM',0,286.86,'2023-08-07',80485.93,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(299,2,'OMMAXPERLS 29717171420230805\nINSURANCE PREMIUM',0,465.85,'2023-08-07',80020.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(300,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-08',79820.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(301,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-10',79620.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(302,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,400,'2023-08-10',79220.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(303,2,'TRUWORTHS LTD\nIB PAYMENT TO',0,1000,'2023-08-10',78220.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(304,2,'EXACT EXACT ACCOUN\nIB PAYMENT TO',0,500,'2023-08-10',77720.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(305,2,'SANLAM POLICY PREMIU\nIB PAYMENT TO',0,1000,'2023-08-10',76720.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(306,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-11',76520.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(307,2,'CLICKS STATIO 5326*4900 08 AUG\nCHEQUE CARD PURCHASE',0,978.38,'2023-08-11',75541.7,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(308,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,403.62,'2023-08-11',75138.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(309,2,'C*HOME IN 1 5326*4900 08 AUG\nCHEQUE CARD PURCHASE',0,17959,'2023-08-11',57179.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(310,2,'FLYWIRE*S DAK 5326*4900 08 AUG\nCHEQUE CARD PURCHASE',0,14677,'2023-08-11',42502.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(311,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-12',42302.08,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(312,2,'#INTERNATIONAL5326572605144900\nCHEQUE CARD PURCHASE',0,159.56,'2023-08-12',42142.52,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(313,2,'ACADEMIC HEAL 5326*4900 10 AUG\nCHEQUE CARD PURCHASE',0,5802.06,'2023-08-12',36340.46,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(314,2,'MCD GATEWAY P 5326*4900 10 AUG\nCHEQUE CARD PURCHASE',0,85,'2023-08-12',36255.46,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(315,2,'MULTICHOICE-SA DSTV DSTV\nIB PAYMENT TO',0,1000,'2023-08-12',35255.46,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(316,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-14',35055.46,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(317,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-14',34855.46,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(318,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-14',34655.46,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(319,2,'UPSIDE DOWN H 5326*4900 12 AUG\nCHEQUE CARD PURCHASE',0,83,'2023-08-15',34572.46,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(320,2,'C*SPAR WATERK 5326*4900 14 AUG\nCHEQUE CARD PURCHASE',0,84.48,'2023-08-15',34487.98,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(321,2,'KFC MB HERCUL 5326*4900 13 AUG\nCHEQUE CARD PURCHASE',0,76.7,'2023-08-15',34411.28,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(322,2,'C*ROMANS PIZZ 5326*4900 13 AUG\nCHEQUE CARD PURCHASE',0,212.7,'2023-08-15',34198.58,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(323,2,'UPSIDE DOWN H 5326*4900 12 AUG\nCHEQUE CARD PURCHASE',0,70,'2023-08-15',34128.58,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(324,2,'UPSIDE DOWN H 5326*4900 12 AUG\nCHEQUE CARD PURCHASE',0,60,'2023-08-15',34068.58,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(325,2,'UP SIDE DOWN 5326*4900 12 AUG\nCHEQUE CARD PURCHASE',0,220,'2023-08-15',33848.58,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(326,2,'HORNSNEK MOTO 5326*4900 12 AUG\nCHEQUE CARD PURCHASE',0,500,'2023-08-15',33348.58,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(327,2,'KFC DAMDORYN 5326*4900 12 AUG\nCHEQUE CARD PURCHASE',0,96.8,'2023-08-15',33251.78,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(328,2,'UPSIDE DOWN H 5326*4900 12 AUG\nCHEQUE CARD PURCHASE',0,167,'2023-08-15',33084.78,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(329,2,'UPSIDE DOWN H 5326*4900 12 AUG\nCHEQUE CARD PURCHASE',0,20,'2023-08-15',33064.78,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(330,2,'0835385321 11H56 179628918\nCELLPHONE INSTANTMON CASH TO',0,2000,'2023-08-15',31064.78,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(331,2,'0835385321 11H56 179628918\nFEE - INSTANT MONEY',0,13.5,'2023-08-15',31051.28,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(332,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-16',30851.28,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(333,2,'C*NANDOS MENL 5326*4900 15 AUG\nCHEQUE CARD PURCHASE',0,265,'2023-08-16',30586.28,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(334,2,'C*MAKRO WONDE 5326*4900 15 AUG\nCHEQUE CARD PURCHASE',0,2886.9,'2023-08-16',27699.38,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(335,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-17',27499.38,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(336,2,'MRP SPORT MEN 5326*4900 15 AUG\nCHEQUE CARD PURCHASE',0,459.98,'2023-08-17',27039.4,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(337,2,'C*MAKRO WONDE 5326*4900 16 AUG\nCHEQUE CARD PURCHASE',0,7422,'2023-08-17',19617.4,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(338,2,'C*MAKRO WONDER5326*4900\nCHEQUE CARD PURCHASE',0,100,'2023-08-17',19517.4,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(339,2,'CROCS MENLYN 5326*4900 15 AUG\nCHEQUE CARD PURCHASE',0,239.7,'2023-08-17',19277.7,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(340,2,'DISCHEM MENLY 5326*4900 15 AUG\nCHEQUE CARD PURCHASE',0,2072.97,'2023-08-17',17204.73,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(341,2,'MR PRICE MENL 5326*4900 15 AUG\nCHEQUE CARD PURCHASE',0,1731.76,'2023-08-17',15472.97,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(342,1,'SALARY\nIB PAYMENT FROM',10000,0,'2023-08-17',25472.97,'2023-09-14 08:20:40','2023-09-14 08:22:24'),(343,2,'MR PRICE M CPT ZAF 17-08-2023 13H59:24\nFEE- POS DECLINED INSUFF FUNDS',0,8.5,'2023-08-17',25464.47,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(344,1,'SALARY\nIB PAYMENT FROM',5000,0,'2023-08-17',30464.47,'2023-09-14 08:20:40','2023-09-14 08:22:24'),(345,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',10000,0,'2023-08-17',40464.47,'2023-09-14 08:20:40','2023-09-14 08:22:24'),(346,2,'NICOLE MA23229ZA1618223\nMOBILE SWIFT PAYMENT',0,5755.53,'2023-08-17',34708.94,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(347,2,'NICOLE MA23229ZA1618223\nFEE-TELETRANSMISSION OUTWARD',0,259,'2023-08-17',34449.94,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(348,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-18',34249.94,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(349,2,'TOTAL MENLYN 5326*4900 15 AUG\nCHEQUE CARD PURCHASE',0,500,'2023-08-18',33749.94,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(350,2,'ADVANCE MENLY 5326*4900 15 AUG\nCHEQUE CARD PURCHASE',0,10,'2023-08-18',33739.94,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(351,2,'M*TAKEALO*T 5326*4900 16 AUG\nCHEQUE CARD PURCHASE',0,118,'2023-08-18',33621.94,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(352,2,'BWH GEZINA 5326*4900 16 AUG\nCHEQUE CARD PURCHASE',0,129,'2023-08-18',33492.94,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(353,2,'DISCHEM WONDE 5326*4900 16 AUG\nCHEQUE CARD PURCHASE',0,929.2,'2023-08-18',32563.74,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(354,2,'TBS BROOKLYN 5326*4900 16 AUG\nCHEQUE CARD PURCHASE',0,275,'2023-08-18',32288.74,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(355,2,'C*GAME BROOKL 5326*4900 16 AUG\nCHEQUE CARD PURCHASE',0,5513.37,'2023-08-18',26775.37,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(356,2,'C*LOVISA MENL 5326*4900 15 AUG\nCHEQUE CARD PURCHASE',0,250,'2023-08-18',26525.37,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(357,2,'CLICKS BROOKL 5326*4900 16 AUG\nCHEQUE CARD PURCHASE',0,1930.81,'2023-08-18',24594.56,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(358,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-19',24394.56,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(359,2,'DISCHEM MENLY 5326*4900 17 AUG\nCHEQUE CARD PURCHASE',0,636.5,'2023-08-19',23758.06,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(360,2,'FLM MENLYN MA 5326*4900 17 AUG\nCHEQUE CARD PURCHASE',0,3425.39,'2023-08-19',20332.67,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(361,2,'C*DRS GJP MOR 5326*4900 17 AUG\nCHEQUE CARD PURCHASE',0,8650,'2023-08-19',11682.67,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(362,2,'U*SNATCHER DE 5326*4900 16 AUG\nCHEQUE CARD PURCHASE',0,1398,'2023-08-19',10284.67,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(363,2,'MENLO PARK CO 5326*4900 17 AUG\nCHEQUE CARD PURCHASE',0,127.8,'2023-08-19',10156.87,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(364,2,'MR PRICE MENL 5326*4900 17 AUG\nCHEQUE CARD PURCHASE',0,2700.38,'2023-08-19',7456.49,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(365,2,'KARABO PARKIN 5326*4900 16 AUG\nCHEQUE CARD PURCHASE',0,10,'2023-08-19',7446.49,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(366,2,'NANDOS GEZINA 5326*4900 16 AUG\nCHEQUE CARD PURCHASE',0,143,'2023-08-19',7303.49,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(367,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-21',7103.49,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(368,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-21',6903.49,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(369,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-21',6703.49,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(370,2,'ADVANCE MENLY 5326*4900 17 AUG\nCHEQUE CARD PURCHASE',0,10,'2023-08-21',6693.49,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(371,2,'S#DOORNPOORT 5326*4900\nCHEQUE CARD PURCHASE',0,18,'2023-08-21',6675.49,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(372,2,'C*SUPERSPAR M 5326*4900 19 AUG\nCHEQUE CARD PURCHASE',0,96.46,'2023-08-21',6579.03,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(373,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-22',6379.03,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(374,2,'C*HORNSNEK MO 5326*4900 19 AUG\nCHEQUE CARD PURCHASE',0,1357.42,'2023-08-22',5021.61,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(375,2,'0633997277 07H26 180428515\nCELLPHONE INSTANTMON CASH TO',0,1500,'2023-08-22',3521.61,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(376,2,'0633997277 07H26 180428515\nFEE - INSTANT MONEY',0,13.5,'2023-08-22',3508.11,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(377,2,'08174145TT05312308220653SC3066\nFEE-FOREIGN EXCHANGE - NO VAT',0,47.9,'2023-08-22',3460.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(378,2,'0832521728 06H14 180525872\nCELLPHONE INSTANTMON CASH TO',0,300,'2023-08-23',3160.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(379,2,'0832521728 06H14 180525872\nFEE - INSTANT MONEY',0,9,'2023-08-23',3151.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(380,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-23',2951.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(381,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-25',2751.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(382,2,'LEVELWIREL71419\nSERVICE AGREEMENT',0,349,'2023-08-25',2402.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(383,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-26',2202.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(384,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,1000,'2023-08-26',1202.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(385,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-28',1002.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(386,2,'TENDAI RATISAI TENDAI LOAN\nIB PAYMENT TO',0,500,'2023-08-28',502.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(387,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-08-28',302.21,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(388,1,'SALARY 62416497198\nREAL TIME TRANSFER FROM',40000,0,'2023-08-28',40302.21,'2023-09-14 08:20:40','2023-09-14 08:22:24'),(389,2,'U*AIRLINES, F 5326*4900 28 AUG\nCHEQUE CARD PURCHASE',0,3050.07,'2023-08-30',37252.14,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(390,2,'SBMOBILE SF9742943\nSERVICE CHARGE',0,55,'2023-08-31',37197.14,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(391,2,'FIXED MONTHLY FEE\nFIXED MONTHLY FEE',0,230,'2023-08-31',36967.14,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(392,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-09-01',36767.14,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(393,2,'UCOUNT\nMEMBERSHIP FEE',0,25,'2023-09-01',36742.14,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(394,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-09-02',36442.14,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(395,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-09-04',36142.14,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(396,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,200,'2023-09-04',35942.14,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(397,2,'OASIS CHRISTIAN ASS OFFERING\nIB PAYMENT TO',0,300,'2023-09-04',35642.14,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(398,2,'114434652 AMELIA DE KOCK\nIMMEDIATE PAYMENT',0,400,'2023-09-04',35242.14,'2023-09-14 08:20:40','2023-09-14 08:24:43'),(399,2,'FEE IMMEDIATE PAYMENT\nFEE IMMEDIATE PAYMENT',0,10,'2023-09-04',35232.14,'2023-09-14 08:20:40','2023-09-14 08:24:43');
+/*!40000 ALTER TABLE `bank_flow_standard` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `card`
+--
+
+DROP TABLE IF EXISTS `card`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `card` (
+  `card_id` int NOT NULL AUTO_INCREMENT,
+  `card_name` varchar(205) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `card_number` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `card_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `card_update` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `account_number` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `card_type` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `card_bank` int NOT NULL,
+  `expire_date` date NOT NULL,
+  `card_assigned_to` int NOT NULL,
+  `status` int NOT NULL DEFAULT '1',
+  `card_sign` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `card_for` int NOT NULL,
+  PRIMARY KEY (`card_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `card`
+--
+
+LOCK TABLES `card` WRITE;
+/*!40000 ALTER TABLE `card` DISABLE KEYS */;
+INSERT INTO `card` VALUES (1,'Debit Card Project 1','9710084048951533','2023-09-07 13:03:40','2023-09-26 14:37:05','','',0,'0000-00-00',0,1,'',0),(2,'Cash','C-001','2023-09-07 13:04:03','2023-09-26 14:37:11','','',0,'0000-00-00',0,1,'',0),(3,'Credit','00','2023-09-26 08:45:28','2023-09-26 14:37:15','','',0,'0000-00-00',0,1,'',0);
+/*!40000 ALTER TABLE `card` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `city`
+--
+
+DROP TABLE IF EXISTS `city`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `city` (
+  `city_id` int NOT NULL AUTO_INCREMENT,
+  `city_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`city_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `city`
+--
+
+LOCK TABLES `city` WRITE;
+/*!40000 ALTER TABLE `city` DISABLE KEYS */;
+INSERT INTO `city` VALUES (1,'Pretoria'),(2,'Durban'),(3,'Cape Town');
+/*!40000 ALTER TABLE `city` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `client`
+--
+
+DROP TABLE IF EXISTS `client`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `client` (
+  `cli_id` int NOT NULL AUTO_INCREMENT,
+  `cli_name` varchar(105) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `cli_email` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `cli_tel` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `cli_contact_person` varchar(105) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `cli_address` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `cli_tax` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `cli_vat` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `cli_date` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`cli_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `client`
+--
+
+LOCK TABLES `client` WRITE;
+/*!40000 ALTER TABLE `client` DISABLE KEYS */;
+INSERT INTO `client` VALUES (1,'ESKOM HOLDINGS LIMITED',NULL,NULL,NULL,'PO Box 66	\nNew Germany	\n3610	','4740101508','','2024-09-18 11:22:47'),(2,'PRASA CRES','charlotte.sello@prasa.com',NULL,NULL,NULL,NULL,NULL,NULL),(3,'United Manganese of Kalahari',NULL,NULL,NULL,NULL,NULL,NULL,NULL),(4,'Emadlangeni Local Municapality',NULL,'0343313041','Mr Khumalo','34 Voor St Utrecht 2890','4000791832',NULL,'2025-01-16 06:35:30'),(5,'Abaqulusi Local Municipality','lmthembu@abaqulusi.gov.za','034-982-2133','L Mthembu','VRYHEID - VRYHEID - 3100 KwaZulu-Natal','','',NULL),(6,'Kudumane Manganese Mine','hendrik.beukes@asia-minerals.com','010 493 7491','Mr H. Beukes','11 Crescent Drive Melrose Arch','4710262058','','2024-04-02 09:26:52'),(7,'Mbombela','','','','','','',NULL),(8,'Nkomazi Local Municipality','Richard.Mabuza@nkomazi.gov.za','013-790-0245','Mr R Mabuza','Municipal Town Hall (Kobwa), Fish Eagle, Malalane','','','2023-11-17 13:13:07'),(9,'Kuruman Mine','','','','','','',NULL),(10,'Musk T Pty Ltd','kmusekiwa1406@gmail.com','0789966479','K Musekiwa','117 Summit View	 Blue Hills	 Midrand	','4630287185','2018/232393/07','2024-04-08 09:19:11'),(11,'SIEMPIES TRANSPORT','','','','185 MUSICA AVENUE,	 MACASSAR	 WESTERN CAPE	','','B2006/119958/23','2024-03-08 11:31:42'),(12,'Newcastle','','','Thwala',' P/Bag X 6621, Newcastle','4000791824','','2024-04-02 09:26:52'),(13,'Sedgars Home','info@sedgarhome.co.za','0105942833','','81 Woodmead Retail Park, 1 Waterval Crescent Woodmead, Sandton','4710269715','','2024-04-02 09:26:52'),(14,'HOUGHTON ESTATE PROJECT','','','','','','',NULL),(15,'Komati Africa',NULL,NULL,'Mxolisi Siwela',NULL,NULL,NULL,'2024-02-19 08:17:40'),(16,'Herold',NULL,'083 258 1693	','','Bp Garage tshepisong,Soweto',NULL,NULL,'2024-02-26 11:47:20'),(17,'Reckitt','','066 484 3472','Sithembiso','Jet Park,Boksburg','','','2024-03-07 10:22:27'),(18,'UNASHE CONSULTING','tichtronic@gmail.com','0725509978','Euclid Tarwireyi','1 springfield Rd Carlswald Midrand Johannesburg','4830291953 ','2017/196668/07','2024-03-22 09:22:26'),(19,'COETZEE TRANSPORT','','+27 81 797 2849','Nico Coetzee','','','','2024-04-08 09:19:11'),(20,'CABOTAGE SA (PTY) LTD','admin@cabotagesa.com','+27 78 996 6479','Kudzai','PO BOX 951 DURBANVILLE 7551','4630275131',NULL,'2024-06-10 10:51:44'),(21,'CyberEye Consulting','brian@cybereyeconsulting.co.za','0768034338','Brian','35 Kensington Close, Parklands Western Cape','4570315764','2020/566486/07','0000-00-00 00:00:00'),(22,'Ramthel ','percy@ramthel.co.za',NULL,'Percy',NULL,'4450300431','2020/001082/07','2024-05-23 07:09:53'),(23,'SWIFTNET (PTY) LTD','paia@swiftnet.co.za','+27 12 311 0122 ','Mr Siphethe Dumeko','61 Oak Avenue Highveld Technopark,\n CENTURION, 0157','','1994/009541/30','2024-04-17 05:53:57'),(24,'Igoda Projects Pty Ltd','','0839252840','','892 Umgeni Rd Lion Match Oficce Building  3 Office 5A Durban','','4930187697',NULL),(25,'LONGMILE LOGISTICS	','longmilelogistics21@gmail.com','+27 84 681 9482','Pido','A203 CNR NYMAN/10TH AVE KENSINGTON, CAPETOWN 7405',NULL,'2018/330103/07',NULL),(26,'TZANEEN','INFO@TZANEEN.GOV.ZA','083 309 6901','','P.O. BOX 24, TZANEEN, 0850','','',NULL),(27,'Contrans Logistics',NULL,'+27 84 624 3299','Daya Naidu','42 Station Road Montague Gardens',NULL,NULL,'2024-05-21 16:18:15'),(28,'Nesher Logistics (Pty) Ltd','noel@nesherlogistics.co.za','078 600 9034','Noel Pillay','487 West Avenue','2022/503850/07','','2024-06-14 10:08:42'),(29,'Min Tyd Transport','mintydtranport@gmail.com','0825670243','','Highway Johannesdal Plot 1209, Pniel 7681','2016/290706/07','4600304796','2024-07-02 08:59:20'),(30,'Bushbuckridge Local Municipality','info@bushbuckridge.gov.za','','',' R533 Graskop Road, Opposite Mapulaneng Driving Licensing Testing Center.','','',NULL),(31,'CLSC HOLDINGS','','0681373974','','','','','2024-06-05 11:09:12'),(32,'tenny trucks',NULL,NULL,NULL,NULL,NULL,NULL,NULL),(33,'G AND P LOGISTICS','pandglogistics24@gmail.com','+27 65 370 5203','Claire','19 Saxen Road Blackheath Industria, Cape Town','2020/764387/07','9334589224','2024-07-05 07:50:43'),(34,'Zombie Networx (Pty) Ltd','neo@zsales.co.za','0718691369','Neo Mono','Fernridge Office Park, Unit 403, 5 Hunter Street, Ferndale, 2196',' 2016/083924/07','4180283345',NULL),(35,'Nesher Logistics (Pty) Ltd','Noel@nesherlogistics.co.za','078 600 9034','Noel','','2022/503850/07','',NULL),(36,'Nama Khoi Municipality','info@namakhoi.gov.za','+27 27 718 8100','','P.O. Box 17 4 Namakwa Street Springbok 8240','+27 27 712 1635','',NULL),(37,'Nokia','francois.van_dyk.ext@nokia.com','0724728614','Francois Van Dyk','939 Bokmakierie Street, Unit 93 Bokmakierie Villas. Theresa Park Akasia','','',NULL),(38,'Kotani Project','kotaniprojects@gmail.com','0813522804','','31 Malelane Capricon Ave Polokwani','','',NULL),(39,'Prest business suppliers','','','0113122723','138 pitzer Rd Glen austin','','',NULL),(40,'Siphilasonke','admin@siphilasonke.co.za','0737735123','Malefetsane','','','','2024-12-03 12:50:14'),(41,'African child engineers','african.child@icloud.com','0829781182','Mxolisi Siwela','','','',NULL),(42,'We Buy Cars (Pty) Ltd','customercare@webuycars.co.za','0870570000','','6 Byls Bridge Boulevard Highveld Ext 73, Centurion Gauteng','2015/130772/07','4960199463','2024-12-09 12:53:17'),(43,'Tswaing Local Municipality','corporate@tswaing.gov.za','0539489400','GJ Moleboge','24 Delareyville ','0','0',NULL),(44,'Aquatelecoms PTY LTD','helpdesk@aquatelecoms.co.za',' 086 566 2542 ','Sydney','51 Douglas Road Glen Austin Midrand',' 2007/198452/23','4130241450',NULL);
+/*!40000 ALTER TABLE `client` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `client_contract`
+--
+
+DROP TABLE IF EXISTS `client_contract`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `client_contract` (
+  `cli_con_id` int NOT NULL AUTO_INCREMENT,
+  `cli_con_company` int NOT NULL,
+  `client_id` int NOT NULL,
+  `cli_con_name` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `cli_con_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`cli_con_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `client_contract`
+--
+
+LOCK TABLES `client_contract` WRITE;
+/*!40000 ALTER TABLE `client_contract` DISABLE KEYS */;
+/*!40000 ALTER TABLE `client_contract` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `client_contracts`
+--
+
+DROP TABLE IF EXISTS `client_contracts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `client_contracts` (
+  `cli_contract_id` int NOT NULL AUTO_INCREMENT,
+  `cli_contract_client` int NOT NULL,
+  `cli_contract_name` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
+  `cli_contract_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`cli_contract_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `client_contracts`
+--
+
+LOCK TABLES `client_contracts` WRITE;
+/*!40000 ALTER TABLE `client_contracts` DISABLE KEYS */;
+INSERT INTO `client_contracts` VALUES (1,12,'A055-2020/21','2024-07-12 12:59:26'),(2,1,'4600069330','2024-09-18 10:21:43');
+/*!40000 ALTER TABLE `client_contracts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `commercial`
+--
+
+DROP TABLE IF EXISTS `commercial`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `commercial` (
+  `co_id` int NOT NULL AUTO_INCREMENT,
+  `co_tender_id` int DEFAULT NULL,
+  `co_task` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `co_assigned_to` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `co_description` text COLLATE utf8mb4_general_ci NOT NULL,
+  `co_respond` text COLLATE utf8mb4_general_ci NOT NULL,
+  `co_date` date NOT NULL,
+  `co_status` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `co_respond_date` date DEFAULT NULL,
+  `co_created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `co_update_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`co_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `commercial`
+--
+
+LOCK TABLES `commercial` WRITE;
+/*!40000 ALTER TABLE `commercial` DISABLE KEYS */;
+/*!40000 ALTER TABLE `commercial` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `comp`
+--
+
+DROP TABLE IF EXISTS `comp`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `comp` (
+  `id` int NOT NULL,
+  `companies` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `comp`
+--
+
+LOCK TABLES `comp` WRITE;
+/*!40000 ALTER TABLE `comp` DISABLE KEYS */;
+INSERT INTO `comp` VALUES (0,'a:3:{i:0;s:8:\"Gutakura\";i:1;s:11:\"PNG-Havilah\";i:2;s:7:\"Ramthel\";}');
+/*!40000 ALTER TABLE `comp` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `company`
+--
+
+DROP TABLE IF EXISTS `company`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `company` (
+  `company_id` int NOT NULL AUTO_INCREMENT,
+  `company_name` varchar(105) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_email` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_tel` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_fax` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_contact_person` varchar(105) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_address` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_reg` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_tax` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_vat` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_website` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_BANK` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_ACC_NAME` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_ACC` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_BRANCH` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_date` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`company_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='const GUTAKURA_PAYMENT_DETAILS = ''BANK  |  FIRST NATIONAL BANK (FNB).<br>ACC NAME  |  GUTAKURA TRADINGS Pty Ltd.<br>ACC #  |  62416497198 <br>BRANCH  |  250130'';\nconst RAMTHEL_PAYMENT_DETAILS =  ''BANK  |  STANDARD BANK.<br>ACC NAME  |  RAMTHEL PTY LTD.<br>ACC #  |  10127739856 <br>BRANCH  |  12645'';\nconst HAVILAH_PAYMENT_DETAILS =  ''BANK  |  ABSA.<br>ACC NAME  |  PNG Havilah Group Pty Ltd.<br>ACC #  |  4106758620 <br>BRANCH  |  632005'';';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `company`
+--
+
+LOCK TABLES `company` WRITE;
+/*!40000 ALTER TABLE `company` DISABLE KEYS */;
+INSERT INTO `company` VALUES (3,'PNG Havilah group Pty Ltd',NULL,'0789683459','086 4352 683','P. Chaitezvi','143 Lilian Street\nAndeon, Pretoria  West','','',NULL,NULL,'ABSA','PNG Havilah Group Pty Ltd','4106758620','632005','2024-02-12 09:26:51'),(1,'Gutakura','gutakuratradings@gmail.com','0126523148','0864352683','Patience Muchinga','143 Lillian Street \r\nAndeon AH\r\nPretoria West','2013/048006/07','9757717153','4800264493','gutakura.co.za','FIRST NATIONAL BANK (FNB)','GUTAKURA TRADINGS Pty Ltd','62416497198','250130','2024-02-12 09:26:51'),(2,'Ramthel','patience.ramthel@gmail.com','0126523148','0864352683','Patience Muchinga','143 Lillian Street \r\nAndeon AH\r\nPretoria West','2020/001082/07','9303516232','4450300431',NULL,'STANDARD BANK.','RAMTHEL PTY LTD','10127739856','12645','2024-04-23 05:44:30'),(4,'Laelnet Connect Pty Ltd','laelnetconnectorg@gmail.com','+27 67 846 7304',NULL,'Pride Shumba','343 Summerset Midrand 1687','2016/858855/07',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+/*!40000 ALTER TABLE `company` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `company_documents`
+--
+
+DROP TABLE IF EXISTS `company_documents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `company_documents` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company` int DEFAULT NULL,
+  `document_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `reg_number` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `start_date` date DEFAULT NULL,
+  `close_date` date DEFAULT NULL,
+  `purpose` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `additional_information` text COLLATE utf8mb4_general_ci,
+  `file_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `company_documents`
+--
+
+LOCK TABLES `company_documents` WRITE;
+/*!40000 ALTER TABLE `company_documents` DISABLE KEYS */;
+/*!40000 ALTER TABLE `company_documents` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `country`
+--
+
+DROP TABLE IF EXISTS `country`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `country` (
+  `country_id` int NOT NULL AUTO_INCREMENT,
+  `country_name` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `country_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`country_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `country`
+--
+
+LOCK TABLES `country` WRITE;
+/*!40000 ALTER TABLE `country` DISABLE KEYS */;
+INSERT INTO `country` VALUES (1,'South Africa','2024-05-24 08:32:50'),(2,'Zimbabwe','2024-05-24 08:32:50'),(3,'Namibia','2024-05-24 08:32:50'),(4,'Botswana','2024-05-24 08:32:50'),(5,'Lesotho','2024-05-24 08:32:50'),(6,'Swaziland','2024-05-24 08:32:50');
+/*!40000 ALTER TABLE `country` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `daily_report`
+--
+
+DROP TABLE IF EXISTS `daily_report`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `daily_report` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `daily_report` text,
+  `daily_report_date` date DEFAULT NULL,
+  `daily_report_description` text,
+  `daily_report_project` text,
+  `daily_report_staff` text,
+  `project_id` int DEFAULT NULL,
+  `user_id` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `daily_report`
+--
+
+LOCK TABLES `daily_report` WRITE;
+/*!40000 ALTER TABLE `daily_report` DISABLE KEYS */;
+/*!40000 ALTER TABLE `daily_report` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `db`
+--
+
+DROP TABLE IF EXISTS `db`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `db` (
+  `db-id` int NOT NULL AUTO_INCREMENT,
+  `[DB Name]` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `[DB date]` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`db-id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `db`
+--
+
+LOCK TABLES `db` WRITE;
+/*!40000 ALTER TABLE `db` DISABLE KEYS */;
+/*!40000 ALTER TABLE `db` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `department`
+--
+
+DROP TABLE IF EXISTS `department`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `department` (
+  `dep_id` int NOT NULL AUTO_INCREMENT,
+  `dep_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `dep_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `dep_update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`dep_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `department`
+--
+
+LOCK TABLES `department` WRITE;
+/*!40000 ALTER TABLE `department` DISABLE KEYS */;
+INSERT INTO `department` VALUES (1,'Director','2023-09-07 11:39:07','2023-09-07 11:39:07'),(2,'Admin','2023-09-07 11:39:07','2023-09-07 11:39:07'),(3,'Accounting','2023-09-07 11:39:07','2023-09-07 11:39:07'),(4,'Technician','2023-09-07 11:39:07','2023-09-08 13:43:15'),(5,'Intern','2023-09-08 13:43:15','2023-09-08 13:43:15'),(6,'Assistant Technician','2023-09-08 13:43:15','2023-09-08 13:43:15'),(7,'Persornal Assistance','2023-09-08 13:43:15','2023-09-08 13:43:15'),(8,'Site Manager','2023-09-08 13:43:15','2023-09-08 13:43:15'),(9,'Logistics','2024-01-11 07:45:09','2024-01-11 07:45:09');
+/*!40000 ALTER TABLE `department` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `departure`
+--
+
+DROP TABLE IF EXISTS `departure`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `departure` (
+  `dep_id` int NOT NULL AUTO_INCREMENT,
+  `dep_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `dep_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `dep_update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`dep_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `departure`
+--
+
+LOCK TABLES `departure` WRITE;
+/*!40000 ALTER TABLE `departure` DISABLE KEYS */;
+INSERT INTO `departure` VALUES (1,'Director','2023-09-07 11:39:07','2023-09-07 11:39:07'),(2,'Admin','2023-09-07 11:39:07','2023-09-07 11:39:07'),(3,'Accounting','2023-09-07 11:39:07','2023-09-07 11:39:07'),(4,'Technician','2023-09-07 11:39:07','2023-09-08 13:43:15'),(5,'Intern','2023-09-08 13:43:15','2023-09-08 13:43:15'),(6,'Assistant Technician','2023-09-08 13:43:15','2023-09-08 13:43:15'),(7,'Persornal Assistance','2023-09-08 13:43:15','2023-09-08 13:43:15'),(8,'Site Manager','2023-09-08 13:43:15','2023-09-08 13:43:15');
+/*!40000 ALTER TABLE `departure` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `depreciation`
+--
+
+DROP TABLE IF EXISTS `depreciation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `depreciation` (
+  `desc_id` int NOT NULL AUTO_INCREMENT,
+  `desc_asset` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `desc_amount` decimal(10,2) NOT NULL,
+  `desc_date` date NOT NULL,
+  `d_created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`desc_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `depreciation`
+--
+
+LOCK TABLES `depreciation` WRITE;
+/*!40000 ALTER TABLE `depreciation` DISABLE KEYS */;
+/*!40000 ALTER TABLE `depreciation` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `depreciation_type`
+--
+
+DROP TABLE IF EXISTS `depreciation_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `depreciation_type` (
+  `depr_ty_id` int NOT NULL AUTO_INCREMENT,
+  `depr_ty_per` int NOT NULL,
+  `depr_ty_desc` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `depr_ty_date` date NOT NULL,
+  `dt_created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`depr_ty_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `depreciation_type`
+--
+
+LOCK TABLES `depreciation_type` WRITE;
+/*!40000 ALTER TABLE `depreciation_type` DISABLE KEYS */;
+/*!40000 ALTER TABLE `depreciation_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `drivers`
+--
+
+DROP TABLE IF EXISTS `drivers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `drivers` (
+  `dri_id` int NOT NULL AUTO_INCREMENT,
+  `dri_truck_owner` int DEFAULT NULL,
+  `dri_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `dri_surname` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `dri_email` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `dri_address` varchar(245) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `dri_phone` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `dri_ID_Number` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `dri_next_of_kin` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `dri_next_of_kin_phone` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `dri_license` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `dri_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`dri_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Name 	Surname	Email	Address	Phone	Next of kin	Lisence';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `drivers`
+--
+
+LOCK TABLES `drivers` WRITE;
+/*!40000 ALTER TABLE `drivers` DISABLE KEYS */;
+INSERT INTO `drivers` VALUES (1,2,'TARUONA MICHAEL','RUSHIZHA',NULL,'44 ALBERT ROAD SALT RIVER','0679083456',NULL,NULL,NULL,NULL,'2024-03-01 07:43:48'),(2,2,'Gabriel',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2024-03-01 07:43:48'),(3,2,'ISAAC','KUNA',NULL,'197 Rolihlahla crescent  crossroads','0694631205','8808205995085 ','Lazarus  Kuna','0788647299','499500000FXJ','2024-03-01 07:43:48'),(4,2,'Sandile',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2024-03-01 13:07:20'),(5,1,'SIPHAMANDLA. B','MBIZWENI',NULL,'64838 kholmanzi street Makhaza Khayelitsha┬á7784','0679085204','9902285652085','BULELANI MBIZWENI','\n0833545091','O636674465','2024-03-26 06:36:51'),(6,1,'ANDREW','SAUNYAMA','saunyamaand@gmail.com','45236 KING GEORGE STREET PHILIPPI CAPE TOWN','0668907020','6603106355089','TENDAI SAUNYAMA','0678198169','60020004J00C','2024-03-26 06:36:51'),(7,1,'EDGAR LANGA','DOLO',NULL,'6404 FOGO STREET LANGA CAPE TOWN','0810902347',NULL,NULL,NULL,NULL,'2024-03-26 06:36:51'),(8,2,'SAKHUMZI',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2024-04-17 06:27:10'),(9,2,'PHINEAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2024-05-23 11:03:52'),(10,3,'Knowledge',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2024-05-23 11:08:52'),(11,3,'EDMORE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2024-05-23 11:12:18'),(12,3,'KHUMBULANI',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2024-05-23 11:16:00'),(13,3,'Cosmas',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2024-05-31 08:37:51'),(14,NULL,'Mbambi','Mkhululi',NULL,NULL,NULL,'8709246299083',NULL,NULL,NULL,'2024-06-07 03:29:22'),(15,NULL,'Anathi','Sokhawukile',NULL,NULL,NULL,'9702265657082',NULL,NULL,'6106000049DF','2024-06-07 03:30:32'),(16,1,'Mthetheleli','Fosi',NULL,NULL,NULL,'9101236197080',NULL,NULL,'60020004H3BK','2024-06-07 03:32:33'),(17,NULL,'CHIKANGA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2024-07-01 12:09:51'),(18,NULL,'Jackson','Nyamhondoro','Jacksonnyamhondorojackson37@gmail.com','','+27 68 553 3021',NULL,'Desire simbarashe Ndlovu','0846439658','AA00295116','2024-10-01 08:55:06'),(19,NULL,'Banele','M','Banelem@gmail.com','','+27 73 330 7323',NULL,'Bothweni','-','-','2024-10-02 04:58:24'),(20,NULL,'EVANS',NULL,'evanstakudzwam@gmail.com','N/A','+27 68 089 5480',NULL,NULL,NULL,NULL,'2024-12-31 14:52:38'),(21,NULL,'JOHN',NULL,'','N/A','+27 65 920 0701',NULL,NULL,NULL,NULL,'2024-12-31 14:54:16'),(22,NULL,'Jelashe',NULL,NULL,NULL,'+27607200772',NULL,NULL,NULL,NULL,'2024-12-31 14:57:33'),(23,2,'Luyanda ','Mashwayi','Luyanda.Mashwayi@ramthel.com',NULL,'+27 68 123 3338','9005206029084',NULL,NULL,NULL,'2025-02-02 03:35:54');
+/*!40000 ALTER TABLE `drivers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `employee_status`
+--
+
+DROP TABLE IF EXISTS `employee_status`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employee_status` (
+  `emp_status_id` int NOT NULL AUTO_INCREMENT,
+  `emp_status_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `emp_status_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`emp_status_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `employee_status`
+--
+
+LOCK TABLES `employee_status` WRITE;
+/*!40000 ALTER TABLE `employee_status` DISABLE KEYS */;
+INSERT INTO `employee_status` VALUES (1,'Full Time','2024-01-08 10:10:45'),(2,'Part Time','2024-01-08 10:10:45'),(3,'Unactive','2024-01-08 10:10:45');
+/*!40000 ALTER TABLE `employee_status` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `employees`
+--
+
+DROP TABLE IF EXISTS `employees`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employees` (
+  `emp_id` int NOT NULL AUTO_INCREMENT,
+  `emp_name` varchar(100) NOT NULL,
+  `emp_surname` varchar(100) NOT NULL,
+  `emp_dept` int NOT NULL,
+  `emp_salary` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `emp_identity` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `emp_gender` int NOT NULL,
+  `emp_account` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `emp_status` int NOT NULL,
+  `emp_dob` date NOT NULL,
+  `emp_address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `emp_role` int NOT NULL,
+  `emp_file` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `companies` varchar(255) NOT NULL,
+  `ram` int NOT NULL,
+  `png` int NOT NULL,
+  `emp_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `emp_update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `emp_phone` varchar(45) DEFAULT NULL,
+  `emp_email` varchar(105) DEFAULT NULL,
+  `emp_password` varchar(245) DEFAULT NULL,
+  PRIMARY KEY (`emp_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `employees`
+--
+
+LOCK TABLES `employees` WRITE;
+/*!40000 ALTER TABLE `employees` DISABLE KEYS */;
+/*!40000 ALTER TABLE `employees` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `environmental`
+--
+
+DROP TABLE IF EXISTS `environmental`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `environmental` (
+  `envir_id` int NOT NULL AUTO_INCREMENT,
+  `envir_tender_id` int DEFAULT NULL,
+  `envir_task` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `envir_assigned_to` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `envir_description` text COLLATE utf8mb4_general_ci NOT NULL,
+  `envir_respond` text COLLATE utf8mb4_general_ci NOT NULL,
+  `envir_date` date NOT NULL,
+  `envir_status` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `envir_respond_date` date DEFAULT NULL,
+  `envir_created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `envir_update_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`envir_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `environmental`
+--
+
+LOCK TABLES `environmental` WRITE;
+/*!40000 ALTER TABLE `environmental` DISABLE KEYS */;
+/*!40000 ALTER TABLE `environmental` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `expense_suppl`
+--
+
+DROP TABLE IF EXISTS `expense_suppl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `expense_suppl` (
+  `exp_su_id` int NOT NULL AUTO_INCREMENT,
+  `exp_su_company` int NOT NULL,
+  `exp_su_date` date DEFAULT NULL,
+  `exp_su_type` int NOT NULL DEFAULT '21',
+  `exp_su_amount` double NOT NULL,
+  `exp_su_cost` double DEFAULT NULL,
+  `exp_su_provider` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `exp_su_receipt` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `exp_su_invoice` int DEFAULT NULL,
+  `exp_su_paid_by` int NOT NULL,
+  `exp_su_method` int DEFAULT NULL,
+  `exp_su_created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`exp_su_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expense_suppl`
+--
+
+LOCK TABLES `expense_suppl` WRITE;
+/*!40000 ALTER TABLE `expense_suppl` DISABLE KEYS */;
+INSERT INTO `expense_suppl` VALUES (1,3,'0000-00-00',21,0,NULL,'','',0,2,1,'2024-05-08 07:33:54'),(2,3,'0000-00-00',21,0,NULL,'','',0,2,1,'2024-05-08 07:36:54'),(3,1,'0000-00-00',21,0,NULL,'','',0,1,1,'2024-05-08 09:34:14'),(4,1,'0000-00-00',21,0,NULL,'','',0,1,1,'2024-05-08 09:37:31'),(5,1,'0000-00-00',21,0,NULL,'','',0,1,1,'2024-05-08 09:43:13'),(6,1,'0000-00-00',21,0,NULL,'','',0,1,1,'2024-05-08 09:44:38'),(7,3,'0000-00-00',21,0,NULL,'','',0,12,1,'2024-05-09 10:09:39'),(8,1,'0000-00-00',21,0,NULL,'','',0,1,1,'2024-05-20 08:28:24'),(9,1,'0000-00-00',21,0,NULL,'','',0,1,1,'2024-05-20 08:32:20'),(10,1,'0000-00-00',21,0,NULL,'','',0,1,1,'2024-05-20 08:34:21'),(11,1,'0000-00-00',21,0,NULL,'','',0,4,1,'2024-05-20 08:46:19');
+/*!40000 ALTER TABLE `expense_suppl` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `expense_supply`
+--
+
+DROP TABLE IF EXISTS `expense_supply`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `expense_supply` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `exp_date` date NOT NULL,
+  `company` int NOT NULL,
+  `quote` int DEFAULT NULL,
+  `receipt` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `amount` double NOT NULL,
+  `provider` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `method` int NOT NULL,
+  `account` int NOT NULL,
+  `paid_by` int NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `new_id_UNIQUE` (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expense_supply`
+--
+
+LOCK TABLES `expense_supply` WRITE;
+/*!40000 ALTER TABLE `expense_supply` DISABLE KEYS */;
+INSERT INTO `expense_supply` VALUES (1,'2024-05-09',2,11,'124073',28189.53,'Idube Electrical',1,0,4,'2024-05-21 09:43:55','2024-05-21 09:43:55'),(2,'2024-05-10',2,11,'76582803',7010.63,'RS Compnents',1,0,4,'2024-05-21 09:45:21','2024-05-21 09:45:21'),(3,'2024-05-16',2,11,'112117',449,'Sirco Trading cc',1,0,4,'2024-05-21 09:46:46','2024-05-21 09:46:46'),(4,'2024-04-22',2,11,'441468',6267.99,'Powerbuild',1,0,4,'2024-05-21 09:50:53','2024-05-21 09:50:53');
+/*!40000 ALTER TABLE `expense_supply` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `expense_truck`
+--
+
+DROP TABLE IF EXISTS `expense_truck`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `expense_truck` (
+  `exp_truck_id` int NOT NULL AUTO_INCREMENT,
+  `exp_truck_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`exp_truck_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expense_truck`
+--
+
+LOCK TABLES `expense_truck` WRITE;
+/*!40000 ALTER TABLE `expense_truck` DISABLE KEYS */;
+INSERT INTO `expense_truck` VALUES (1,'Repair'),(2,'Fuel'),(3,'Salary');
+/*!40000 ALTER TABLE `expense_truck` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `expense_type`
+--
+
+DROP TABLE IF EXISTS `expense_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `expense_type` (
+  `ex_ty_id` int NOT NULL AUTO_INCREMENT,
+  `ex_ty_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `ex_ty_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `ex_ty_update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ex_ty_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expense_type`
+--
+
+LOCK TABLES `expense_type` WRITE;
+/*!40000 ALTER TABLE `expense_type` DISABLE KEYS */;
+INSERT INTO `expense_type` VALUES (1,'Materials','2023-09-04 13:38:41','2023-09-04 13:38:41'),(2,'Fuel','2023-09-04 13:38:41','2023-09-04 13:38:41'),(3,'Accommodation','2023-09-04 13:38:41','2023-09-04 13:38:41'),(4,'Food','2023-09-04 13:38:41','2023-09-04 13:38:41'),(5,'Labour','2023-09-04 13:38:41','2023-09-04 13:38:41'),(6,'Repair','2024-01-10 11:31:35','2024-01-10 11:31:35'),(7,'Depreciation','2024-01-10 11:31:35','2024-01-10 11:31:35'),(8,'Insurance','2024-01-10 11:31:35','2024-01-10 11:31:35'),(9,'Salary','2024-01-10 11:31:35','2024-01-10 11:31:35'),(10,'Stationary','2024-01-10 11:31:35','2024-01-10 11:31:35'),(11,'Office Sundry','2024-01-10 11:31:35','2024-01-10 11:31:35'),(12,'House Expense','2024-01-10 11:31:35','2024-01-10 11:31:35'),(13,'Tollgate','2024-01-18 11:43:52','2024-01-18 11:43:52'),(14,'Assets','2024-01-25 05:56:37','2024-01-25 05:56:37'),(15,'Charges','2024-02-07 07:25:14','2024-02-07 07:25:14'),(16,'Cash Send','2024-02-07 07:48:04','2024-02-07 07:48:04'),(17,'Hiring','2024-02-07 07:48:04','2024-02-07 07:48:04'),(18,'Subscription','2024-02-07 07:48:04','2024-02-07 07:48:04'),(19,'Rockhole','2024-04-08 12:59:52','2024-04-08 12:59:52'),(20,'Truck expenses','2024-04-09 04:10:45','2024-04-09 04:10:45'),(21,'Supply Cost','2024-04-22 14:12:31','2024-04-22 14:12:31'),(22,'Renting','2024-05-08 07:35:56','2024-05-08 07:35:56'),(23,'Withdrawal','2024-07-15 08:10:39','2024-07-15 08:10:39'),(24,'Electricity ','2024-07-15 08:18:51','2024-07-15 08:18:51'),(25,'Data','2024-08-01 13:11:23','2024-08-01 13:11:23'),(26,'Tool','2024-09-10 10:02:45','2024-09-10 10:02:45'),(27,'Training','2024-09-10 10:02:45','2024-09-10 10:02:45'),(28,'Company Document expense','2024-09-10 10:52:52','2024-09-10 10:52:52');
+/*!40000 ALTER TABLE `expense_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `expenses`
+--
+
+DROP TABLE IF EXISTS `expenses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `expenses` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `old_id` int NOT NULL,
+  `exp_date` date NOT NULL,
+  `company` int NOT NULL,
+  `truck` int DEFAULT NULL,
+  `receipt` varchar(100) NOT NULL,
+  `amount` double NOT NULL,
+  `provider` varchar(100) NOT NULL,
+  `purpose` varchar(100) NOT NULL,
+  `purpose_ex` int DEFAULT NULL,
+  `method` int NOT NULL,
+  `account` int NOT NULL,
+  `paid_by` int NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `new_id_UNIQUE` (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=461 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expenses`
+--
+
+LOCK TABLES `expenses` WRITE;
+/*!40000 ALTER TABLE `expenses` DISABLE KEYS */;
+/*!40000 ALTER TABLE `expenses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `gender`
+--
+
+DROP TABLE IF EXISTS `gender`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `gender` (
+  `ge_id` int NOT NULL AUTO_INCREMENT,
+  `ge_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `ge_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `ge_update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ge_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `gender`
+--
+
+LOCK TABLES `gender` WRITE;
+/*!40000 ALTER TABLE `gender` DISABLE KEYS */;
+INSERT INTO `gender` VALUES (1,'Male','2023-09-07 11:42:33','2023-09-07 11:42:33'),(2,'Female','2023-09-07 11:42:33','2023-09-07 11:42:33');
+/*!40000 ALTER TABLE `gender` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `health_safety`
+--
+
+DROP TABLE IF EXISTS `health_safety`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `health_safety` (
+  `he_sa_id` int NOT NULL AUTO_INCREMENT,
+  `he_sa_tender_id` int DEFAULT NULL,
+  `he_sa_task` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `he_sa_assigned_to` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `he_sa_description` text COLLATE utf8mb4_general_ci NOT NULL,
+  `he_sa_respond` text COLLATE utf8mb4_general_ci NOT NULL,
+  `he_sa_date` date NOT NULL,
+  `he_sa_status` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `he_sa_respond_date` date DEFAULT NULL,
+  `he_sa_created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `he_sa_update_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`he_sa_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `health_safety`
+--
+
+LOCK TABLES `health_safety` WRITE;
+/*!40000 ALTER TABLE `health_safety` DISABLE KEYS */;
+/*!40000 ALTER TABLE `health_safety` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `id_type`
+--
+
+DROP TABLE IF EXISTS `id_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `id_type` (
+  `type_id` int NOT NULL AUTO_INCREMENT,
+  `type_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`type_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `id_type`
+--
+
+LOCK TABLES `id_type` WRITE;
+/*!40000 ALTER TABLE `id_type` DISABLE KEYS */;
+INSERT INTO `id_type` VALUES (1,' Business reg certif '),(2,'National ID'),(3,'Other');
+/*!40000 ALTER TABLE `id_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `incidents_report_project`
+--
+
+DROP TABLE IF EXISTS `incidents_report_project`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `incidents_report_project` (
+  `incidents_report_id` int NOT NULL AUTO_INCREMENT,
+  `incidents_report` varchar(255) NOT NULL,
+  `incidents_report_date` date NOT NULL,
+  `incidents_report_description` text NOT NULL,
+  `incidents_report_project` int NOT NULL,
+  `incidents_report_staff` int NOT NULL,
+  `project_id` int NOT NULL,
+  `incidents_report_status` enum('not yet implemented','in progress','implemented','not applicable') NOT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`incidents_report_id`),
+  KEY `project_id` (`project_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `incidents_report_project`
+--
+
+LOCK TABLES `incidents_report_project` WRITE;
+/*!40000 ALTER TABLE `incidents_report_project` DISABLE KEYS */;
+/*!40000 ALTER TABLE `incidents_report_project` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `invoice`
+--
+
+DROP TABLE IF EXISTS `invoice`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `invoice` (
+  `inv_id` int NOT NULL AUTO_INCREMENT,
+  `invoice_date` date DEFAULT NULL,
+  `inv_date` date DEFAULT NULL,
+  `trucks` varchar(100) DEFAULT NULL,
+  `client_id` int DEFAULT NULL,
+  `inv_purchase_order` varchar(45) DEFAULT NULL,
+  `inv_company` varchar(255) DEFAULT NULL,
+  `inv_name` varchar(255) DEFAULT NULL,
+  `inv_number` varchar(255) DEFAULT NULL,
+  `inv_amount` decimal(10,2) DEFAULT NULL,
+  `inv_vat` decimal(10,2) DEFAULT NULL,
+  `commission_rate` double DEFAULT NULL,
+  `inv_total_amount` decimal(10,2) DEFAULT NULL,
+  `inv_method` varchar(255) DEFAULT NULL,
+  `inv_account` varchar(255) DEFAULT NULL,
+  `inv_status` varchar(45) DEFAULT NULL,
+  `inv_notes` longtext,
+  `inv_created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `inv_update_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`inv_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `invoice`
+--
+
+LOCK TABLES `invoice` WRITE;
+/*!40000 ALTER TABLE `invoice` DISABLE KEYS */;
+/*!40000 ALTER TABLE `invoice` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `invoice_audit_trigger` AFTER UPDATE ON `invoice` FOR EACH ROW BEGIN
+  INSERT INTO invoice_audit (
+    inv_id,
+    old_inv_company,
+    new_inv_company,
+    old_inv_name,
+    new_inv_name,
+    old_inv_amount,
+    new_inv_amount,
+    old_inv_vat,
+    new_inv_vat,
+    old_inv_total_amount,
+    new_inv_total_amount,
+    old_inv_date,
+    new_inv_date,
+    old_inv_method,
+    new_inv_method,
+    old_inv_account,
+    new_inv_account,
+    old_inv_created_date,
+    new_inv_created_date,
+    old_inv_update_date,
+    new_inv_update_date
+  )
+  VALUES (
+    OLD.inv_id,
+    OLD.inv_company,
+    NEW.inv_company,
+    OLD.inv_name,
+    NEW.inv_name,
+    OLD.inv_amount,
+    NEW.inv_amount,
+    OLD.inv_vat,
+    NEW.inv_vat,
+    OLD.inv_total_amount,
+    NEW.inv_total_amount,
+    OLD.inv_date,
+    NEW.inv_date,
+    OLD.inv_method,
+    NEW.inv_method,
+    OLD.inv_account,
+    NEW.inv_account,
+    OLD.inv_created_date,
+    NEW.inv_created_date,
+    OLD.inv_update_date,
+    NEW.inv_update_date
+  );
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `invoice_audit`
+--
+
+DROP TABLE IF EXISTS `invoice_audit`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `invoice_audit` (
+  `audit_id` int NOT NULL AUTO_INCREMENT,
+  `inv_id` int DEFAULT NULL,
+  `old_inv_company` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `new_inv_company` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `old_inv_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `new_inv_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `old_inv_project` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `new_inv_project` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `old_inv_amount` decimal(10,2) DEFAULT NULL,
+  `new_inv_amount` decimal(10,2) DEFAULT NULL,
+  `old_inv_vat` decimal(10,2) DEFAULT NULL,
+  `new_inv_vat` decimal(10,2) DEFAULT NULL,
+  `old_inv_total_amount` decimal(10,2) DEFAULT NULL,
+  `new_inv_total_amount` decimal(10,2) DEFAULT NULL,
+  `old_inv_date` date DEFAULT NULL,
+  `new_inv_date` date DEFAULT NULL,
+  `old_inv_method` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `new_inv_method` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `old_inv_account` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `new_inv_account` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `old_inv_created_date` timestamp NULL DEFAULT NULL,
+  `new_inv_created_date` timestamp NULL DEFAULT NULL,
+  `old_inv_update_date` timestamp NULL DEFAULT NULL,
+  `new_inv_update_date` timestamp NULL DEFAULT NULL,
+  `audit_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`audit_id`),
+  KEY `inv_id` (`inv_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=412 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `invoice_audit`
+--
+
+LOCK TABLES `invoice_audit` WRITE;
+/*!40000 ALTER TABLE `invoice_audit` DISABLE KEYS */;
+INSERT INTO `invoice_audit` VALUES (1,7,'3','3','012','012',NULL,NULL,34574.75,34574.75,NULL,NULL,NULL,NULL,'2023-11-03','2023-11-03','1','1','1','1','2024-01-19 12:12:59','2024-01-19 12:12:59','2024-01-24 08:56:46','2024-01-24 08:56:46','2024-01-24 09:03:17'),(2,7,'3','3','012','012',NULL,NULL,34574.75,34574.75,NULL,NULL,NULL,NULL,'2023-11-03','2023-11-03','1','1','1','1','2024-01-19 12:12:59','2024-01-19 12:12:59','2024-01-24 08:56:46','2024-01-24 08:56:46','2024-01-24 09:03:27'),(3,2,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,65025.25,65025.25,NULL,NULL,65025.25,65025.25,'2023-10-30','2023-10-30','1','1','10 12 773 985 6','10 12 773 985 6','2024-01-11 08:09:25','2024-01-11 08:09:25','2024-01-24 06:08:37','2024-01-24 10:04:05','2024-01-24 10:04:05'),(4,7,'3','3','012','Musk T Pty Ltd Trip',NULL,NULL,34574.75,34574.75,NULL,NULL,NULL,NULL,'2023-11-03','2023-11-03','1','1','1','1','2024-01-19 12:12:59','2024-01-19 12:12:59','2024-01-24 08:56:46','2024-01-24 10:05:16','2024-01-24 10:05:16'),(5,1,'3','3','012','Musk T Pty Ltd Trip',NULL,NULL,34574.75,34574.75,NULL,NULL,164897.00,164897.00,'2023-11-03','2023-11-03','1','1','1','1','2024-01-11 08:09:25','2024-01-11 08:09:25','2024-01-24 08:55:25','2024-01-24 10:05:16','2024-01-24 10:05:16'),(6,15,'3','3','GRINDROD','GRINDROD',NULL,NULL,130756.44,130756.44,NULL,NULL,NULL,NULL,'2024-01-02','2024-01-02','1','1','1','1','2024-01-19 12:47:52','2024-01-19 12:47:52','2024-01-24 06:08:37','2024-01-24 10:05:50','2024-01-24 10:05:50'),(7,13,'2','2','CAVAN PROJECT','CAVAN PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'2023-12-14','2023-12-14','1','1',NULL,NULL,'2024-01-19 12:44:58','2024-01-19 12:44:58','2024-01-19 12:44:58','2024-01-24 10:07:11','2024-01-24 10:07:11'),(8,7,'3','3','Musk T Pty Ltd Trip','Trips ',NULL,NULL,34574.75,34574.75,NULL,NULL,NULL,NULL,'2023-11-03','2023-11-03','1','1','1','1','2024-01-19 12:12:59','2024-01-19 12:12:59','2024-01-24 10:05:16','2024-01-24 11:07:00','2024-01-24 11:07:00'),(9,16,'1','1','Eskom project ','Eskom project ',NULL,NULL,133536.49,133536.49,20030.47,20030.47,153566.96,153566.96,'0000-00-00','2024-01-30','1','1',NULL,NULL,'2024-02-12 13:51:18','2024-02-12 13:51:18','2024-02-12 13:51:18','2024-02-12 14:09:31','2024-02-12 14:09:31'),(10,17,'1','1','Eskom project ','Eskom project ',NULL,NULL,113137.96,113137.96,16970.69,16970.69,130108.65,130108.65,'0000-00-00','2023-12-12','1','1',NULL,NULL,'2024-02-12 14:08:39','2024-02-12 14:08:39','2024-02-12 14:08:39','2024-02-12 14:09:31','2024-02-12 14:09:31'),(11,16,'1','1','Eskom project ','Eskom project ',NULL,NULL,133536.49,133536.49,20030.47,20030.47,153566.96,153566.96,'2024-01-30','2024-01-30','1','1',NULL,NULL,'2024-02-12 13:51:18','2024-02-12 13:51:18','2024-02-12 14:09:31','2024-02-13 22:30:33','2024-02-13 22:30:33'),(12,17,'1','1','Eskom project ','Eskom project ',NULL,NULL,113137.96,113137.96,16970.69,16970.69,130108.65,130108.65,'2023-12-12','2023-12-12','1','1',NULL,NULL,'2024-02-12 14:08:39','2024-02-12 14:08:39','2024-02-12 14:09:31','2024-02-13 22:30:42','2024-02-13 22:30:42'),(13,6,'2','2','ESKOM PROJECT','ESKOM PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'2023-11-03','2023-11-03','1','1',NULL,NULL,'2024-01-19 12:08:49','2024-01-19 12:08:49','2024-01-24 06:08:37','2024-02-13 22:31:56','2024-02-13 22:31:56'),(14,8,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,241910.56,241910.56,NULL,NULL,NULL,NULL,'2023-11-17','2023-11-17','1','1',NULL,NULL,'2024-01-19 12:21:22','2024-01-19 12:21:22','2024-01-24 06:08:37','2024-02-13 22:31:56','2024-02-13 22:31:56'),(15,9,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,371128.59,371128.59,NULL,NULL,NULL,NULL,'2023-11-29','2023-11-29','1','1',NULL,NULL,'2024-01-19 12:22:25','2024-01-19 12:22:25','2024-01-24 06:08:37','2024-02-13 22:31:56','2024-02-13 22:31:56'),(16,12,'3','3','GRINDROD SUB ','GRINDROD SUB ',NULL,NULL,14870.00,14870.00,NULL,NULL,NULL,NULL,'2023-12-04','2023-12-04','1','1','1','1','2024-01-19 12:41:28','2024-01-19 12:41:28','2024-01-24 06:08:37','2024-02-13 22:31:56','2024-02-13 22:31:56'),(17,11,'3','3','COTZEE SUB','COTZEE SUB',NULL,NULL,9720.00,9720.00,NULL,NULL,NULL,NULL,'2023-12-04','2023-12-04','1','1','1','1','2024-01-19 12:27:15','2024-01-19 12:27:15','2024-01-24 06:08:37','2024-02-13 22:31:56','2024-02-13 22:31:56'),(18,13,'2','2','CAVAN PROJECT','CAVAN PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'2023-12-14','2023-12-14','1','1',NULL,NULL,'2024-01-19 12:44:58','2024-01-19 12:44:58','2024-01-24 10:07:11','2024-02-13 22:31:56','2024-02-13 22:31:56'),(19,14,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,94768.34,94768.34,NULL,NULL,NULL,NULL,'2023-12-21','2023-12-21','1','1',NULL,NULL,'2024-01-19 12:45:57','2024-01-19 12:45:57','2024-01-19 12:45:57','2024-02-13 22:31:56','2024-02-13 22:31:56'),(20,15,'3','3','GRINDROD','GRINDROD',NULL,NULL,130756.44,130756.44,NULL,NULL,NULL,NULL,'2024-01-02','2024-01-02','1','1','1','1','2024-01-19 12:47:52','2024-01-19 12:47:52','2024-01-24 10:05:50','2024-02-13 22:31:56','2024-02-13 22:31:56'),(21,10,'1','1','Eskom project ','Eskom project ',NULL,NULL,133536.49,133536.49,20030.47,20030.47,153566.96,153566.96,'2024-01-30','2024-01-30','1','1',NULL,NULL,'2024-02-12 13:51:18','2024-02-12 13:51:18','2024-02-13 22:30:33','2024-02-13 22:31:56','2024-02-13 22:31:56'),(22,15,'1','1','Project: 2019-NCP-005-02 New Mine Entrance Bulk Services','Project: 2019-NCP-005-02 New Mine Entrance Bulk Services',NULL,NULL,86956.52,86956.52,13043.48,13043.48,100000.00,100000.00,'0000-00-00','2023-12-29','1','1',NULL,NULL,'2024-02-13 22:49:01','2024-02-13 22:49:01','2024-02-13 22:49:01','2024-02-13 22:54:04','2024-02-13 22:54:04'),(23,1,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,65025.25,65025.25,NULL,NULL,65025.25,65025.25,'0000-00-00','2023-10-30','1','1','10 12 773 985 6','10 12 773 985 6','0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(24,2,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,34574.75,34574.75,NULL,NULL,164897.00,164897.00,'0000-00-00','2023-11-03','1','1','1','1','0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(25,3,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,130756.44,130756.44,NULL,NULL,130756.44,130756.44,'0000-00-00','2023-11-30','1','1','10 12 773 985 6','10 12 773 985 6','0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(26,4,'2','2','ESKOM PROJECT','ESKOM PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'0000-00-00','2023-11-03','1','1',NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(27,5,'3','3','Trips ','Trips ',NULL,NULL,34574.75,34574.75,NULL,NULL,NULL,NULL,'0000-00-00','2023-11-03','1','1','1','1','0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(28,6,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,241910.56,241910.56,NULL,NULL,NULL,NULL,'0000-00-00','2023-11-17','1','1',NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(29,7,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,371128.59,371128.59,NULL,NULL,NULL,NULL,'0000-00-00','2023-11-29','1','1',NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(30,8,'3','3','COTZEE SUB','COTZEE SUB',NULL,NULL,9720.00,9720.00,NULL,NULL,NULL,NULL,'0000-00-00','2023-12-04','1','1','1','1','0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(31,9,'3','3','GRINDROD SUB ','GRINDROD SUB ',NULL,NULL,14870.00,14870.00,NULL,NULL,NULL,NULL,'0000-00-00','2023-12-04','1','1','1','1','0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(32,10,'2','2','CAVAN PROJECT','CAVAN PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'0000-00-00','2023-12-14','1','1',NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(33,11,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,94768.34,94768.34,NULL,NULL,NULL,NULL,'0000-00-00','2023-12-21','1','1',NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(34,12,'3','3','GRINDROD','GRINDROD',NULL,NULL,130756.44,130756.44,NULL,NULL,NULL,NULL,'0000-00-00','2024-01-02','1','1','1','1','0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(35,13,'1','1','Eskom project ','Eskom project ',NULL,NULL,133536.49,133536.49,20030.47,20030.47,153566.96,153566.96,'0000-00-00','2024-01-30','1','1',NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(36,14,'1','1','Eskom project ','Eskom project ',NULL,NULL,113137.96,113137.96,16970.69,16970.69,130108.65,130108.65,'0000-00-00','2023-12-12','1','1',NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','2024-02-13 22:54:04','2024-02-13 22:54:04'),(37,1,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,65025.25,65025.25,NULL,NULL,65025.25,65025.25,'2023-10-30','2023-10-30','1','1','10 12 773 985 6','10 12 773 985 6','0000-00-00 00:00:00','2024-01-10 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(38,2,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,34574.75,34574.75,NULL,NULL,164897.00,164897.00,'2023-11-03','2023-11-03','1','1','1','1','0000-00-00 00:00:00','2024-01-10 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(39,3,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,130756.44,130756.44,NULL,NULL,130756.44,130756.44,'2023-11-30','2023-11-30','1','1','10 12 773 985 6','10 12 773 985 6','0000-00-00 00:00:00','2024-01-10 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(40,4,'2','2','ESKOM PROJECT','ESKOM PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'2023-11-03','2023-11-03','1','1',NULL,NULL,'0000-00-00 00:00:00','2024-01-18 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(41,5,'3','3','Trips ','Trips ',NULL,NULL,34574.75,34574.75,NULL,NULL,NULL,NULL,'2023-11-03','2023-11-03','1','1','1','1','0000-00-00 00:00:00','2024-01-18 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(42,6,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,241910.56,241910.56,NULL,NULL,NULL,NULL,'2023-11-17','2023-11-17','1','1',NULL,NULL,'0000-00-00 00:00:00','2024-01-18 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(43,7,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,371128.59,371128.59,NULL,NULL,NULL,NULL,'2023-11-29','2023-11-29','1','1',NULL,NULL,'0000-00-00 00:00:00','2024-01-18 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(44,8,'3','3','COTZEE SUB','COTZEE SUB',NULL,NULL,9720.00,9720.00,NULL,NULL,NULL,NULL,'2023-12-04','2023-12-04','1','1','1','1','0000-00-00 00:00:00','2024-01-18 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(45,9,'3','3','GRINDROD SUB ','GRINDROD SUB ',NULL,NULL,14870.00,14870.00,NULL,NULL,NULL,NULL,'2023-12-04','2023-12-04','1','1','1','1','0000-00-00 00:00:00','2024-01-18 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(46,10,'2','2','CAVAN PROJECT','CAVAN PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'2023-12-14','2023-12-14','1','1',NULL,NULL,'0000-00-00 00:00:00','2024-01-18 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(47,11,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,94768.34,94768.34,NULL,NULL,NULL,NULL,'2023-12-21','2023-12-21','1','1',NULL,NULL,'0000-00-00 00:00:00','2024-01-18 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(48,12,'3','3','GRINDROD','GRINDROD',NULL,NULL,130756.44,130756.44,NULL,NULL,NULL,NULL,'2024-01-02','2024-01-02','1','1','1','1','0000-00-00 00:00:00','2024-01-18 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(49,13,'1','1','Eskom project ','Eskom project ',NULL,NULL,133536.49,133536.49,20030.47,20030.47,153566.96,153566.96,'2024-01-30','2024-01-30','1','1',NULL,NULL,'0000-00-00 00:00:00','2024-02-11 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(50,14,'1','1','Eskom project ','Eskom project ',NULL,NULL,113137.96,113137.96,16970.69,16970.69,130108.65,130108.65,'2023-12-12','2023-12-12','1','1',NULL,NULL,'0000-00-00 00:00:00','2024-02-11 22:00:00','2024-02-13 22:54:04','2024-02-13 22:55:47','2024-02-13 22:55:47'),(51,15,'1','1','Project: 2019-NCP-005-02 New Mine Entrance Bulk Services','Project: 2019-NCP-005-02 New Mine Entrance Bulk Services',NULL,NULL,86956.52,86956.52,13043.48,13043.48,100000.00,100000.00,'2023-12-29','2023-12-29','1','1',NULL,NULL,'2024-02-13 22:49:01','2024-02-13 22:49:01','2024-02-13 22:54:04','2024-02-13 22:56:15','2024-02-13 22:56:15'),(52,17,'1','1','Quotation','Quotation',NULL,NULL,89770.00,89770.00,13465.50,13465.50,103235.50,103235.50,'0000-00-00','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:05:32','2024-02-19 08:05:32','2024-02-19 08:05:32','2024-02-19 08:07:13','2024-02-19 08:07:13'),(53,18,'1','1','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,829687.13,829687.13,124453.07,124453.07,954140.20,954140.20,'0000-00-00','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-19 08:21:10','2024-02-19 08:21:10'),(54,18,'1','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,829687.13,829687.13,124453.07,124453.07,954140.20,954140.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-19 08:21:10','2024-02-19 08:29:00','2024-02-19 08:29:00'),(55,17,'1','2','Quotation','Quotation',NULL,NULL,89770.00,89770.00,13465.50,13465.50,103235.50,103235.50,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:05:32','2024-02-19 08:05:32','2024-02-19 08:07:13','2024-02-19 08:29:00','2024-02-19 08:29:00'),(56,19,'2','2','Quotation','Quotation',NULL,NULL,94770.00,94770.00,14215.50,14215.50,108985.50,108985.50,'0000-00-00','2024-02-19','1','1',NULL,NULL,'2024-02-19 09:05:15','2024-02-19 09:05:15','2024-02-19 09:05:15','2024-02-19 09:06:09','2024-02-19 09:06:09'),(57,19,'2','2','Quotation','Quotation',NULL,NULL,94770.00,94770.00,14215.50,14215.50,108985.50,108985.50,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 09:05:15','2024-02-19 09:05:15','2024-02-19 09:06:09','2024-02-19 09:07:46','2024-02-19 09:07:46'),(58,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,829687.13,830687.13,124453.07,124603.07,954140.20,955290.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-19 08:29:00','2024-02-19 09:25:18','2024-02-19 09:25:18'),(59,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,830687.13,839687.13,124603.07,124603.07,955290.20,955290.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-19 09:25:18','2024-02-19 09:31:23','2024-02-19 09:31:23'),(60,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,839687.13,839687.13,124603.07,125953.05,955290.20,965640.18,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-19 09:31:23','2024-02-19 09:32:21','2024-02-19 09:32:21'),(61,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,839687.13,639687.13,125953.05,95953.07,965640.18,735640.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-19 09:32:21','2024-02-20 11:48:30','2024-02-20 11:48:30'),(62,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,639687.13,639687.13,95953.07,95953.07,735640.20,735640.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-20 11:48:30','2024-02-20 12:07:16','2024-02-20 12:07:16'),(63,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,639687.13,639687.13,95953.07,95953.07,735640.20,735640.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-20 12:07:16','2024-02-20 12:47:53','2024-02-20 12:47:53'),(64,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,639687.13,639687.13,95953.07,95953.07,735640.20,735640.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-20 12:47:53','2024-02-20 12:52:33','2024-02-20 12:52:33'),(65,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,639687.13,639687.13,95953.07,95953.07,735640.20,735640.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-20 12:52:33','2024-02-20 13:02:09','2024-02-20 13:02:09'),(66,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,639687.13,639687.13,95953.07,95953.07,735640.20,735640.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-20 13:02:09','2024-02-20 13:06:05','2024-02-20 13:06:05'),(67,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,639687.13,639687.13,95953.07,95953.07,735640.20,735640.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-20 13:06:05','2024-02-20 13:08:26','2024-02-20 13:08:26'),(68,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,639687.13,639687.13,95953.07,95953.07,735640.20,735640.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-20 13:08:26','2024-02-20 13:12:50','2024-02-20 13:12:50'),(69,18,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,639687.13,639687.13,95953.07,95953.07,735640.20,735640.20,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-19 08:20:20','2024-02-19 08:20:20','2024-02-20 13:12:50','2024-02-20 13:13:49','2024-02-20 13:13:49'),(70,20,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,255.00,255874.85,38.00,38381.23,294.00,294.00,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-21 10:34:35','2024-02-21 10:34:35','2024-02-21 10:34:35','2024-02-21 10:37:12','2024-02-21 10:37:12'),(71,20,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,255874.85,255874.85,38381.23,38381.23,294.00,294256.07,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-21 10:34:35','2024-02-21 10:34:35','2024-02-21 10:37:12','2024-02-21 10:38:05','2024-02-21 10:38:05'),(72,20,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,255874.85,255874.85,38381.23,38381.23,294256.07,294256.08,'2024-02-19','2024-02-19','1','1',NULL,NULL,'2024-02-21 10:34:35','2024-02-21 10:34:35','2024-02-21 10:38:05','2024-02-21 10:39:52','2024-02-21 10:39:52'),(73,20,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,255874.85,255874.85,38381.23,38381.23,294256.08,294256.08,'2024-02-19','2024-02-21','1','1',NULL,NULL,'2024-02-21 10:34:35','2024-02-21 10:34:35','2024-02-21 10:39:52','2024-02-21 10:41:21','2024-02-21 10:41:21'),(74,22,'1','2','MC-Cable Faulty Marconi MS46 and Alber Wessels MS74','MC-Cable Faulty Marconi MS46 and Alber Wessels MS74',NULL,NULL,34643.75,34643.75,5196.56,5196.56,39840.31,39840.31,'2024-02-14','2024-02-14','1','1',NULL,NULL,'2024-02-21 13:58:38','2024-02-21 13:58:38','2024-02-21 13:58:38','2024-02-21 14:00:28','2024-02-21 14:00:28'),(75,22,'2','2','MC-Cable Faulty Marconi MS46 and Alber Wessels MS74','MC-Cable Faulty Marconi MS46 and Alber Wessels MS74',NULL,NULL,34643.75,34643.75,5196.56,5196.56,39840.31,39840.31,'2024-02-14','2024-02-14','1','1',NULL,NULL,'2024-02-21 13:58:38','2024-02-21 13:58:38','2024-02-21 14:00:28','2024-02-21 14:05:25','2024-02-21 14:05:25'),(76,23,'2','2','Grindrod Trips','Grindrod Trips',NULL,NULL,25119.00,25119.00,3767.85,3767.85,28886.85,28886.85,'2024-03-01','2024-03-01','1','1',NULL,NULL,'2024-03-01 06:47:48','2024-03-01 06:47:48','2024-03-01 06:47:48','2024-03-01 06:48:34','2024-03-01 06:48:34'),(77,21,'2','3','Grindrod Trips','Grindrod Trips',NULL,NULL,25119.00,25119.00,3767.85,3767.85,28886.85,28886.85,'2024-03-01','2024-03-01','1','1',NULL,NULL,'2024-03-01 06:47:48','2024-03-01 06:47:48','2024-03-01 06:48:34','2024-03-01 12:20:52','2024-03-01 12:20:52'),(78,24,'2','3','Coetzee ','Coetzee ',NULL,NULL,29430.00,29430.00,4414.50,4414.50,33844.50,33844.50,'2024-03-05','2024-03-05','1','1',NULL,NULL,'2024-03-05 06:48:44','2024-03-05 06:48:44','2024-03-05 06:48:44','2024-03-05 08:56:23','2024-03-05 08:56:23'),(79,4,'2','2','ESKOM PROJECT','ESKOM PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'2023-11-03','2023-11-03','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-02-13 22:55:47','2024-03-06 11:51:41','2024-03-06 11:51:41'),(80,25,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,274887.67,274887.67,41233.15,41233.15,316120.82,316120.82,'2024-02-06','2024-02-06','1','1',NULL,NULL,'2024-03-08 08:47:53','2024-03-08 08:47:53','2024-03-08 08:47:53','2024-03-08 08:48:43','2024-03-08 08:48:43'),(81,22,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,274887.67,239032.76,41233.15,35854.91,316120.82,274887.67,'2024-02-06','2024-02-06','1','1',NULL,NULL,'2024-03-08 08:47:53','2024-03-08 08:47:53','2024-03-08 08:48:43','2024-03-08 08:51:06','2024-03-08 08:51:06'),(82,27,'2','2','Subconsultant','Subconsultant',NULL,NULL,13043.48,13043.48,1956.52,1956.52,15000.00,15000.00,'2024-03-22','2024-03-22','1','1',NULL,NULL,'2024-03-22 09:19:26','2024-03-22 09:19:26','2024-03-22 09:19:26','2024-03-22 09:20:20','2024-03-22 09:20:20'),(83,26,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,205970.00,205970.00,30895.50,30895.50,236865.50,236865.50,'2024-02-28','2024-02-28','1','1',NULL,NULL,'2024-03-08 08:56:39','2024-03-08 08:56:39','2024-03-08 08:56:39','2024-03-25 09:18:14','2024-03-25 09:18:14'),(84,24,'3','2','Coetzee ','Coetzee ',NULL,NULL,29430.00,29430.00,4414.50,4414.50,33844.50,33844.50,'2024-03-05','2024-03-05','1','1',NULL,NULL,'2024-03-05 06:48:44','2024-03-05 06:48:44','2024-03-05 08:56:23','2024-03-25 09:18:39','2024-03-25 09:18:39'),(85,21,'3','2','Grindrod Trips','Grindrod Trips',NULL,NULL,25119.00,25119.00,3767.85,3767.85,28886.85,28886.85,'2024-03-01','2024-03-01','1','1',NULL,NULL,'2024-03-01 06:47:48','2024-03-01 06:47:48','2024-03-01 12:20:52','2024-03-25 09:18:39','2024-03-25 09:18:39'),(86,12,'3','2','GRINDROD','GRINDROD',NULL,NULL,130756.44,130756.44,NULL,NULL,NULL,NULL,'2024-01-02','2024-01-02','1','1','1','1','2024-01-18 22:00:00','2024-01-18 22:00:00','2024-02-13 22:55:47','2024-03-25 09:22:05','2024-03-25 09:22:05'),(87,12,'2','2','GRINDROD','GRINDROD',NULL,NULL,130756.44,113701.25,NULL,17.00,NULL,130756.44,'2024-01-02','2024-01-02','1','1','1','1','2024-01-18 22:00:00','2024-01-18 22:00:00','2024-03-25 09:22:05','2024-03-25 09:29:44','2024-03-25 09:29:44'),(88,12,'2','2','GRINDROD','GRINDROD',NULL,NULL,113701.25,113701.25,17.00,17055.19,130756.44,130756.44,'2024-01-02','2024-01-02','1','1','1','1','2024-01-18 22:00:00','2024-01-18 22:00:00','2024-03-25 09:29:44','2024-03-25 09:30:09','2024-03-25 09:30:09'),(89,28,'2','2','GRINDROD SUB DEC','GRINDROD SUB DEC',NULL,NULL,100889.57,100889.57,15133.44,15133.44,116023.01,116023.01,'2024-02-02','2024-02-02','1','1',NULL,NULL,'2024-03-25 09:51:17','2024-03-25 09:51:17','2024-03-25 09:51:17','2024-03-25 09:51:41','2024-03-25 09:51:41'),(90,30,'2','2',' Truck Trips for February ',' Truck Trips for February ',NULL,NULL,46643.48,53640.00,6996.52,8046.00,53640.00,61686.00,'2024-04-04','2024-04-04','1','1',NULL,NULL,'2024-04-04 05:59:27','2024-04-04 05:59:27','2024-04-04 05:59:27','2024-04-04 06:15:05','2024-04-04 06:15:05'),(91,30,'2','2',' Truck Trips for February ',' Musk T. Truck Trips for February ',NULL,NULL,53640.00,53640.00,8046.00,8046.00,61686.00,61686.00,'2024-04-04','2024-04-04','1','1',NULL,NULL,'2024-04-04 05:59:27','2024-04-04 05:59:27','2024-04-04 06:15:05','2024-04-04 06:17:40','2024-04-04 06:17:40'),(92,31,'2','2','PUR ORDER		N0002698','PUR ORDER		N0002698',NULL,NULL,41692.50,41692.50,6253.88,6253.88,47946.38,47946.38,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:07:12','2024-04-04 11:07:12','2024-04-04 11:07:12','2024-04-04 11:19:08','2024-04-04 11:19:08'),(93,33,'2','2','PUR ORDER		N0002697','PUR ORDER		N0002697',NULL,NULL,42586.00,42589.75,6387.90,6388.46,48973.90,48978.21,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:29:17','2024-04-04 11:29:17','2024-04-04 11:29:17','2024-04-08 07:30:31','2024-04-08 07:30:31'),(94,31,'2','2','PUR ORDER		N0002698','PUR ORDER		N0002698',NULL,NULL,41692.50,41691.00,6253.88,6253.65,47946.38,47944.65,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:07:12','2024-04-04 11:07:12','2024-04-04 11:19:08','2024-04-08 07:30:31','2024-04-08 07:30:31'),(95,12,'2','3','GRINDROD','GRINDROD',NULL,NULL,113701.25,113701.25,17055.19,17055.19,130756.44,130756.44,'2024-01-02','2024-01-02','1','1','1','1','2024-01-18 22:00:00','2024-01-18 22:00:00','2024-03-25 09:30:09','2024-04-09 08:12:44','2024-04-09 08:12:44'),(96,36,'2','3','Musk T','Musk T',NULL,NULL,49014.00,49014.00,7352.10,7352.10,56366.10,56366.10,'2024-04-08','2024-04-08','1','1',NULL,NULL,'2024-04-08 08:31:02','2024-04-08 08:31:02','2024-04-08 08:31:02','2024-04-09 08:12:44','2024-04-09 08:12:44'),(97,30,'2','3',' Musk T. Truck Trips for February ',' Musk T. Truck Trips for February ',NULL,NULL,53640.00,53640.00,8046.00,8046.00,61686.00,61686.00,'2024-04-04','2024-04-04','1','1',NULL,NULL,'2024-04-04 05:59:27','2024-04-04 05:59:27','2024-04-04 06:17:40','2024-04-09 08:12:44','2024-04-09 08:12:44'),(98,36,'3','3','Musk T','Musk T',NULL,NULL,49014.00,49014.00,7352.10,7352.10,56366.10,56366.10,'2024-04-08','2024-04-04','1','1',NULL,NULL,'2024-04-08 08:31:02','2024-04-08 08:31:02','2024-04-09 08:12:44','2024-04-10 06:59:01','2024-04-10 06:59:01'),(99,36,'3','3','Musk T','Musk T',NULL,NULL,49014.00,49014.00,7352.10,7352.10,56366.10,56366.10,'2024-04-04','2024-03-04','1','1',NULL,NULL,'2024-04-08 08:31:02','2024-04-08 08:31:02','2024-04-10 06:59:01','2024-04-11 06:09:04','2024-04-11 06:09:04'),(100,30,'3','3',' Musk T. Truck Trips for February ',' Musk T. Truck Trips for February ',NULL,NULL,53640.00,53640.00,8046.00,8046.00,61686.00,61686.00,'2024-04-04','2024-03-04','1','1',NULL,NULL,'2024-04-04 05:59:27','2024-04-04 05:59:27','2024-04-09 08:12:44','2024-04-11 06:09:04','2024-04-11 06:09:04'),(101,36,'3','3','Musk T','Musk T',NULL,NULL,49014.00,49014.00,7352.10,7352.10,56366.10,56366.10,'2024-03-04','2024-03-05','1','1',NULL,NULL,'2024-04-08 08:31:02','2024-04-08 08:31:02','2024-04-11 06:09:04','2024-04-11 06:14:35','2024-04-11 06:14:35'),(102,36,'3','3','Musk T','Musk T',NULL,NULL,49014.00,49014.00,7352.10,7352.10,56366.10,56366.10,'2024-03-05','2024-03-04','1','1',NULL,NULL,'2024-04-08 08:31:02','2024-04-08 08:31:02','2024-04-11 06:14:35','2024-04-11 06:16:48','2024-04-11 06:16:48'),(103,37,NULL,NULL,NULL,NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,7.00,'2024-03-05','2024-03-08',NULL,NULL,NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-04-11 06:59:36','2024-04-11 07:14:56','2024-04-11 07:14:56'),(104,37,NULL,'3',NULL,NULL,NULL,NULL,0.00,0.00,0.00,0.00,7.00,7.00,'2024-03-08','2024-03-08',NULL,NULL,NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-04-11 07:14:56','2024-04-11 07:15:20','2024-04-11 07:15:20'),(105,37,'3','1',NULL,' Nomulwethu Kmr',NULL,NULL,0.00,178260.87,0.00,26739.13,7.00,205000.00,'2024-03-08','2024-03-08',NULL,'1',NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-04-11 07:15:20','2024-04-12 08:06:02','2024-04-12 08:06:02'),(106,37,'1','1',' Nomulwethu Kmr',' Nomulwethu Kmr',NULL,NULL,178260.87,178260.87,26739.13,26739.13,205000.00,205000.00,'2024-03-08','2024-02-29','1','1',NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-04-12 08:06:02','2024-04-12 08:07:15','2024-04-12 08:07:15'),(107,39,'1','1',' Claim 1 & 2 Etwata',' Claim 1 & 2 Etwata',NULL,NULL,114514.25,281109.22,17177.14,42166.38,131691.39,323.00,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-12 08:28:28','2024-04-12 08:28:28','2024-04-12 08:28:28','2024-04-12 08:31:55','2024-04-12 08:31:55'),(108,39,'1','1',' Claim 1 & 2 Etwata',' Claim 1 & 2 Etwata',NULL,NULL,281109.22,281109.22,42166.38,42166.38,323.00,323275.60,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-12 08:28:28','2024-04-12 08:28:28','2024-04-12 08:31:55','2024-04-12 08:32:23','2024-04-12 08:32:23'),(109,37,'1','1',' Nomulwethu Kmr','Nomulwethu Kmr',NULL,NULL,178260.87,178260.87,26739.13,26739.13,205000.00,205000.00,'2024-02-29','2024-02-29','1','1',NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-04-12 08:07:15','2024-04-12 08:32:56','2024-04-12 08:32:56'),(110,39,'1','1',' Claim 1 & 2 Etwata','Claim 1 & 2 Etwata',NULL,NULL,281109.22,281109.22,42166.38,42166.38,323275.60,323275.60,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-12 08:28:28','2024-04-12 08:28:28','2024-04-12 08:32:23','2024-04-12 08:32:56','2024-04-12 08:32:56'),(111,30,'3','3',' Musk T. Truck Trips for February ','Musk T. Truck Trips for February ',NULL,NULL,53640.00,53640.00,8046.00,8046.00,61686.00,61686.00,'2024-03-04','2024-03-04','1','1',NULL,NULL,'2024-04-04 05:59:27','2024-04-04 05:59:27','2024-04-11 06:09:04','2024-04-12 08:33:12','2024-04-12 08:33:12'),(112,6,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,241910.56,210357.01,NULL,31553.55,NULL,241910.56,'2023-11-17','2023-11-17','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-02-13 22:55:47','2024-04-12 08:42:57','2024-04-12 08:42:57'),(113,7,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,371128.59,322720.51,NULL,48408.08,NULL,371128.59,'2023-11-29','2023-11-29','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-02-13 22:55:47','2024-04-12 08:42:57','2024-04-12 08:42:57'),(114,11,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,94768.34,82407.25,NULL,12361.09,NULL,94768.34,'2023-12-21','2023-12-21','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-02-13 22:55:47','2024-04-12 08:42:57','2024-04-12 08:42:57'),(115,32,'2','2','PUR ORDER		N0002695','PUR ORDER		N0002695',NULL,NULL,34536.25,34536.25,5180.44,5180.44,39716.69,39716.69,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:26:31','2024-04-04 11:26:31','2024-04-04 11:26:31','2024-04-16 09:30:56','2024-04-16 09:30:56'),(116,34,'2','2','PUR ORDER		N0002696','PUR ORDER		N0002696',NULL,NULL,39934.00,39934.00,5990.10,5990.10,45924.10,45924.10,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:32:45','2024-04-04 11:32:45','2024-04-04 11:32:45','2024-04-16 09:30:56','2024-04-16 09:30:56'),(117,31,'2','2','PUR ORDER		N0002698','PUR ORDER		N0002698',NULL,NULL,41691.00,41691.00,6253.65,6253.65,47944.65,47944.65,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:07:12','2024-04-04 11:07:12','2024-04-08 07:30:31','2024-04-16 09:30:56','2024-04-16 09:30:56'),(118,33,'2','2','PUR ORDER		N0002697','PUR ORDER		N0002697',NULL,NULL,42589.75,42589.75,6388.46,6388.46,48978.21,48978.21,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:29:17','2024-04-04 11:29:17','2024-04-08 07:30:31','2024-04-16 09:30:56','2024-04-16 09:30:56'),(119,35,'2','2','PUR ORDER		N0002699','PUR ORDER		N0002699',NULL,NULL,34323.25,34323.25,5148.49,5148.49,39471.74,39471.74,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:35:29','2024-04-04 11:35:29','2024-04-04 11:35:29','2024-04-16 09:30:56','2024-04-16 09:30:56'),(120,40,NULL,'3','ABC Conductor','ABC Conductor',NULL,NULL,49500.00,49500.00,0.00,0.00,49500.00,49500.00,'2024-04-19','2024-04-19','1','1',NULL,NULL,'2024-04-19 05:39:45','2024-04-19 05:39:45','2024-04-19 05:39:45','2024-04-19 05:41:21','2024-04-19 05:41:21'),(121,42,'2','2','Grindrod Loads','Grindrod Loads',NULL,NULL,46030.00,46030.00,6904.50,6904.50,52934.50,52934.50,'0000-00-00','2024-05-01','1','1',NULL,NULL,'2024-05-01 05:45:53','2024-05-01 05:45:53','2024-05-01 05:45:53','2024-05-01 05:50:39','2024-05-01 05:50:39'),(122,42,'2','2','Grindrod Loads','Grindrod Loads',NULL,NULL,46030.00,46030.00,6904.50,6904.50,52934.50,52934.50,'2024-05-01','2024-05-01','1','1',NULL,NULL,'2024-05-01 05:45:53','2024-05-01 05:45:53','2024-05-01 05:50:39','2024-05-01 05:52:12','2024-05-01 05:52:12'),(123,42,'2','2','Grindrod Loads','Grindrod Loads',NULL,NULL,46030.00,41427.00,6904.50,6214.05,52934.50,47641.05,'2024-05-01','2024-05-01','1','1',NULL,NULL,'2024-05-01 05:45:53','2024-05-01 05:45:53','2024-05-01 05:52:12','2024-05-01 09:27:24','2024-05-01 09:27:24'),(124,45,'1','2','CYBEREYE CONSULTING','CYBEREYE CONSULTING',NULL,NULL,7600.00,7600.00,1140.00,1140.00,8740.00,8740.00,'2024-05-05','2024-05-05','1','1',NULL,NULL,'2024-05-07 09:48:31','2024-05-07 09:48:31','2024-05-07 09:48:31','2024-05-07 09:48:50','2024-05-07 09:48:50'),(125,45,'2','2','CYBEREYE CONSULTING','CYBEREYE CONSULTING',NULL,NULL,7600.00,7600.00,1140.00,1140.00,8740.00,8740.00,'2024-05-05','2024-05-07','1','1',NULL,NULL,'2024-05-07 09:48:31','2024-05-07 09:48:31','2024-05-07 09:48:50','2024-05-07 09:49:32','2024-05-07 09:49:32'),(126,45,'2','3','CYBEREYE CONSULTING','CYBEREYE CONSULTING',NULL,NULL,7600.00,7600.00,1140.00,1140.00,8740.00,8740.00,'2024-05-07','2024-05-07','1','1',NULL,NULL,'2024-05-07 09:48:31','2024-05-07 09:48:31','2024-05-07 09:49:32','2024-05-07 14:09:49','2024-05-07 14:09:49'),(127,44,'2','3','JRM','JRM',NULL,NULL,22275.00,22275.00,3341.25,3341.25,25616.25,25616.25,'2024-05-06','2024-05-06','1','1',NULL,NULL,'2024-05-06 06:33:05','2024-05-06 06:33:05','2024-05-06 06:33:05','2024-05-07 14:09:49','2024-05-07 14:09:49'),(128,43,'2','3','Coetzee','Coetzee',NULL,NULL,9990.00,9990.00,1498.50,1498.50,11488.50,11488.50,'2024-05-02','2024-05-02','1','1',NULL,NULL,'2024-05-02 19:20:37','2024-05-02 19:20:37','2024-05-02 19:20:37','2024-05-07 14:09:49','2024-05-07 14:09:49'),(129,42,'2','3','Grindrod Loads','Grindrod Loads',NULL,NULL,41427.00,41427.00,6214.05,6214.05,47641.05,47641.05,'2024-05-01','2024-05-01','1','1',NULL,NULL,'2024-05-01 05:45:53','2024-05-01 05:45:53','2024-05-01 09:27:24','2024-05-07 14:09:49','2024-05-07 14:09:49'),(130,40,'3','2','ABC Conductor','ABC Conductor',NULL,NULL,49500.00,49500.00,0.00,0.00,49500.00,49500.00,'2024-04-19','2024-04-19','1','1',NULL,NULL,'2024-04-19 05:39:45','2024-04-19 05:39:45','2024-04-19 05:41:21','2024-05-08 06:15:29','2024-05-08 06:15:29'),(131,44,'3','3','JRM','JRM',NULL,NULL,22275.00,22275.00,3341.25,3341.25,25616.25,25616.25,'2024-05-06','2024-05-04','1','1',NULL,NULL,'2024-05-06 06:33:05','2024-05-06 06:33:05','2024-05-07 14:09:49','2024-05-08 06:15:29','2024-05-08 06:15:29'),(132,45,'3','3','CYBEREYE CONSULTING','CYBEREYE CONSULTING',NULL,NULL,7600.00,7600.00,1140.00,1140.00,8740.00,8740.00,'2024-05-07','2024-05-04','1','1',NULL,NULL,'2024-05-07 09:48:31','2024-05-07 09:48:31','2024-05-07 14:09:49','2024-05-08 06:15:29','2024-05-08 06:15:29'),(133,48,'2','2','Contrans Logistics','Contrans Logistics',NULL,NULL,16500.00,16500.00,2475.00,2475.00,18975.00,18975.00,'2024-05-21','2024-05-21','1','1',NULL,NULL,'2024-05-21 14:05:41','2024-05-21 14:05:41','2024-05-21 14:05:41','2024-05-21 14:07:46','2024-05-21 14:07:46'),(134,48,'2','2','Contrans Logistics','Contrans Logistics',NULL,NULL,16500.00,16500.00,2475.00,2475.00,18975.00,18975.00,'2024-05-21','2024-05-21','1','1',NULL,NULL,'2024-05-21 14:05:41','2024-05-21 14:05:41','2024-05-21 14:07:46','2024-05-21 14:08:50','2024-05-21 14:08:50'),(135,37,'1','1','Nomulwethu Kmr','Nomulwethu Kmr',NULL,NULL,178260.87,178260.87,26739.13,26739.13,205000.00,205000.00,'2024-02-29','2024-02-29','1','1',NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-04-12 08:32:56','2024-05-23 07:10:27','2024-05-23 07:10:27'),(136,37,'1','1','Nomulwethu Kmr','Nomulwethu Kmr',NULL,NULL,178260.87,178260.87,26739.13,26739.13,205000.00,205000.00,'2024-02-29','2024-03-29','1','1',NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-05-23 07:10:27','2024-05-23 07:11:05','2024-05-23 07:11:05'),(137,37,'1','1','Nomulwethu Kmr','Nomulwethu Kmr',NULL,NULL,178260.87,220500.00,26739.13,33075.00,205000.00,253575.00,'2024-03-29','2024-03-29','1','1',NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-05-23 07:11:05','2024-05-23 07:12:41','2024-05-23 07:12:41'),(138,37,'1','1','Nomulwethu Kmr','Ramthel ELE Project',NULL,NULL,220500.00,220500.00,33075.00,33075.00,253575.00,253575.00,'2024-03-29','2024-03-29','1','1',NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-05-23 07:12:41','2024-05-23 07:14:11','2024-05-23 07:14:11'),(139,37,'1','1','Ramthel ELE Project','Nomulwethu Kmr',NULL,NULL,220500.00,178260.87,33075.00,26739.13,253575.00,205000.00,'2024-03-29','2024-02-29','1','1',NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-05-23 07:14:11','2024-05-23 07:16:57','2024-05-23 07:16:57'),(140,30,'3','2','Musk T. Truck Trips for February ','Musk T. Truck Trips for February ',NULL,NULL,53640.00,53640.00,8046.00,8046.00,61686.00,61686.00,'2024-03-04','2024-03-04','1','1',NULL,NULL,'2024-04-04 05:59:27','2024-04-04 05:59:27','2024-04-12 08:33:12','2024-05-23 08:44:20','2024-05-23 08:44:20'),(141,36,'3','2','Musk T','Musk T',NULL,NULL,49014.00,49014.00,7352.10,7352.10,56366.10,56366.10,'2024-03-04','2024-03-04','1','1',NULL,NULL,'2024-04-08 08:31:02','2024-04-08 08:31:02','2024-04-11 06:16:48','2024-05-23 08:50:36','2024-05-23 08:50:36'),(142,20,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,255874.85,255874.85,38381.23,38381.23,294256.08,294256.08,'2024-02-21','2024-03-21','1','1',NULL,NULL,'2024-02-21 10:34:35','2024-02-21 10:34:35','2024-02-21 10:41:21','2024-05-23 08:52:50','2024-05-23 08:52:50'),(143,36,'2','2','Musk T','Musk T',NULL,NULL,49014.00,49014.00,7352.10,7352.10,56366.10,56366.10,'2024-03-04','2024-03-04','1','1',NULL,NULL,'2024-04-08 08:31:02','2024-04-08 08:31:02','2024-05-23 08:50:36','2024-05-23 08:55:39','2024-05-23 08:55:39'),(144,37,'1','1','Nomulwethu Kmr','Nomulwethu Kmr',NULL,NULL,178260.87,178260.87,26739.13,26739.13,205000.00,205000.00,'2024-02-29','2024-02-29','1','1',NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-05-23 07:16:57','2024-05-23 08:55:39','2024-05-23 08:55:39'),(145,38,'1','1','Emadlangeni Lm','Emadlangeni Lm',NULL,NULL,114514.25,114514.25,17177.14,17177.14,131691.39,131691.39,'2024-03-05','2024-03-05','1','1',NULL,NULL,'2024-04-12 08:10:56','2024-04-12 08:10:56','2024-04-12 08:10:56','2024-05-23 08:55:39','2024-05-23 08:55:39'),(146,39,'1','1','Claim 1 & 2 Etwata','Claim 1 & 2 Etwata',NULL,NULL,281109.22,281109.22,42166.38,42166.38,323275.60,323275.60,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-12 08:28:28','2024-04-12 08:28:28','2024-04-12 08:32:56','2024-05-23 08:55:39','2024-05-23 08:55:39'),(147,41,'3','3','Cybereye Trips','Cybereye Trips',NULL,NULL,3200.00,3200.00,0.00,0.00,3200.00,3200.00,'2024-04-23','2024-04-23','1','1',NULL,NULL,'2024-04-23 09:20:57','2024-04-23 09:20:57','2024-04-23 09:20:57','2024-05-23 08:55:39','2024-05-23 08:55:39'),(148,42,'3','3','Grindrod Loads','Grindrod Loads',NULL,NULL,41427.00,41427.00,6214.05,6214.05,47641.05,47641.05,'2024-05-01','2024-05-01','1','1',NULL,NULL,'2024-05-01 05:45:53','2024-05-01 05:45:53','2024-05-07 14:09:49','2024-05-23 08:55:39','2024-05-23 08:55:39'),(149,43,'3','3','Coetzee','Coetzee',NULL,NULL,9990.00,9990.00,1498.50,1498.50,11488.50,11488.50,'2024-05-02','2024-05-02','1','1',NULL,NULL,'2024-05-02 19:20:37','2024-05-02 19:20:37','2024-05-07 14:09:49','2024-05-23 08:55:39','2024-05-23 08:55:39'),(150,44,'3','3','JRM','JRM',NULL,NULL,22275.00,22275.00,3341.25,3341.25,25616.25,25616.25,'2024-05-04','2024-05-04','1','1',NULL,NULL,'2024-05-06 06:33:05','2024-05-06 06:33:05','2024-05-08 06:15:29','2024-05-23 08:55:39','2024-05-23 08:55:39'),(151,45,'3','3','CYBEREYE CONSULTING','CYBEREYE CONSULTING',NULL,NULL,7600.00,7600.00,1140.00,1140.00,8740.00,8740.00,'2024-05-04','2024-05-04','1','1',NULL,NULL,'2024-05-07 09:48:31','2024-05-07 09:48:31','2024-05-08 06:15:29','2024-05-23 08:55:39','2024-05-23 08:55:39'),(152,46,'3','3','CABOTAGE SA (PTY) LTD','CABOTAGE SA (PTY) LTD',NULL,NULL,8250.00,8250.00,1237.50,1237.50,9487.50,9487.50,'2024-05-01','2024-05-01','1','1',NULL,NULL,'2024-05-08 06:20:35','2024-05-08 06:20:35','2024-05-08 06:20:35','2024-05-23 08:55:39','2024-05-23 08:55:39'),(153,47,'3','3','LONGMILE LOGISTICS','LONGMILE LOGISTICS',NULL,NULL,2700.00,2700.00,0.00,0.00,2700.00,2700.00,'2024-05-01','2024-05-01','1','1',NULL,NULL,'2024-05-09 07:11:28','2024-05-09 07:11:28','2024-05-09 07:11:28','2024-05-23 08:55:39','2024-05-23 08:55:39'),(154,49,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,147271.26,147271.26,22090.69,22090.69,169361.95,169361.95,'2024-03-27','2024-03-27','1','1',NULL,NULL,'2024-05-23 08:28:48','2024-05-23 08:28:48','2024-05-23 08:28:48','2024-05-23 08:55:39','2024-05-23 08:55:39'),(155,30,'2','2','Musk T. Truck Trips for February ','Musk T. Truck Trips for February ',NULL,NULL,53640.00,53640.00,8046.00,8046.00,61686.00,61686.00,'2024-03-04','2024-03-04','1','1',NULL,NULL,'2024-04-04 05:59:27','2024-04-04 05:59:27','2024-05-23 08:44:20','2024-05-23 08:55:39','2024-05-23 08:55:39'),(156,21,'2','2','Grindrod Trips','Grindrod Trips',NULL,NULL,25119.00,25119.00,3767.85,3767.85,28886.85,28886.85,'2024-03-01','2024-03-01','1','1',NULL,NULL,'2024-03-01 06:47:48','2024-03-01 06:47:48','2024-03-25 09:18:39','2024-05-23 08:55:39','2024-05-23 08:55:39'),(157,24,'2','2','Coetzee ','Coetzee ',NULL,NULL,29430.00,29430.00,4414.50,4414.50,33844.50,33844.50,'2024-03-05','2024-03-05','1','1',NULL,NULL,'2024-03-05 06:48:44','2024-03-05 06:48:44','2024-03-25 09:18:39','2024-05-23 08:55:39','2024-05-23 08:55:39'),(158,29,'1','1','Service','Service',NULL,NULL,100000.00,100000.00,15000.00,15000.00,115000.00,115000.00,'2024-03-22','2024-03-22','1','1',NULL,NULL,'2024-03-26 08:07:34','2024-03-26 08:07:34','2024-03-26 08:07:34','2024-05-23 08:55:39','2024-05-23 08:55:39'),(159,28,'2','2','GRINDROD SUB DEC','GRINDROD SUB DEC',NULL,NULL,100889.57,100889.57,15133.44,15133.44,116023.01,116023.01,'2024-02-02','2024-02-02','1','1',NULL,NULL,'2024-03-25 09:51:17','2024-03-25 09:51:17','2024-03-25 09:51:41','2024-05-23 08:55:39','2024-05-23 08:55:39'),(160,27,'2','2','Subconsultant','Subconsultant',NULL,NULL,13043.48,13043.48,1956.52,1956.52,15000.00,15000.00,'2024-03-22','2024-03-22','1','1',NULL,NULL,'2024-03-22 09:19:26','2024-03-22 09:19:26','2024-03-22 09:20:20','2024-05-23 08:55:39','2024-05-23 08:55:39'),(161,26,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,205970.00,205970.00,30895.50,30895.50,236865.50,236865.50,'2024-02-28','2024-02-28','1','1',NULL,NULL,'2024-03-08 08:56:39','2024-03-08 08:56:39','2024-03-25 09:18:14','2024-05-23 08:55:39','2024-05-23 08:55:39'),(162,20,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,255874.85,255874.85,38381.23,38381.23,294256.08,294256.08,'2024-03-21','2024-03-21','1','1',NULL,NULL,'2024-02-21 10:34:35','2024-02-21 10:34:35','2024-05-23 08:52:50','2024-05-23 08:55:39','2024-05-23 08:55:39'),(163,15,'1','1','Project: 2019-NCP-005-02 New Mine Entrance Bulk Services','Project: 2019-NCP-005-02 New Mine Entrance Bulk Services',NULL,NULL,86956.52,86956.52,13043.48,13043.48,100000.00,100000.00,'2023-12-29','2023-12-29','1','1',NULL,NULL,'2024-02-13 22:49:01','2024-02-13 22:49:01','2024-02-13 22:56:15','2024-05-23 08:55:39','2024-05-23 08:55:39'),(164,14,'1','1','Eskom project ','Eskom project ',NULL,NULL,113137.96,113137.96,16970.69,16970.69,130108.65,130108.65,'2023-12-12','2023-12-12','1','1',NULL,NULL,'2024-02-11 22:00:00','2024-02-11 22:00:00','2024-02-13 22:55:47','2024-05-23 08:55:39','2024-05-23 08:55:39'),(165,13,'1','1','Eskom project ','Eskom project ',NULL,NULL,133536.49,133536.49,20030.47,20030.47,153566.96,153566.96,'2024-01-30','2024-01-30','1','1',NULL,NULL,'2024-02-11 22:00:00','2024-02-11 22:00:00','2024-02-13 22:55:47','2024-05-23 08:55:39','2024-05-23 08:55:39'),(166,12,'3','3','GRINDROD','GRINDROD',NULL,NULL,113701.25,113701.25,17055.19,17055.19,130756.44,130756.44,'2024-01-02','2024-01-02','1','1','1','1','2024-01-18 22:00:00','2024-01-18 22:00:00','2024-04-09 08:12:44','2024-05-23 08:55:39','2024-05-23 08:55:39'),(167,11,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,82407.25,82407.25,12361.09,12361.09,94768.34,94768.34,'2023-12-21','2023-12-21','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-04-12 08:42:57','2024-05-23 08:55:39','2024-05-23 08:55:39'),(168,10,'2','2','CAVAN PROJECT','CAVAN PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'2023-12-14','2023-12-14','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-02-13 22:55:47','2024-05-23 08:55:39','2024-05-23 08:55:39'),(169,9,'3','3','GRINDROD SUB ','GRINDROD SUB ',NULL,NULL,14870.00,14870.00,NULL,NULL,NULL,NULL,'2023-12-04','2023-12-04','1','1','1','1','2024-01-18 22:00:00','2024-01-18 22:00:00','2024-02-13 22:55:47','2024-05-23 08:55:39','2024-05-23 08:55:39'),(170,8,'3','3','COTZEE SUB','COTZEE SUB',NULL,NULL,9720.00,9720.00,NULL,NULL,NULL,NULL,'2023-12-04','2023-12-04','1','1','1','1','2024-01-18 22:00:00','2024-01-18 22:00:00','2024-02-13 22:55:47','2024-05-23 08:55:39','2024-05-23 08:55:39'),(171,7,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,322720.51,322720.51,48408.08,48408.08,371128.59,371128.59,'2023-11-29','2023-11-29','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-04-12 08:42:57','2024-05-23 08:55:39','2024-05-23 08:55:39'),(172,6,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,210357.01,210357.01,31553.55,31553.55,241910.56,241910.56,'2023-11-17','2023-11-17','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-04-12 08:42:57','2024-05-23 08:55:39','2024-05-23 08:55:39'),(173,22,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,239032.76,239032.76,35854.91,35854.91,274887.67,274887.67,'2024-02-06','2024-02-06','1','1',NULL,NULL,'2024-03-08 08:47:53','2024-03-08 08:47:53','2024-03-08 08:51:06','2024-05-23 08:55:39','2024-05-23 08:55:39'),(174,4,'2','2','ESKOM PROJECT','ESKOM PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'2023-11-03','2023-11-03','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-03-06 11:51:41','2024-05-23 08:55:39','2024-05-23 08:55:39'),(175,3,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,130756.44,130756.44,NULL,NULL,130756.44,130756.44,'2023-11-30','2023-11-30','1','1','10 12 773 985 6','10 12 773 985 6','2024-01-10 22:00:00','2024-01-10 22:00:00','2024-02-13 22:55:47','2024-05-23 08:55:39','2024-05-23 08:55:39'),(176,2,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,34574.75,34574.75,NULL,NULL,164897.00,164897.00,'2023-11-03','2023-11-03','1','1','1','1','2024-01-10 22:00:00','2024-01-10 22:00:00','2024-02-13 22:55:47','2024-05-23 08:55:39','2024-05-23 08:55:39'),(177,1,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,65025.25,65025.25,NULL,NULL,65025.25,65025.25,'2023-10-30','2023-10-30','1','1','10 12 773 985 6','10 12 773 985 6','2024-01-10 22:00:00','2024-01-10 22:00:00','2024-02-13 22:55:47','2024-05-23 08:55:39','2024-05-23 08:55:39'),(178,51,'2','2',' NEWCASTLE LOCAL MUN',' NEWCASTLE LOCAL MUN',NULL,NULL,193074.25,193074.25,28961.14,28961.14,222035.39,222035.39,'2024-04-29','2024-04-29','1','1',NULL,NULL,'2024-05-23 09:24:24','2024-05-23 09:24:24','2024-05-23 09:24:24','2024-05-23 09:25:24','2024-05-23 09:25:24'),(179,48,'2','2','Contrans Logistics','Contrans Logistics',NULL,NULL,16500.00,11500.00,2475.00,1725.00,18975.00,13225.00,'2024-05-21','2024-05-21','1','1',NULL,NULL,'2024-05-21 14:05:41','2024-05-21 14:05:41','2024-05-21 14:08:50','2024-05-27 07:24:32','2024-05-27 07:24:32'),(180,52,'1','1','Emadlangeni (Kaarport) Electrification Project','Emadlangeni (Kaarport) Electrification Project',NULL,NULL,101770.80,101770.80,15265.62,15265.62,117036.42,117036.42,'2024-05-28','2024-05-28','1','1',NULL,NULL,'2024-05-28 13:02:44','2024-05-28 13:02:44','2024-05-28 13:02:44','2024-05-28 13:05:07','2024-05-28 13:05:07'),(181,48,'2','3','Contrans Logistics','Contrans Logistics',NULL,NULL,11500.00,11500.00,1725.00,1725.00,13225.00,13225.00,'2024-05-21','2024-05-21','1','1',NULL,NULL,'2024-05-21 14:05:41','2024-05-21 14:05:41','2024-05-27 07:24:32','2024-06-05 06:38:09','2024-06-05 06:38:09'),(182,28,'2','3','GRINDROD SUB DEC','GRINDROD SUB DEC',NULL,NULL,100889.57,100889.57,15133.44,15133.44,116023.01,116023.01,'2024-02-02','2024-02-02','1','1',NULL,NULL,'2024-03-25 09:51:17','2024-03-25 09:51:17','2024-05-23 08:55:39','2024-06-10 10:21:26','2024-06-10 10:21:26'),(183,24,'2','3','Coetzee ','Coetzee ',NULL,NULL,29430.00,29430.00,4414.50,4414.50,33844.50,33844.50,'2024-03-05','2024-03-05','1','1',NULL,NULL,'2024-03-05 06:48:44','2024-03-05 06:48:44','2024-05-23 08:55:39','2024-06-10 10:21:26','2024-06-10 10:21:26'),(184,21,'2','3','Grindrod Trips','Grindrod Trips',NULL,NULL,25119.00,25119.00,3767.85,3767.85,28886.85,28886.85,'2024-03-01','2024-03-01','1','1',NULL,NULL,'2024-03-01 06:47:48','2024-03-01 06:47:48','2024-05-23 08:55:39','2024-06-10 10:21:26','2024-06-10 10:21:26'),(185,30,'2','3','Musk T. Truck Trips for February ','Musk T. Truck Trips for February ',NULL,NULL,53640.00,53640.00,8046.00,8046.00,61686.00,61686.00,'2024-03-04','2024-03-04','1','1',NULL,NULL,'2024-04-04 05:59:27','2024-04-04 05:59:27','2024-05-23 08:55:39','2024-06-10 10:21:26','2024-06-10 10:21:26'),(186,36,'2','3','Musk T','Musk T',NULL,NULL,49014.00,49014.00,7352.10,7352.10,56366.10,56366.10,'2024-03-04','2024-03-04','1','1',NULL,NULL,'2024-04-08 08:31:02','2024-04-08 08:31:02','2024-05-23 08:55:39','2024-06-10 10:21:26','2024-06-10 10:21:26'),(187,51,'2','2',' NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,193074.25,193074.25,28961.14,28961.14,222035.39,222035.39,'2024-04-29','2024-04-29','1','1',NULL,NULL,'2024-05-23 09:24:24','2024-05-23 09:24:24','2024-05-23 09:25:24','2024-06-10 10:21:26','2024-06-10 10:21:26'),(188,55,'1','3','CyberEye Consulting - Grindrod ','CyberEye Consulting - Grindrod ',NULL,NULL,110605.00,110605.00,16590.75,16590.75,127195.75,127195.75,'2024-06-04','2024-06-04','1','1',NULL,NULL,'2024-06-10 12:49:58','2024-06-10 12:49:58','2024-06-10 12:49:58','2024-06-10 12:50:41','2024-06-10 12:50:41'),(189,57,'2','2','Trips: (01/05/2024┬áto┬á31/05/2024) ','Trips: (01/05/2024┬áto┬á31/05/2024) ',NULL,NULL,2500.00,2500.00,375.00,375.00,2875.00,2875.00,'2024-06-10','2024-06-10','1','1',NULL,NULL,'2024-06-11 07:02:11','2024-06-11 07:02:11','2024-06-11 07:02:11','2024-06-11 07:32:52','2024-06-11 07:32:52'),(190,57,'2','2','Trips: (01/05/2024┬áto┬á31/05/2024) ','Trips: (01/05/2024-31/05/2024)',NULL,NULL,2500.00,2500.00,375.00,375.00,2875.00,2875.00,'2024-06-10','2024-06-10','1','1',NULL,NULL,'2024-06-11 07:02:11','2024-06-11 07:02:11','2024-06-11 07:32:52','2024-06-11 07:37:17','2024-06-11 07:37:17'),(191,58,'2','2','Four way  ','Four way  ',NULL,NULL,3795.00,3795.00,569.25,569.25,4364.25,4364.25,'2024-06-14','2024-06-14','1','1',NULL,NULL,'2024-06-14 10:13:21','2024-06-14 10:13:21','2024-06-14 10:13:21','2024-06-14 10:14:32','2024-06-14 10:14:32'),(192,54,'3','3','CLSC HOLDINGS May ','CLSC HOLDINGS May ',NULL,NULL,24500.00,24500.00,3675.00,0.00,28175.00,24500.00,'2024-06-07','2024-06-07','1','1',NULL,NULL,'2024-06-10 11:31:59','2024-06-10 11:31:59','2024-06-10 11:31:59','2024-06-14 12:59:12','2024-06-14 12:59:12'),(193,53,'3','3','Trace Loads','Trace Loads',NULL,NULL,1650.00,1650.00,247.50,247.50,1897.50,1897.50,'2024-06-06','2024-06-06','1','1',NULL,NULL,'2024-06-10 09:37:29','2024-06-10 09:37:29','2024-06-10 09:37:29','2024-06-14 13:11:23','2024-06-14 13:11:23'),(194,54,'3','3','CLSC HOLDINGS May ','CLSC HOLDINGS May ',NULL,NULL,24500.00,24500.00,0.00,0.00,24500.00,24500.00,'2024-06-07','2024-06-07','1','1',NULL,NULL,'2024-06-10 11:31:59','2024-06-10 11:31:59','2024-06-14 12:59:12','2024-06-14 13:11:23','2024-06-14 13:11:23'),(195,55,'3','3','CyberEye Consulting - Grindrod ','CyberEye Consulting - Grindrod ',NULL,NULL,110605.00,110605.00,16590.75,16590.75,127195.75,127195.75,'2024-06-04','2024-06-04','1','1',NULL,NULL,'2024-06-10 12:49:58','2024-06-10 12:49:58','2024-06-10 12:50:41','2024-06-14 13:11:23','2024-06-14 13:11:23'),(196,56,'3','3','Min Tyd Transport May','Min Tyd Transport May',NULL,NULL,36750.00,36750.00,5512.50,5512.50,42262.50,42262.50,'2024-05-24','2024-05-24','1','1',NULL,NULL,'2024-06-10 13:03:10','2024-06-10 13:03:10','2024-06-10 13:03:10','2024-06-14 13:11:23','2024-06-14 13:11:23'),(197,59,'3','3','Senzomix','Senzomix',NULL,NULL,3960.00,3960.00,594.00,594.00,4554.00,4554.00,'2024-05-30','2024-05-30','1','1',NULL,NULL,'2024-06-14 13:09:51','2024-06-14 13:09:51','2024-06-14 13:09:51','2024-06-14 13:11:23','2024-06-14 13:11:23'),(198,61,'2','2','PUR ORDER		N0003715','PUR ORDER		N0003715',NULL,NULL,40940.25,40940.25,6141.04,6141.04,47081.29,47081.29,'2024-06-18','2024-06-18','1','1',NULL,NULL,'2024-06-18 13:11:43','2024-06-18 13:11:43','2024-06-18 13:11:43','2024-06-18 14:01:38','2024-06-18 14:01:38'),(199,60,'3','3','CyberEye Consulting  |   Trace Loads  ','CyberEye Consulting  |   Trace Loads  ',NULL,NULL,28000.00,28000.00,4200.00,4200.00,32200.00,32200.00,'2024-06-06','2024-06-06','1','1',NULL,NULL,'2024-06-14 13:18:43','2024-06-14 13:18:43','2024-06-14 13:18:43','2024-06-18 14:01:57','2024-06-18 14:01:57'),(200,60,'3','2','CyberEye Consulting  |   Trace Loads  ','CyberEye Consulting  |   Trace Loads  ',NULL,NULL,28000.00,28000.00,4200.00,4200.00,32200.00,32200.00,'2024-06-06','2024-06-06','1','1',NULL,NULL,'2024-06-14 13:18:43','2024-06-14 13:18:43','2024-06-18 14:01:57','2024-06-21 09:43:06','2024-06-21 09:43:06'),(201,55,'3','2','CyberEye Consulting - Grindrod ','CyberEye Consulting - Grindrod ',NULL,NULL,110605.00,110605.00,16590.75,16590.75,127195.75,127195.75,'2024-06-04','2024-06-04','1','1',NULL,NULL,'2024-06-10 12:49:58','2024-06-10 12:49:58','2024-06-14 13:11:23','2024-06-21 09:43:07','2024-06-21 09:43:07'),(202,45,'3','2','CYBEREYE CONSULTING','CYBEREYE CONSULTING',NULL,NULL,7600.00,7600.00,1140.00,1140.00,8740.00,8740.00,'2024-05-04','2024-05-04','1','1',NULL,NULL,'2024-05-07 09:48:31','2024-05-07 09:48:31','2024-05-23 08:55:39','2024-06-21 10:35:00','2024-06-21 10:35:00'),(203,63,'2','2','N0003864','N0003864',NULL,NULL,30228.25,30228.25,4534.24,4534.24,34762.49,34762.49,'2024-06-25','2024-06-25','1','1',NULL,NULL,'2024-06-25 14:01:26','2024-06-25 14:01:26','2024-06-25 14:01:26','2024-06-25 14:02:02','2024-06-25 14:02:02'),(204,63,'2','2','N0003864','PUR ORDER  N0003864',NULL,NULL,30228.25,30228.25,4534.24,4534.24,34762.49,34762.49,'2024-06-25','2024-06-25','1','1',NULL,NULL,'2024-06-25 14:01:26','2024-06-25 14:01:26','2024-06-25 14:02:02','2024-06-25 14:04:39','2024-06-25 14:04:39'),(205,64,'2','2','PUR ORDER	N0003881','PUR ORDER	N0003881',NULL,NULL,30389.75,30389.75,4558.46,4558.46,34948.21,34948.21,'2024-06-25','2024-06-25','1','1',NULL,NULL,'2024-06-25 14:07:29','2024-06-25 14:07:29','2024-06-25 14:07:29','2024-06-25 14:08:08','2024-06-25 14:08:08'),(206,65,'2','2','Contrans Trips','Contrans Trips',NULL,NULL,24790.00,24790.00,3718.50,3718.50,28508.50,28508.50,'2024-06-30','2024-06-30','1','1',NULL,NULL,'2024-07-02 07:19:36','2024-07-02 07:19:36','2024-07-02 07:19:36','2024-07-02 07:21:45','2024-07-02 07:21:45'),(207,66,'2','2','Senzomix','Senzomix June 2024',NULL,NULL,12250.00,12250.00,1837.50,1837.50,14087.50,14087.50,'2024-06-30','2024-06-30','1','1',NULL,NULL,'2024-07-02 08:58:30','2024-07-02 08:58:30','2024-07-02 08:58:30','2024-07-02 09:00:06','2024-07-02 09:00:06'),(208,66,'2','3','Senzomix June 2024','Senzomix June 2024',NULL,NULL,12250.00,12250.00,1837.50,1837.50,14087.50,14087.50,'2024-06-30','2024-06-30','1','1',NULL,NULL,'2024-07-02 08:58:30','2024-07-02 08:58:30','2024-07-02 09:00:06','2024-07-05 07:52:25','2024-07-05 07:52:25'),(209,65,'2','3','Contrans Trips','Contrans Trips',NULL,NULL,24790.00,24790.00,3718.50,3718.50,28508.50,28508.50,'2024-06-30','2024-06-30','1','1',NULL,NULL,'2024-07-02 07:19:36','2024-07-02 07:19:36','2024-07-02 07:21:45','2024-07-05 07:52:25','2024-07-05 07:52:25'),(210,60,'2','3','CyberEye Consulting  |   Trace Loads  ','CyberEye Consulting  |   Trace Loads  ',NULL,NULL,28000.00,28000.00,4200.00,4200.00,32200.00,32200.00,'2024-06-06','2024-06-06','1','1',NULL,NULL,'2024-06-14 13:18:43','2024-06-14 13:18:43','2024-06-21 09:43:06','2024-07-05 07:52:25','2024-07-05 07:52:25'),(211,57,'2','3','Trips: (01/05/2024-31/05/2024)','Trips: (01/05/2024-31/05/2024)',NULL,NULL,2500.00,2500.00,375.00,375.00,2875.00,2875.00,'2024-06-10','2024-06-10','1','1',NULL,NULL,'2024-06-11 07:02:11','2024-06-11 07:02:11','2024-06-11 07:37:17','2024-07-05 07:52:25','2024-07-05 07:52:25'),(212,55,'2','3','CyberEye Consulting - Grindrod ','CyberEye Consulting - Grindrod ',NULL,NULL,110605.00,110605.00,16590.75,16590.75,127195.75,127195.75,'2024-06-04','2024-06-04','1','1',NULL,NULL,'2024-06-10 12:49:58','2024-06-10 12:49:58','2024-06-21 09:43:07','2024-07-05 07:52:25','2024-07-05 07:52:25'),(213,67,'2','2','G AND P LOGISTICS ','G AND P LOGISTICS ',NULL,NULL,101500.00,101500.00,15225.00,15225.00,116725.00,116725.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:33:07','2024-07-05 09:33:07','2024-07-05 09:33:07','2024-07-05 09:35:00','2024-07-05 09:35:00'),(214,68,'2','2','LIMECOAL','LIMECOAL',NULL,NULL,18465.22,18465.22,2769.78,2769.78,21235.00,21235.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:40:04','2024-07-05 09:40:04','2024-07-05 09:40:04','2024-07-05 09:40:32','2024-07-05 09:40:32'),(215,69,'2','2','Grindrod','Grindrod',NULL,NULL,136077.63,136077.63,20411.64,20411.64,156489.27,156489.27,'2024-07-01','2024-07-01','1','1',NULL,NULL,'2024-07-05 09:44:17','2024-07-05 09:44:17','2024-07-05 09:44:17','2024-07-05 09:45:40','2024-07-05 09:45:40'),(216,69,'2','3','Grindrod','Grindrod',NULL,NULL,136077.63,136077.63,20411.64,20411.64,156489.27,156489.27,'2024-07-01','2024-07-01','1','1',NULL,NULL,'2024-07-05 09:44:17','2024-07-05 09:44:17','2024-07-05 09:45:40','2024-07-05 09:45:56','2024-07-05 09:45:56'),(217,68,'2','3','LIMECOAL','LIMECOAL',NULL,NULL,18465.22,18465.22,2769.78,2769.78,21235.00,21235.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:40:04','2024-07-05 09:40:04','2024-07-05 09:40:32','2024-07-05 09:45:56','2024-07-05 09:45:56'),(218,67,'2','3','G AND P LOGISTICS ','G AND P LOGISTICS ',NULL,NULL,101500.00,101500.00,15225.00,15225.00,116725.00,116725.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:33:07','2024-07-05 09:33:07','2024-07-05 09:35:00','2024-07-05 09:45:56','2024-07-05 09:45:56'),(219,67,'3','3','G AND P LOGISTICS ','G AND P LOGISTICS ',NULL,NULL,101500.00,101500.00,15225.00,15225.00,116725.00,116725.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:33:07','2024-07-05 09:33:07','2024-07-05 09:45:56','2024-07-05 10:14:27','2024-07-05 10:14:27'),(220,68,'3','3','LIMECOAL','LIMECOAL',NULL,NULL,18465.22,18465.22,2769.78,2769.78,21235.00,21235.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:40:04','2024-07-05 09:40:04','2024-07-05 09:45:56','2024-07-05 10:14:27','2024-07-05 10:14:27'),(221,69,'3','3','Grindrod','Grindrod',NULL,NULL,136077.63,136077.63,20411.64,20411.64,156489.27,156489.27,'2024-07-01','2024-07-01','1','1',NULL,NULL,'2024-07-05 09:44:17','2024-07-05 09:44:17','2024-07-05 09:45:56','2024-07-05 10:14:27','2024-07-05 10:14:27'),(222,67,'3','2','G AND P LOGISTICS ','G AND P LOGISTICS ',NULL,NULL,101500.00,101500.00,15225.00,15225.00,116725.00,116725.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:33:07','2024-07-05 09:33:07','2024-07-05 10:14:27','2024-07-05 10:14:44','2024-07-05 10:14:44'),(223,67,'2','3','G AND P LOGISTICS ','G AND P LOGISTICS ',NULL,NULL,101500.00,101500.00,15225.00,15225.00,116725.00,116725.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:33:07','2024-07-05 09:33:07','2024-07-05 10:14:44','2024-07-05 12:26:21','2024-07-05 12:26:21'),(224,65,'3','2','Contrans Trips','Contrans Trips',NULL,NULL,24790.00,23951.00,3718.50,3592.65,28508.50,27543.65,'2024-06-30','2024-06-30','1','1',NULL,NULL,'2024-07-02 07:19:36','2024-07-02 07:19:36','2024-07-05 07:52:25','2024-07-08 09:24:29','2024-07-08 09:24:29'),(225,67,'3','3','G AND P LOGISTICS ','G AND P LOGISTICS ',NULL,NULL,101500.00,101500.00,15225.00,0.00,116725.00,101500.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:33:07','2024-07-05 09:33:07','2024-07-05 12:26:21','2024-07-08 13:19:03','2024-07-08 13:19:03'),(226,65,'2','3','Contrans Trips','Contrans Trips',NULL,NULL,23951.00,23951.00,3592.65,3592.65,27543.65,27543.65,'2024-06-30','2024-06-30','1','1',NULL,NULL,'2024-07-02 07:19:36','2024-07-02 07:19:36','2024-07-08 09:24:29','2024-07-09 05:09:45','2024-07-09 05:09:45'),(227,48,'3','3','Contrans Logistics','Contrans Logistics',NULL,NULL,11500.00,11500.00,1725.00,1725.00,13225.00,13225.00,'2024-05-21','2024-05-21','1','1',NULL,NULL,'2024-05-21 14:05:41','2024-05-21 14:05:41','2024-06-05 06:38:09','2024-07-10 08:55:45','2024-07-10 08:55:45'),(228,54,'3','3','CLSC HOLDINGS May ','CLSC HOLDINGS May ',NULL,NULL,24500.00,24500.00,0.00,0.00,24500.00,24500.00,'2024-06-07','2024-06-07','1','1',NULL,NULL,'2024-06-10 11:31:59','2024-06-10 11:31:59','2024-06-14 13:11:23','2024-07-10 08:55:45','2024-07-10 08:55:45'),(229,69,'3','3','Grindrod','Grindrod',NULL,NULL,136077.63,136077.63,20411.64,20411.64,156489.27,156489.27,'2024-07-01','2024-07-01','1','1',NULL,NULL,'2024-07-05 09:44:17','2024-07-05 09:44:17','2024-07-05 10:14:27','2024-07-10 08:55:45','2024-07-10 08:55:45'),(230,68,'3','3','LIMECOAL','LIMECOAL',NULL,NULL,18465.22,18465.22,2769.78,2769.78,21235.00,21235.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:40:04','2024-07-05 09:40:04','2024-07-05 10:14:27','2024-07-10 08:55:45','2024-07-10 08:55:45'),(231,67,'3','3','G AND P LOGISTICS ','G AND P LOGISTICS ',NULL,NULL,101500.00,101500.00,0.00,0.00,101500.00,101500.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:33:07','2024-07-05 09:33:07','2024-07-08 13:19:03','2024-07-10 08:55:45','2024-07-10 08:55:45'),(232,66,'3','3','Senzomix June 2024','Senzomix June 2024',NULL,NULL,12250.00,12250.00,1837.50,1837.50,14087.50,14087.50,'2024-06-30','2024-06-30','1','1',NULL,NULL,'2024-07-02 08:58:30','2024-07-02 08:58:30','2024-07-05 07:52:25','2024-07-10 08:55:45','2024-07-10 08:55:45'),(233,65,'3','3','Contrans Trips','Contrans Trips',NULL,NULL,23951.00,23951.00,3592.65,3592.65,27543.65,27543.65,'2024-06-30','2024-06-30','1','1',NULL,NULL,'2024-07-02 07:19:36','2024-07-02 07:19:36','2024-07-09 05:09:45','2024-07-10 08:55:45','2024-07-10 08:55:45'),(234,60,'3','3','CyberEye Consulting  |   Trace Loads  ','CyberEye Consulting  |   Trace Loads  ',NULL,NULL,28000.00,28000.00,4200.00,4200.00,32200.00,32200.00,'2024-06-06','2024-06-06','1','1',NULL,NULL,'2024-06-14 13:18:43','2024-06-14 13:18:43','2024-07-05 07:52:25','2024-07-10 08:55:45','2024-07-10 08:55:45'),(235,57,'3','3','Trips: (01/05/2024-31/05/2024)','Trips: (01/05/2024-31/05/2024)',NULL,NULL,2500.00,2500.00,375.00,375.00,2875.00,2875.00,'2024-06-10','2024-06-10','1','1',NULL,NULL,'2024-06-11 07:02:11','2024-06-11 07:02:11','2024-07-05 07:52:25','2024-07-10 08:55:45','2024-07-10 08:55:45'),(236,56,'3','3','Min Tyd Transport May','Min Tyd Transport May',NULL,NULL,36750.00,36750.00,5512.50,5512.50,42262.50,42262.50,'2024-05-24','2024-05-24','1','1',NULL,NULL,'2024-06-10 13:03:10','2024-06-10 13:03:10','2024-06-14 13:11:23','2024-07-10 08:55:45','2024-07-10 08:55:45'),(237,70,'2','2','Service Cable repairs @ Link st','Service Cable repairs @ Link st',NULL,NULL,30150.00,30150.00,4522.50,4522.50,34672.50,34672.50,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 12:59:47','2024-07-11 12:59:47','2024-07-11 12:59:47','2024-07-11 13:00:35','2024-07-11 13:00:35'),(238,71,'2','2','Service Cable repairs @ Greaves st','Service Cable repairs @ Greaves st',NULL,NULL,42180.00,42180.00,6327.00,6327.00,48507.00,48507.00,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:06:30','2024-07-11 13:06:30','2024-07-11 13:06:30','2024-07-11 13:10:29','2024-07-11 13:10:29'),(239,72,'2','2','Service cable faults @ Pou st','Service cable faults @ Pou st',NULL,NULL,39740.00,39740.00,5961.00,5961.00,45701.00,45701.00,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:07:51','2024-07-11 13:07:51','2024-07-11 13:07:51','2024-07-11 13:10:29','2024-07-11 13:10:29'),(240,73,'2','2','Service cable repair @ Sun st','Service cable repair @ Sun st',NULL,NULL,33720.00,33720.00,5058.00,5058.00,38778.00,38778.00,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:13:00','2024-07-11 13:13:00','2024-07-11 13:13:00','2024-07-11 13:16:13','2024-07-11 13:16:13'),(241,74,'2','2','Service Cable @ Horizon Circle st','Service Cable @ Horizon Circle st',NULL,NULL,36360.00,36360.00,5454.00,5454.00,41814.00,41814.00,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:13:49','2024-07-11 13:13:49','2024-07-11 13:13:49','2024-07-11 13:16:13','2024-07-11 13:16:13'),(242,75,'2','2','Service Cable faults @ Milkway st','Service Cable faults @ Milkway st',NULL,NULL,33770.00,33770.00,5065.50,5065.50,38835.50,38835.50,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:18:41','2024-07-11 13:18:41','2024-07-11 13:18:41','2024-07-11 13:23:47','2024-07-11 13:23:47'),(243,76,'2','2','Service Cable fault @ Gemine','Service Cable fault @ Gemine',NULL,NULL,41410.00,41410.00,6211.50,6211.50,47621.50,47621.50,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:25:16','2024-07-11 13:25:16','2024-07-11 13:25:16','2024-07-11 13:27:50','2024-07-11 13:27:50'),(244,77,'2','2','Service Cable repairs @ Umkhomaas St','Service Cable repairs @ Umkhomaas St',NULL,NULL,55580.00,55580.00,8337.00,8337.00,63917.00,63917.00,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:25:59','2024-07-11 13:25:59','2024-07-11 13:25:59','2024-07-11 13:27:50','2024-07-11 13:27:50'),(245,71,'2','2','Service Cable repairs @ Greaves st','Service Cable repairs @ Greaves st',NULL,NULL,42180.00,42180.00,6327.00,6327.00,48507.00,48507.00,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:06:30','2024-07-11 13:06:30','2024-07-11 13:10:29','2024-07-11 13:28:31','2024-07-11 13:28:31'),(246,72,'2','2','Service cable faults @ Pou st','Service cable faults @ Pou st',NULL,NULL,39740.00,39740.00,5961.00,5961.00,45701.00,45701.00,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:07:51','2024-07-11 13:07:51','2024-07-11 13:10:29','2024-07-11 13:28:31','2024-07-11 13:28:31'),(247,73,'2','2','Service cable repair @ Sun st','Service cable repair @ Sun st',NULL,NULL,33720.00,33720.00,5058.00,5058.00,38778.00,38778.00,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:13:00','2024-07-11 13:13:00','2024-07-11 13:16:13','2024-07-11 13:28:31','2024-07-11 13:28:31'),(248,74,'2','2','Service Cable @ Horizon Circle st','Service Cable @ Horizon Circle st',NULL,NULL,36360.00,36360.00,5454.00,5454.00,41814.00,41814.00,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:13:49','2024-07-11 13:13:49','2024-07-11 13:16:13','2024-07-11 13:28:31','2024-07-11 13:28:31'),(249,75,'2','2','Service Cable faults @ Milkway st','Service Cable faults @ Milkway st',NULL,NULL,33770.00,33770.00,5065.50,5065.50,38835.50,38835.50,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:18:41','2024-07-11 13:18:41','2024-07-11 13:23:47','2024-07-11 13:28:31','2024-07-11 13:28:31'),(250,76,'2','2','Service Cable fault @ Gemine','Service Cable fault @ Gemine',NULL,NULL,41410.00,41410.00,6211.50,6211.50,47621.50,47621.50,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:25:16','2024-07-11 13:25:16','2024-07-11 13:27:50','2024-07-11 13:28:31','2024-07-11 13:28:31'),(251,77,'2','2','Service Cable repairs @ Umkhomaas St','Service Cable repairs @ Umkhomaas St',NULL,NULL,55580.00,55580.00,8337.00,8337.00,63917.00,63917.00,'2024-07-11','2024-07-11','1','1',NULL,NULL,'2024-07-11 13:25:59','2024-07-11 13:25:59','2024-07-11 13:27:50','2024-07-11 13:28:31','2024-07-11 13:28:31'),(252,70,'2','2','Service Cable repairs @ Link st','Service Cable repairs @ Link st',NULL,NULL,30150.00,30150.00,4522.50,4522.50,34672.50,34672.50,'2024-07-11','2024-05-29','1','1',NULL,NULL,'2024-07-11 12:59:47','2024-07-11 12:59:47','2024-07-11 13:00:35','2024-07-12 11:02:21','2024-07-12 11:02:21'),(253,71,'2','2','Service Cable repairs @ Greaves st','Service Cable repairs @ Greaves st',NULL,NULL,42180.00,42180.00,6327.00,6327.00,48507.00,48507.00,'2024-07-11','2024-05-31','1','1',NULL,NULL,'2024-07-11 13:06:30','2024-07-11 13:06:30','2024-07-11 13:28:31','2024-07-12 11:02:21','2024-07-12 11:02:21'),(254,72,'2','2','Service cable faults @ Pou st','Service cable faults @ Pou st',NULL,NULL,39740.00,39740.00,5961.00,5961.00,45701.00,45701.00,'2024-07-11','2024-06-03','1','1',NULL,NULL,'2024-07-11 13:07:51','2024-07-11 13:07:51','2024-07-11 13:28:31','2024-07-12 11:02:21','2024-07-12 11:02:21'),(255,73,'2','2','Service cable repair @ Sun st','Service cable repair @ Sun st',NULL,NULL,33720.00,33720.00,5058.00,5058.00,38778.00,38778.00,'2024-07-11','2024-06-04','1','1',NULL,NULL,'2024-07-11 13:13:00','2024-07-11 13:13:00','2024-07-11 13:28:31','2024-07-12 11:02:21','2024-07-12 11:02:21'),(256,74,'2','2','Service Cable @ Horizon Circle st','Service Cable @ Horizon Circle st',NULL,NULL,36360.00,36360.00,5454.00,5454.00,41814.00,41814.00,'2024-07-11','2024-06-06','1','1',NULL,NULL,'2024-07-11 13:13:49','2024-07-11 13:13:49','2024-07-11 13:28:31','2024-07-12 11:02:21','2024-07-12 11:02:21'),(257,75,'2','2','Service Cable faults @ Milkway st','Service Cable faults @ Milkway st',NULL,NULL,33770.00,33770.00,5065.50,5065.50,38835.50,38835.50,'2024-07-11','2024-06-07','1','1',NULL,NULL,'2024-07-11 13:18:41','2024-07-11 13:18:41','2024-07-11 13:28:31','2024-07-12 11:02:21','2024-07-12 11:02:21'),(258,76,'2','2','Service Cable fault @ Gemine','Service Cable fault @ Gemine',NULL,NULL,41410.00,41410.00,6211.50,6211.50,47621.50,47621.50,'2024-07-11','2024-06-10','1','1',NULL,NULL,'2024-07-11 13:25:16','2024-07-11 13:25:16','2024-07-11 13:28:31','2024-07-12 11:02:21','2024-07-12 11:02:21'),(259,77,'2','2','Service Cable repairs @ Umkhomaas St','Service Cable repairs @ Umkhomaas St',NULL,NULL,55580.00,55580.00,8337.00,8337.00,63917.00,63917.00,'2024-07-11','2024-06-11','1','1',NULL,NULL,'2024-07-11 13:25:59','2024-07-11 13:25:59','2024-07-11 13:28:31','2024-07-12 11:02:21','2024-07-12 11:02:21'),(260,76,'2','2','Service Cable fault @ Gemine','Service Cable fault @ Gemine',NULL,NULL,41410.00,41410.00,6211.50,6211.50,47621.50,47621.50,'2024-06-10','2024-06-07','1','1',NULL,NULL,'2024-07-11 13:25:16','2024-07-11 13:25:16','2024-07-12 11:02:21','2024-07-12 11:07:42','2024-07-12 11:07:42'),(261,75,'2','2','Service Cable faults @ Milkway st','Service Cable faults @ Milkway st',NULL,NULL,33770.00,33770.00,5065.50,5065.50,38835.50,38835.50,'2024-06-07','2024-06-04','1','1',NULL,NULL,'2024-07-11 13:18:41','2024-07-11 13:18:41','2024-07-12 11:02:21','2024-07-12 11:07:42','2024-07-12 11:07:42'),(262,70,'2','2','Service Cable repairs @ Link st','Service Cable repairs @ Link st',NULL,NULL,30150.00,30150.00,4522.50,4522.50,34672.50,34672.50,'2024-05-29','2024-05-20','1','1',NULL,NULL,'2024-07-11 12:59:47','2024-07-11 12:59:47','2024-07-12 11:02:21','2024-07-12 11:07:42','2024-07-12 11:07:42'),(263,71,'2','2','Service Cable repairs @ Greaves st','Service Cable repairs @ Greaves st',NULL,NULL,42180.00,42180.00,6327.00,6327.00,48507.00,48507.00,'2024-05-31','2024-05-23','1','1',NULL,NULL,'2024-07-11 13:06:30','2024-07-11 13:06:30','2024-07-12 11:02:21','2024-07-12 11:07:42','2024-07-12 11:07:42'),(264,72,'2','2','Service cable faults @ Pou st','Service cable faults @ Pou st',NULL,NULL,39740.00,39740.00,5961.00,5961.00,45701.00,45701.00,'2024-06-03','2024-05-27','1','1',NULL,NULL,'2024-07-11 13:07:51','2024-07-11 13:07:51','2024-07-12 11:02:21','2024-07-12 11:07:42','2024-07-12 11:07:42'),(265,73,'2','2','Service cable repair @ Sun st','Service cable repair @ Sun st',NULL,NULL,33720.00,33720.00,5058.00,5058.00,38778.00,38778.00,'2024-06-04','2024-05-29','1','1',NULL,NULL,'2024-07-11 13:13:00','2024-07-11 13:13:00','2024-07-12 11:02:21','2024-07-12 11:07:42','2024-07-12 11:07:42'),(266,74,'2','2','Service Cable @ Horizon Circle st','Service Cable @ Horizon Circle st',NULL,NULL,36360.00,36360.00,5454.00,5454.00,41814.00,41814.00,'2024-06-06','2024-05-31','1','1',NULL,NULL,'2024-07-11 13:13:49','2024-07-11 13:13:49','2024-07-12 11:02:21','2024-07-12 11:07:42','2024-07-12 11:07:42'),(267,68,'3','2','LIMECOAL','LIMECOAL',NULL,NULL,18465.22,18465.22,2769.78,2769.78,21235.00,21235.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:40:04','2024-07-05 09:40:04','2024-07-10 08:55:45','2024-07-16 07:51:45','2024-07-16 07:51:45'),(268,60,'3','2','CyberEye Consulting  |   Trace Loads  ','CyberEye Consulting  |   Trace Loads  ',NULL,NULL,28000.00,28000.00,4200.00,4200.00,32200.00,32200.00,'2024-06-06','2024-06-06','1','1',NULL,NULL,'2024-06-14 13:18:43','2024-06-14 13:18:43','2024-07-10 08:55:45','2024-07-16 07:51:45','2024-07-16 07:51:45'),(269,59,'3','2','Senzomix','Senzomix',NULL,NULL,3960.00,3960.00,594.00,594.00,4554.00,4554.00,'2024-05-30','2024-05-30','1','1',NULL,NULL,'2024-06-14 13:09:51','2024-06-14 13:09:51','2024-06-14 13:11:23','2024-07-16 07:51:45','2024-07-16 07:51:45'),(270,57,'3','2','Trips: (01/05/2024-31/05/2024)','Trips: (01/05/2024-31/05/2024)',NULL,NULL,2500.00,2500.00,375.00,375.00,2875.00,2875.00,'2024-06-10','2024-06-10','1','1',NULL,NULL,'2024-06-11 07:02:11','2024-06-11 07:02:11','2024-07-10 08:55:45','2024-07-16 07:51:45','2024-07-16 07:51:45'),(271,55,'3','2','CyberEye Consulting - Grindrod ','CyberEye Consulting - Grindrod ',NULL,NULL,110605.00,110605.00,16590.75,16590.75,127195.75,127195.75,'2024-06-04','2024-06-04','1','1',NULL,NULL,'2024-06-10 12:49:58','2024-06-10 12:49:58','2024-07-05 07:52:25','2024-07-16 07:51:45','2024-07-16 07:51:45'),(272,48,'3','2','Contrans Logistics','Contrans Logistics',NULL,NULL,11500.00,11500.00,1725.00,1725.00,13225.00,13225.00,'2024-05-21','2024-05-21','1','1',NULL,NULL,'2024-05-21 14:05:41','2024-05-21 14:05:41','2024-07-10 08:55:45','2024-07-16 07:51:45','2024-07-16 07:51:45'),(273,43,'3','2','Coetzee','Coetzee',NULL,NULL,9990.00,9990.00,1498.50,1498.50,11488.50,11488.50,'2024-05-02','2024-05-02','1','1',NULL,NULL,'2024-05-02 19:20:37','2024-05-02 19:20:37','2024-05-23 08:55:39','2024-07-16 07:51:45','2024-07-16 07:51:45'),(274,78,'2','2','CAVAN PROJECT','CAVAN PROJECT',NULL,NULL,60000.00,60000.00,0.15,0.15,60000.00,60000.00,'2024-05-30','2024-05-30',NULL,NULL,NULL,NULL,'2024-07-16 13:36:21','2024-07-16 13:36:21','2024-07-16 13:36:21','2024-07-16 13:42:02','2024-07-16 13:42:02'),(275,68,'2','2','LIMECOAL','LIMECOAL',NULL,NULL,18465.22,18465.22,2769.78,2769.78,21235.00,21235.00,'2024-07-03','2024-06-30','1','1',NULL,NULL,'2024-07-05 09:40:04','2024-07-05 09:40:04','2024-07-16 07:51:45','2024-07-17 11:51:01','2024-07-17 11:51:01'),(276,1,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,65025.25,65025.25,NULL,NULL,65025.25,65025.25,'2023-10-30','2023-10-30','1','1','10 12 773 985 6','10 12 773 985 6','2024-01-10 22:00:00','2024-01-10 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(277,2,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,34574.75,34574.75,NULL,NULL,164897.00,164897.00,'2023-11-03','2023-11-03','1','1','1','1','2024-01-10 22:00:00','2024-01-10 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(278,3,'3','3','Musk T Pty Ltd Trip','Musk T Pty Ltd Trip',NULL,NULL,130756.44,130756.44,NULL,NULL,130756.44,130756.44,'2023-11-30','2023-11-30','1','1','10 12 773 985 6','10 12 773 985 6','2024-01-10 22:00:00','2024-01-10 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(279,4,'2','2','ESKOM PROJECT','ESKOM PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'2023-11-03','2023-11-03','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(280,6,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,210357.01,210357.01,31553.55,31553.55,241910.56,241910.56,'2023-11-17','2023-11-17','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(281,7,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,322720.51,322720.51,48408.08,48408.08,371128.59,371128.59,'2023-11-29','2023-11-29','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(282,8,'3','3','COTZEE SUB','COTZEE SUB',NULL,NULL,9720.00,9720.00,NULL,NULL,NULL,NULL,'2023-12-04','2023-12-04','1','1','1','1','2024-01-18 22:00:00','2024-01-18 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(283,9,'3','3','GRINDROD SUB ','GRINDROD SUB ',NULL,NULL,14870.00,14870.00,NULL,NULL,NULL,NULL,'2023-12-04','2023-12-04','1','1','1','1','2024-01-18 22:00:00','2024-01-18 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(284,10,'2','2','CAVAN PROJECT','CAVAN PROJECT',NULL,NULL,20000.00,20000.00,NULL,NULL,NULL,NULL,'2023-12-14','2023-12-14','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(285,11,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,82407.25,82407.25,12361.09,12361.09,94768.34,94768.34,'2023-12-21','2023-12-21','1','1',NULL,NULL,'2024-01-18 22:00:00','2024-01-18 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(286,12,'3','3','GRINDROD','GRINDROD',NULL,NULL,113701.25,113701.25,17055.19,17055.19,130756.44,130756.44,'2024-01-02','2024-01-02','1','1','1','1','2024-01-18 22:00:00','2024-01-18 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(287,20,'2','2','Hluvukani Electrication (600)','Hluvukani Electrication (600)',NULL,NULL,255874.85,255874.85,38381.23,38381.23,294256.08,294256.08,'2024-03-21','2024-03-21','1','1',NULL,NULL,'2024-02-21 10:34:35','2024-02-21 10:34:35','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(288,29,'1','1','Service','Service',NULL,NULL,100000.00,100000.00,15000.00,15000.00,115000.00,115000.00,'2024-03-22','2024-03-22','1','1',NULL,NULL,'2024-03-26 08:07:34','2024-03-26 08:07:34','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(289,40,'2','2','ABC Conductor','ABC Conductor',NULL,NULL,49500.00,49500.00,0.00,0.00,49500.00,49500.00,'2024-04-19','2024-04-19','1','1',NULL,NULL,'2024-04-19 05:39:45','2024-04-19 05:39:45','2024-05-08 06:15:29','2024-07-18 13:47:19','2024-07-18 13:47:19'),(290,13,'1','1','Eskom project ','Eskom project ',NULL,NULL,133536.49,133536.49,20030.47,20030.47,153566.96,153566.96,'2024-01-30','2024-01-30','1','1',NULL,NULL,'2024-02-11 22:00:00','2024-02-11 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(291,14,'1','1','Eskom project ','Eskom project ',NULL,NULL,113137.96,113137.96,16970.69,16970.69,130108.65,130108.65,'2023-12-12','2023-12-12','1','1',NULL,NULL,'2024-02-11 22:00:00','2024-02-11 22:00:00','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(292,27,'2','2','Subconsultant','Subconsultant',NULL,NULL,13043.48,13043.48,1956.52,1956.52,15000.00,15000.00,'2024-03-22','2024-03-22','1','1',NULL,NULL,'2024-03-22 09:19:26','2024-03-22 09:19:26','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(293,28,'3','3','GRINDROD SUB DEC','GRINDROD SUB DEC',NULL,NULL,100889.57,100889.57,15133.44,15133.44,116023.01,116023.01,'2024-02-02','2024-02-02','1','1',NULL,NULL,'2024-03-25 09:51:17','2024-03-25 09:51:17','2024-06-10 10:21:26','2024-07-18 13:47:19','2024-07-18 13:47:19'),(294,24,'3','3','Coetzee ','Coetzee ',NULL,NULL,29430.00,29430.00,4414.50,4414.50,33844.50,33844.50,'2024-03-05','2024-03-05','1','1',NULL,NULL,'2024-03-05 06:48:44','2024-03-05 06:48:44','2024-06-10 10:21:26','2024-07-18 13:47:19','2024-07-18 13:47:19'),(295,21,'3','3','Grindrod Trips','Grindrod Trips',NULL,NULL,25119.00,25119.00,3767.85,3767.85,28886.85,28886.85,'2024-03-01','2024-03-01','1','1',NULL,NULL,'2024-03-01 06:47:48','2024-03-01 06:47:48','2024-06-10 10:21:26','2024-07-18 13:47:19','2024-07-18 13:47:19'),(296,30,'3','3','Musk T. Truck Trips for February ','Musk T. Truck Trips for February ',NULL,NULL,53640.00,53640.00,8046.00,8046.00,61686.00,61686.00,'2024-03-04','2024-03-04','1','1',NULL,NULL,'2024-04-04 05:59:27','2024-04-04 05:59:27','2024-06-10 10:21:26','2024-07-18 13:47:19','2024-07-18 13:47:19'),(297,31,'2','2','PUR ORDER		N0002698','PUR ORDER		N0002698',NULL,NULL,41691.00,41691.00,6253.65,6253.65,47944.65,47944.65,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:07:12','2024-04-04 11:07:12','2024-04-16 09:30:56','2024-07-18 13:47:19','2024-07-18 13:47:19'),(298,32,'2','2','PUR ORDER		N0002695','PUR ORDER		N0002695',NULL,NULL,34536.25,34536.25,5180.44,5180.44,39716.69,39716.69,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:26:31','2024-04-04 11:26:31','2024-04-16 09:30:56','2024-07-18 13:47:19','2024-07-18 13:47:19'),(299,33,'2','2','PUR ORDER		N0002697','PUR ORDER		N0002697',NULL,NULL,42589.75,42589.75,6388.46,6388.46,48978.21,48978.21,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:29:17','2024-04-04 11:29:17','2024-04-16 09:30:56','2024-07-18 13:47:19','2024-07-18 13:47:19'),(300,34,'2','2','PUR ORDER		N0002696','PUR ORDER		N0002696',NULL,NULL,39934.00,39934.00,5990.10,5990.10,45924.10,45924.10,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:32:45','2024-04-04 11:32:45','2024-04-16 09:30:56','2024-07-18 13:47:19','2024-07-18 13:47:19'),(301,35,'2','2','PUR ORDER		N0002699','PUR ORDER		N0002699',NULL,NULL,34323.25,34323.25,5148.49,5148.49,39471.74,39471.74,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-04 11:35:29','2024-04-04 11:35:29','2024-04-16 09:30:56','2024-07-18 13:47:19','2024-07-18 13:47:19'),(302,36,'3','3','Musk T','Musk T',NULL,NULL,49014.00,49014.00,7352.10,7352.10,56366.10,56366.10,'2024-03-04','2024-03-04','1','1',NULL,NULL,'2024-04-08 08:31:02','2024-04-08 08:31:02','2024-06-10 10:21:26','2024-07-18 13:47:19','2024-07-18 13:47:19'),(303,38,'1','1','Emadlangeni Lm','Emadlangeni Lm',NULL,NULL,114514.25,114514.25,17177.14,17177.14,131691.39,131691.39,'2024-03-05','2024-03-05','1','1',NULL,NULL,'2024-04-12 08:10:56','2024-04-12 08:10:56','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(304,41,'3','3','Cybereye Trips','Cybereye Trips',NULL,NULL,3200.00,3200.00,0.00,0.00,3200.00,3200.00,'2024-04-23','2024-04-23','1','1',NULL,NULL,'2024-04-23 09:20:57','2024-04-23 09:20:57','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(305,42,'3','3','Grindrod Loads','Grindrod Loads',NULL,NULL,41427.00,41427.00,6214.05,6214.05,47641.05,47641.05,'2024-05-01','2024-05-01','1','1',NULL,NULL,'2024-05-01 05:45:53','2024-05-01 05:45:53','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(306,43,'2','2','Coetzee','Coetzee',NULL,NULL,9990.00,9990.00,1498.50,1498.50,11488.50,11488.50,'2024-05-02','2024-05-02','1','1',NULL,NULL,'2024-05-02 19:20:37','2024-05-02 19:20:37','2024-07-16 07:51:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(307,44,'3','3','JRM','JRM',NULL,NULL,22275.00,22275.00,3341.25,3341.25,25616.25,25616.25,'2024-05-04','2024-05-04','1','1',NULL,NULL,'2024-05-06 06:33:05','2024-05-06 06:33:05','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(308,45,'2','2','CYBEREYE CONSULTING','CYBEREYE CONSULTING',NULL,NULL,7600.00,7600.00,1140.00,1140.00,8740.00,8740.00,'2024-05-04','2024-05-04','1','1',NULL,NULL,'2024-05-07 09:48:31','2024-05-07 09:48:31','2024-06-21 10:35:00','2024-07-18 13:47:19','2024-07-18 13:47:19'),(309,49,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,147271.26,147271.26,22090.69,22090.69,169361.95,169361.95,'2024-03-27','2024-03-27','1','1',NULL,NULL,'2024-05-23 08:28:48','2024-05-23 08:28:48','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(310,51,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,193074.25,193074.25,28961.14,28961.14,222035.39,222035.39,'2024-04-29','2024-04-29','1','1',NULL,NULL,'2024-05-23 09:24:24','2024-05-23 09:24:24','2024-06-10 10:21:26','2024-07-18 13:47:19','2024-07-18 13:47:19'),(311,78,'2','2','CAVAN PROJECT','CAVAN PROJECT',NULL,NULL,60000.00,60000.00,0.15,0.15,60000.00,60000.00,'2024-05-30','2024-05-30',NULL,NULL,NULL,NULL,'2024-07-16 13:36:21','2024-07-16 13:36:21','2024-07-16 13:42:02','2024-07-18 13:47:19','2024-07-18 13:47:19'),(312,69,'3','3','Grindrod','Grindrod',NULL,NULL,136077.63,136077.63,20411.64,20411.64,156489.27,156489.27,'2024-07-01','2024-07-01','1','1',NULL,NULL,'2024-07-05 09:44:17','2024-07-05 09:44:17','2024-07-10 08:55:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(313,68,'2','2','LIMECOAL','LIMECOAL',NULL,NULL,18465.22,18465.22,2769.78,2769.78,21235.00,21235.00,'2024-06-30','2024-06-30','1','1',NULL,NULL,'2024-07-05 09:40:04','2024-07-05 09:40:04','2024-07-17 11:51:01','2024-07-18 13:47:19','2024-07-18 13:47:19'),(314,67,'3','3','G AND P LOGISTICS ','G AND P LOGISTICS ',NULL,NULL,101500.00,101500.00,0.00,0.00,101500.00,101500.00,'2024-07-03','2024-07-03','1','1',NULL,NULL,'2024-07-05 09:33:07','2024-07-05 09:33:07','2024-07-10 08:55:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(315,66,'3','3','Senzomix June 2024','Senzomix June 2024',NULL,NULL,12250.00,12250.00,1837.50,1837.50,14087.50,14087.50,'2024-06-30','2024-06-30','1','1',NULL,NULL,'2024-07-02 08:58:30','2024-07-02 08:58:30','2024-07-10 08:55:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(316,65,'3','3','Contrans Trips','Contrans Trips',NULL,NULL,23951.00,23951.00,3592.65,3592.65,27543.65,27543.65,'2024-06-30','2024-06-30','1','1',NULL,NULL,'2024-07-02 07:19:36','2024-07-02 07:19:36','2024-07-10 08:55:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(317,60,'2','2','CyberEye Consulting  |   Trace Loads  ','CyberEye Consulting  |   Trace Loads  ',NULL,NULL,28000.00,28000.00,4200.00,4200.00,32200.00,32200.00,'2024-06-06','2024-06-06','1','1',NULL,NULL,'2024-06-14 13:18:43','2024-06-14 13:18:43','2024-07-16 07:51:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(318,57,'2','2','Trips: (01/05/2024-31/05/2024)','Trips: (01/05/2024-31/05/2024)',NULL,NULL,2500.00,2500.00,375.00,375.00,2875.00,2875.00,'2024-06-10','2024-06-10','1','1',NULL,NULL,'2024-06-11 07:02:11','2024-06-11 07:02:11','2024-07-16 07:51:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(319,56,'3','3','Min Tyd Transport May','Min Tyd Transport May',NULL,NULL,36750.00,36750.00,5512.50,5512.50,42262.50,42262.50,'2024-05-24','2024-05-24','1','1',NULL,NULL,'2024-06-10 13:03:10','2024-06-10 13:03:10','2024-07-10 08:55:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(320,55,'2','2','CyberEye Consulting - Grindrod ','CyberEye Consulting - Grindrod ',NULL,NULL,110605.00,110605.00,16590.75,16590.75,127195.75,127195.75,'2024-06-04','2024-06-04','1','1',NULL,NULL,'2024-06-10 12:49:58','2024-06-10 12:49:58','2024-07-16 07:51:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(321,54,'3','3','CLSC HOLDINGS May ','CLSC HOLDINGS May ',NULL,NULL,24500.00,24500.00,0.00,0.00,24500.00,24500.00,'2024-06-07','2024-06-07','1','1',NULL,NULL,'2024-06-10 11:31:59','2024-06-10 11:31:59','2024-07-10 08:55:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(322,53,'3','3','Trace Loads','Trace Loads',NULL,NULL,1650.00,1650.00,247.50,247.50,1897.50,1897.50,'2024-06-06','2024-06-06','1','1',NULL,NULL,'2024-06-10 09:37:29','2024-06-10 09:37:29','2024-06-14 13:11:23','2024-07-18 13:47:19','2024-07-18 13:47:19'),(323,48,'2','2','Contrans Logistics','Contrans Logistics',NULL,NULL,11500.00,11500.00,1725.00,1725.00,13225.00,13225.00,'2024-05-21','2024-05-21','1','1',NULL,NULL,'2024-05-21 14:05:41','2024-05-21 14:05:41','2024-07-16 07:51:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(324,47,'3','3','LONGMILE LOGISTICS','LONGMILE LOGISTICS',NULL,NULL,2700.00,2700.00,0.00,0.00,2700.00,2700.00,'2024-05-01','2024-05-01','1','1',NULL,NULL,'2024-05-09 07:11:28','2024-05-09 07:11:28','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(325,46,'3','3','CABOTAGE SA (PTY) LTD','CABOTAGE SA (PTY) LTD',NULL,NULL,8250.00,8250.00,1237.50,1237.50,9487.50,9487.50,'2024-05-01','2024-05-01','1','1',NULL,NULL,'2024-05-08 06:20:35','2024-05-08 06:20:35','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(326,39,'1','1','Claim 1 & 2 Etwata','Claim 1 & 2 Etwata',NULL,NULL,281109.22,281109.22,42166.38,42166.38,323275.60,323275.60,'2024-03-28','2024-03-28','1','1',NULL,NULL,'2024-04-12 08:28:28','2024-04-12 08:28:28','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(327,37,'1','1','Nomulwethu Kmr','Nomulwethu Kmr',NULL,NULL,178260.87,178260.87,26739.13,26739.13,205000.00,205000.00,'2024-02-29','2024-02-29','1','1',NULL,NULL,'2024-04-11 06:59:36','2024-04-11 06:59:36','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(328,26,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,205970.00,205970.00,30895.50,30895.50,236865.50,236865.50,'2024-02-28','2024-02-28','1','1',NULL,NULL,'2024-03-08 08:56:39','2024-03-08 08:56:39','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(329,22,'2','2','NEWCASTLE LOCAL MUN','NEWCASTLE LOCAL MUN',NULL,NULL,239032.76,239032.76,35854.91,35854.91,274887.67,274887.67,'2024-02-06','2024-02-06','1','1',NULL,NULL,'2024-03-08 08:47:53','2024-03-08 08:47:53','2024-05-23 08:55:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(330,77,'2','2','Service Cable repairs @ Umkhomaas St','Service Cable repairs @ Umkhomaas St',NULL,NULL,55580.00,55580.00,8337.00,8337.00,63917.00,63917.00,'2024-06-11','2024-06-11','1','1',NULL,NULL,'2024-07-11 13:25:59','2024-07-11 13:25:59','2024-07-12 11:02:21','2024-07-18 13:47:19','2024-07-18 13:47:19'),(331,76,'2','2','Service Cable fault @ Gemine','Service Cable fault @ Gemine',NULL,NULL,41410.00,41410.00,6211.50,6211.50,47621.50,47621.50,'2024-06-07','2024-06-07','1','1',NULL,NULL,'2024-07-11 13:25:16','2024-07-11 13:25:16','2024-07-12 11:07:42','2024-07-18 13:47:19','2024-07-18 13:47:19'),(332,75,'2','2','Service Cable faults @ Milkway st','Service Cable faults @ Milkway st',NULL,NULL,33770.00,33770.00,5065.50,5065.50,38835.50,38835.50,'2024-06-04','2024-06-04','1','1',NULL,NULL,'2024-07-11 13:18:41','2024-07-11 13:18:41','2024-07-12 11:07:42','2024-07-18 13:47:19','2024-07-18 13:47:19'),(333,74,'2','2','Service Cable @ Horizon Circle st','Service Cable @ Horizon Circle st',NULL,NULL,36360.00,36360.00,5454.00,5454.00,41814.00,41814.00,'2024-05-31','2024-05-31','1','1',NULL,NULL,'2024-07-11 13:13:49','2024-07-11 13:13:49','2024-07-12 11:07:42','2024-07-18 13:47:19','2024-07-18 13:47:19'),(334,73,'2','2','Service cable repair @ Sun st','Service cable repair @ Sun st',NULL,NULL,33720.00,33720.00,5058.00,5058.00,38778.00,38778.00,'2024-05-29','2024-05-29','1','1',NULL,NULL,'2024-07-11 13:13:00','2024-07-11 13:13:00','2024-07-12 11:07:42','2024-07-18 13:47:19','2024-07-18 13:47:19'),(335,72,'2','2','Service cable faults @ Pou st','Service cable faults @ Pou st',NULL,NULL,39740.00,39740.00,5961.00,5961.00,45701.00,45701.00,'2024-05-27','2024-05-27','1','1',NULL,NULL,'2024-07-11 13:07:51','2024-07-11 13:07:51','2024-07-12 11:07:42','2024-07-18 13:47:19','2024-07-18 13:47:19'),(336,71,'2','2','Service Cable repairs @ Greaves st','Service Cable repairs @ Greaves st',NULL,NULL,42180.00,42180.00,6327.00,6327.00,48507.00,48507.00,'2024-05-23','2024-05-23','1','1',NULL,NULL,'2024-07-11 13:06:30','2024-07-11 13:06:30','2024-07-12 11:07:42','2024-07-18 13:47:19','2024-07-18 13:47:19'),(337,70,'2','2','Service Cable repairs @ Link st','Service Cable repairs @ Link st',NULL,NULL,30150.00,30150.00,4522.50,4522.50,34672.50,34672.50,'2024-05-20','2024-05-20','1','1',NULL,NULL,'2024-07-11 12:59:47','2024-07-11 12:59:47','2024-07-12 11:07:42','2024-07-18 13:47:19','2024-07-18 13:47:19'),(338,64,'2','2','PUR ORDER	N0003881','PUR ORDER	N0003881',NULL,NULL,30389.75,30389.75,4558.46,4558.46,34948.21,34948.21,'2024-06-25','2024-06-25','1','1',NULL,NULL,'2024-06-25 14:07:29','2024-06-25 14:07:29','2024-06-25 14:08:08','2024-07-18 13:47:19','2024-07-18 13:47:19'),(339,63,'2','2','PUR ORDER  N0003864','PUR ORDER  N0003864',NULL,NULL,30228.25,30228.25,4534.24,4534.24,34762.49,34762.49,'2024-06-25','2024-06-25','1','1',NULL,NULL,'2024-06-25 14:01:26','2024-06-25 14:01:26','2024-06-25 14:04:39','2024-07-18 13:47:19','2024-07-18 13:47:19'),(340,62,'1','1','Emadlangeni(Kaarport ) Electrification Projects','Emadlangeni(Kaarport ) Electrification Projects',NULL,NULL,39717.30,39717.30,5957.60,5957.60,45674.90,45674.90,'2024-06-20','2024-06-20','1','1',NULL,NULL,'2024-06-20 07:42:22','2024-06-20 07:42:22','2024-06-20 07:42:22','2024-07-18 13:47:19','2024-07-18 13:47:19'),(341,61,'2','2','PUR ORDER		N0003715','PUR ORDER		N0003715',NULL,NULL,40940.25,40940.25,6141.04,6141.04,47081.29,47081.29,'2024-06-18','2024-06-18','1','1',NULL,NULL,'2024-06-18 13:11:43','2024-06-18 13:11:43','2024-06-18 14:01:38','2024-07-18 13:47:19','2024-07-18 13:47:19'),(342,59,'2','2','Senzomix','Senzomix',NULL,NULL,3960.00,3960.00,594.00,594.00,4554.00,4554.00,'2024-05-30','2024-05-30','1','1',NULL,NULL,'2024-06-14 13:09:51','2024-06-14 13:09:51','2024-07-16 07:51:45','2024-07-18 13:47:19','2024-07-18 13:47:19'),(343,58,'2','2','Four way  ','Four way  ',NULL,NULL,3795.00,3795.00,569.25,569.25,4364.25,4364.25,'2024-06-14','2024-06-14','1','1',NULL,NULL,'2024-06-14 10:13:21','2024-06-14 10:13:21','2024-06-14 10:14:32','2024-07-18 13:47:19','2024-07-18 13:47:19'),(344,52,'1','1','Emadlangeni (Kaarport) Electrification Project','Emadlangeni (Kaarport) Electrification Project',NULL,NULL,101770.80,101770.80,15265.62,15265.62,117036.42,117036.42,'2024-05-28','2024-05-28','1','1',NULL,NULL,'2024-05-28 13:02:44','2024-05-28 13:02:44','2024-05-28 13:05:07','2024-07-18 13:47:19','2024-07-18 13:47:19'),(345,80,'3','3','G AND P LOGISTICS Trips \r\n','G AND P LOGISTICS Trips \r\n',NULL,NULL,76700.00,76700.00,0.00,0.00,76700.00,76700.00,'2024-07-25','2024-07-25','1','1','1','1','2024-07-25 21:18:01','2024-07-25 21:18:01','2024-07-25 21:18:01','2024-07-25 21:18:47','2024-07-25 21:18:47'),(346,80,'3','3','G AND P LOGISTICS Trips \r\n','G AND P LOGISTICS Trips \r\n',NULL,NULL,76700.00,76700.00,0.00,0.00,76700.00,76700.00,'2024-07-25','2024-07-25','1','1','1','1','2024-07-25 21:18:01','2024-07-25 21:18:01','2024-07-25 21:18:47','2024-07-25 21:21:03','2024-07-25 21:21:03'),(347,82,'2','2','Lindsay Saker Fourways','Lindsay Saker Fourways',NULL,NULL,4484.04,4484.04,672.61,672.61,5156.65,5156.65,'2024-08-01','2024-08-01','1','1','1','1','2024-08-01 11:43:51','2024-08-01 11:43:51','2024-08-01 11:43:51','2024-08-01 12:03:51','2024-08-01 12:03:51'),(348,81,'1','1','Lindsay Saker Fourways','Lindsay Saker Fourways',NULL,NULL,1921.74,1921.74,288.26,288.26,2210.00,2210.00,'2024-08-01','2024-08-01','1','1','1','1','2024-08-01 11:36:11','2024-08-01 11:36:11','2024-08-01 11:36:11','2024-08-01 12:03:51','2024-08-01 12:03:51'),(349,80,'3','3','G AND P LOGISTICS Trips \r\n','G AND P LOGISTICS Trips \r\n',NULL,NULL,76700.00,131600.00,0.00,0.00,76700.00,131600.00,'2024-07-25','2024-07-25','1','1','1','1','2024-07-25 21:18:01','2024-07-25 21:18:01','2024-07-25 21:21:03','2024-08-05 13:19:15','2024-08-05 13:19:15'),(350,84,'3','3','Maximise','Maximise',NULL,NULL,14345.00,14345.00,2151.75,2151.75,16496.75,16496.75,'2024-07-31','2024-07-31','1','1','1','1','2024-08-06 08:20:08','2024-08-06 08:20:08','2024-08-06 08:20:08','2024-08-06 08:25:19','2024-08-06 08:25:19'),(351,83,'3','3','Grindrod','Grindrod',NULL,NULL,214309.39,214309.39,32146.41,32146.41,246455.80,246455.80,'2024-07-31','2024-07-31','1','1','1','1','2024-08-06 08:18:37','2024-08-06 08:18:37','2024-08-06 08:18:37','2024-08-06 08:25:19','2024-08-06 08:25:19'),(352,84,'3','3','Maximise','Maximise',NULL,NULL,14345.00,14345.00,2151.75,2151.75,16496.75,16496.75,'2024-07-31','2024-07-31','1','1','1','1','2024-08-06 08:20:08','2024-08-06 08:20:08','2024-08-06 08:25:19','2024-08-06 08:26:12','2024-08-06 08:26:12'),(353,83,'3','3','Grindrod','Grindrod',NULL,NULL,214309.39,214309.39,32146.41,32146.41,246455.80,246455.80,'2024-07-31','2024-07-31','1','1','1','1','2024-08-06 08:18:37','2024-08-06 08:18:37','2024-08-06 08:25:19','2024-08-06 08:26:12','2024-08-06 08:26:12'),(354,62,'1','1','Emadlangeni(Kaarport ) Electrification Projects','Emadlangeni(Kaarport ) Electrification Projects',NULL,NULL,39717.30,39717.30,5957.60,5957.60,45674.90,45674.90,'2024-06-20','2024-08-05','1','1',NULL,NULL,'2024-06-20 07:42:22','2024-06-20 07:42:22','2024-07-18 13:47:19','2024-08-16 06:38:20','2024-08-16 06:38:20'),(355,62,'1','1','Emadlangeni(Kaarport ) Electrification Projects','Emadlangeni(Kaarport ) Electrification Projects',NULL,NULL,39717.30,39717.30,5957.60,5957.60,45674.90,45674.90,'2024-08-05','2024-08-05','1','1',NULL,NULL,'2024-06-20 07:42:22','2024-06-20 07:42:22','2024-08-16 06:38:20','2024-08-16 06:45:06','2024-08-16 06:45:06'),(356,62,'1','1','Emadlangeni(Kaarport ) Electrification Projects','Emadlangeni(Kaarport ) Electrification Projects',NULL,NULL,39717.30,39717.30,5957.60,5957.60,45674.90,45674.90,'2024-08-05','2024-08-05','1','1',NULL,NULL,'2024-06-20 07:42:22','2024-06-20 07:42:22','2024-08-16 06:45:06','2024-08-16 07:01:05','2024-08-16 07:01:05'),(357,62,'1','1','Emadlangeni(Kaarport ) Electrification Projects','Emadlangeni (Kaarport) Electrification Projects',NULL,NULL,39717.30,39717.30,5957.60,5957.60,45674.90,45674.90,'2024-08-05','2024-08-05','1','1',NULL,NULL,'2024-06-20 07:42:22','2024-06-20 07:42:22','2024-08-16 07:01:05','2024-08-16 09:59:06','2024-08-16 09:59:06'),(358,85,'1','1','EKUTHULENI ELECTRIFICATION','EKUTHULENI ELECTRIFICATION',NULL,NULL,52456.00,52456.00,7868.40,7868.40,60324.40,60324.40,'2024-09-18','2024-09-18','1','1','1','1','2024-09-18 10:08:32','2024-09-18 10:08:32','2024-09-18 10:08:32','2024-09-18 10:26:36','2024-09-18 10:26:36'),(359,87,'1','1','EKUTHULENI ELECTRIFICATION ','EKUTHULENI ELECTRIFICATION ',NULL,NULL,26228.00,26228.00,3934.20,3934.20,30162.20,30162.20,'2024-09-20','2024-09-20','1','1','1','1','2024-09-20 09:25:25','2024-09-20 09:25:25','2024-09-20 09:25:25','2024-09-20 09:27:20','2024-09-20 09:27:20'),(360,90,'2','2','Trench for the repair of the MV-Cable @Drankensburg &amp; Agate','Trench for the repair of the MV-Cable @Drankensburg & Agate',NULL,NULL,37260.00,37260.00,5589.00,5589.00,42849.00,42849.00,'2024-09-30','2024-09-30','1','1','1','1','2024-10-02 12:26:42','2024-10-02 12:26:42','2024-10-02 12:26:42','2024-10-02 13:00:14','2024-10-02 13:00:14'),(361,95,'2','2','Trench for the repair of MV-Cable Crocodile and Leopard','Trench for the repair of MV-Cable Crocodile and Leopard',NULL,NULL,53710.00,53710.00,8056.50,8056.50,61766.50,61766.50,'2024-09-30','2024-09-30','1','1','1','1','2024-10-02 12:35:25','2024-10-02 12:35:25','2024-10-02 12:35:25','2024-10-02 13:17:45','2024-10-02 13:17:45'),(362,94,'2','2','Service Cable Repair @Allen ST','Service Cable Repair @Allen ST',NULL,NULL,41700.00,41700.00,6255.00,6255.00,47955.00,47955.00,'2024-09-30','2024-09-30','1','1','1','1','2024-10-02 12:32:42','2024-10-02 12:32:42','2024-10-02 12:32:42','2024-10-02 13:17:53','2024-10-02 13:17:53'),(363,88,'2','2','Service Cable repair @ Buffet St','Service Cable repair @ Buffet St',NULL,NULL,38525.50,38525.50,5778.83,5778.83,44304.33,44304.33,'2024-09-30','2024-09-30','1','1','1','1','2024-10-02 12:14:43','2024-10-02 12:14:43','2024-10-02 12:14:43','2024-10-02 13:18:13','2024-10-02 13:18:13'),(364,89,'2','2','Trench for the repair of the MV-Cable between Northwards','Trench for the repair of the MV-Cable between Northwards',NULL,NULL,39860.00,39860.00,5979.00,5979.00,45839.00,45839.00,'2024-09-30','2024-09-30','1','1','1','1','2024-10-02 12:25:26','2024-10-02 12:25:26','2024-10-02 12:25:26','2024-10-02 13:18:21','2024-10-02 13:18:21'),(365,90,'2','2','Trench for the repair of the MV-Cable @Drankensburg & Agate','Trench for the repair of the MV-Cable @Drankensburg & Agate',NULL,NULL,37260.00,37260.00,5589.00,5589.00,42849.00,42849.00,'2024-09-30','2024-09-30','1','1','1','1','2024-10-02 12:26:42','2024-10-02 12:26:42','2024-10-02 13:00:14','2024-10-02 13:18:26','2024-10-02 13:18:26'),(366,91,'2','2','Trench for the repair of the MV-Cable @Cerise Str','Trench for the repair of the MV-Cable @Cerise Str',NULL,NULL,33240.00,33240.00,4986.00,4986.00,38226.00,38226.00,'2024-09-30','2024-09-30','1','1','1','1','2024-10-02 12:27:45','2024-10-02 12:27:45','2024-10-02 12:27:45','2024-10-02 13:18:33','2024-10-02 13:18:33'),(367,92,'2','2','Trench for the repair of the MV-Cable between Hill Drop SS and Magnolia','Trench for the repair of the MV-Cable between Hill Drop SS and Magnolia',NULL,NULL,39950.00,39950.00,5992.50,5992.50,45942.50,45942.50,'2024-09-30','2024-09-30','1','1','1','1','2024-10-02 12:29:06','2024-10-02 12:29:06','2024-10-02 12:29:06','2024-10-02 13:18:41','2024-10-02 13:18:41'),(368,93,'2','2','Trench for the repair of the MV-Cable between Lennoxton SS','Trench for the repair of the MV-Cable between Lennoxton SS',NULL,NULL,37388.75,37388.75,5608.31,5608.31,42997.06,42997.06,'2024-09-30','2024-09-30','1','1','1','1','2024-10-02 12:31:05','2024-10-02 12:31:05','2024-10-02 12:31:05','2024-10-02 13:18:51','2024-10-02 13:18:51'),(369,95,'2','2','Trench for the repair of MV-Cable Crocodile and Leopard','Trench for the repair of MV-Cable Crocodile and Leopard',NULL,NULL,53710.00,53710.00,8056.50,8056.50,61766.50,61766.50,'2024-09-30','2024-10-02','1','1','1','1','2024-10-02 12:35:25','2024-10-02 12:35:25','2024-10-02 13:17:45','2024-10-02 13:58:47','2024-10-02 13:58:47'),(370,88,'2','2','Service Cable repair @ Buffet St','Service Cable repair @ Buffet St',NULL,NULL,38525.50,38525.50,5778.83,5778.83,44304.33,44304.33,'2024-09-30','2024-10-02','1','1','1','1','2024-10-02 12:14:43','2024-10-02 12:14:43','2024-10-02 13:18:13','2024-10-02 13:59:03','2024-10-02 13:59:03'),(371,89,'2','2','Trench for the repair of the MV-Cable between Northwards','Trench for the repair of the MV-Cable between Northwards',NULL,NULL,39860.00,39860.00,5979.00,5979.00,45839.00,45839.00,'2024-09-30','2024-10-02','1','1','1','1','2024-10-02 12:25:26','2024-10-02 12:25:26','2024-10-02 13:18:21','2024-10-02 13:59:09','2024-10-02 13:59:09'),(372,90,'2','2','Trench for the repair of the MV-Cable @Drankensburg & Agate','Trench for the repair of the MV-Cable @Drankensburg & Agate',NULL,NULL,37260.00,37260.00,5589.00,5589.00,42849.00,42849.00,'2024-09-30','2024-10-02','1','1','1','1','2024-10-02 12:26:42','2024-10-02 12:26:42','2024-10-02 13:18:26','2024-10-02 13:59:17','2024-10-02 13:59:17'),(373,91,'2','2','Trench for the repair of the MV-Cable @Cerise Str','Trench for the repair of the MV-Cable @Cerise Str',NULL,NULL,33240.00,33240.00,4986.00,4986.00,38226.00,38226.00,'2024-09-30','2024-10-02','1','1','1','1','2024-10-02 12:27:45','2024-10-02 12:27:45','2024-10-02 13:18:33','2024-10-02 13:59:23','2024-10-02 13:59:23'),(374,92,'2','2','Trench for the repair of the MV-Cable between Hill Drop SS and Magnolia','Trench for the repair of the MV-Cable between Hill Drop SS and Magnolia',NULL,NULL,39950.00,39950.00,5992.50,5992.50,45942.50,45942.50,'2024-09-30','2024-10-02','1','1','1','1','2024-10-02 12:29:06','2024-10-02 12:29:06','2024-10-02 13:18:41','2024-10-02 13:59:34','2024-10-02 13:59:34'),(375,93,'2','2','Trench for the repair of the MV-Cable between Lennoxton SS','Trench for the repair of the MV-Cable between Lennoxton SS',NULL,NULL,37388.75,37388.75,5608.31,5608.31,42997.06,42997.06,'2024-09-30','2024-10-02','1','1','1','1','2024-10-02 12:31:05','2024-10-02 12:31:05','2024-10-02 13:18:51','2024-10-02 13:59:41','2024-10-02 13:59:41'),(376,94,'2','2','Service Cable Repair @Allen ST','Service Cable Repair @Allen ST',NULL,NULL,41700.00,41700.00,6255.00,6255.00,47955.00,47955.00,'2024-09-30','2024-10-02','1','1','1','1','2024-10-02 12:32:42','2024-10-02 12:32:42','2024-10-02 13:17:53','2024-10-02 13:59:46','2024-10-02 13:59:46'),(377,98,'3','1','Eskom Holdings','Eskom Holdings',NULL,NULL,26228.00,26228.00,3934.20,3934.20,30162.20,30162.20,'2024-09-26','2024-09-26','1','1','1','1','2024-10-18 07:22:48','2024-10-18 07:22:48','2024-10-18 07:22:48','2024-10-18 07:28:46','2024-10-18 07:28:46'),(378,104,'3','1','GC3565 GC_LUIPAARDSVLEI -\r\nKRUGERSDORP','GC3565 GC_LUIPAARDSVLEI -\r\nKRUGERSDORP',NULL,NULL,303068.43,303068.43,45460.26,45460.26,348528.69,348528.69,'2024-10-21','2024-10-21','1','1','1','1','2024-12-03 12:24:47','2024-12-03 12:24:47','2024-12-03 12:24:47','2024-12-03 12:27:06','2024-12-03 12:27:06'),(379,104,'1','1','GC3565 GC_LUIPAARDSVLEI -\r\nKRUGERSDORP','GC3565 GC_LUIPAARDSVLEI -\r\nKRUGERSDORP',NULL,NULL,303068.43,303068.43,45460.26,45460.26,348528.69,348528.69,'2024-10-21','2024-10-21','1','1','1','1','2024-12-03 12:24:47','2024-12-03 12:24:47','2024-12-03 12:27:06','2024-12-03 12:28:38','2024-12-03 12:28:38'),(380,104,'1','1','GC3565 GC_LUIPAARDSVLEI -\r\nKRUGERSDORP','GC3565 GC_LUIPAARDSVLEI -\r\nKRUGERSDORP',NULL,NULL,303068.43,303068.43,45460.26,45460.26,348528.69,348528.69,'2024-10-21','2024-10-21','1','1','1','1','2024-12-03 12:24:47','2024-12-03 12:24:47','2024-12-03 12:28:38','2024-12-03 12:42:25','2024-12-03 12:42:25'),(381,104,'1','1','GC3565 GC_LUIPAARDSVLEI -\r\nKRUGERSDORP','GC3565 GC_LUIPAARDSVLEI -\r\nKRUGERSDORP',NULL,NULL,303068.43,303068.43,45460.26,45460.26,348528.69,348528.69,'2024-10-21','2024-10-21','1','1','1','1','2024-12-03 12:24:47','2024-12-03 12:24:47','2024-12-03 12:42:25','2024-12-03 12:43:04','2024-12-03 12:43:04'),(382,104,'1','1','GC3565 GC_LUIPAARDSVLEI -\r\nKRUGERSDORP','GC3565 GC_LUIPAARDSVLEI -\r\nKRUGERSDORP',NULL,NULL,303068.43,303068.43,45460.26,45460.26,348528.69,348528.69,'2024-10-21','2024-10-21','1','1','1','1','2024-12-03 12:24:47','2024-12-03 12:24:47','2024-12-03 12:43:04','2024-12-03 12:46:35','2024-12-03 12:46:35'),(383,106,'1','1','Selling Fuso','Fuso',NULL,NULL,196521.74,196521.74,29478.26,29478.26,226000.00,226000.00,'2024-12-09','2024-12-09','1','1','1','1','2024-12-09 12:49:26','2024-12-09 12:49:26','2024-12-09 12:49:26','2024-12-09 12:54:31','2024-12-09 12:54:31'),(384,107,'2','2','TRENCH FOR THE REPAIR OF THE MV-CABLE @KWAMATHUKUZA','TRENCH FOR THE REPAIR OF THE MV-CABLE @KWAMATHUKUZA',NULL,NULL,39950.00,39950.00,5992.50,5992.50,45942.50,45942.50,'2024-12-13','2024-12-13','1','1','1','1','2024-12-17 06:43:30','2024-12-17 06:43:30','2024-12-17 06:43:30','2024-12-17 07:01:26','2024-12-17 07:01:26'),(385,108,'2','2','TRENCH FOR THE REPAIR OF THE MV CABLE @HLUHLUWE M/S','TRENCH FOR THE REPAIR OF THE MV CABLE @HLUHLUWE M/S',NULL,NULL,30610.00,30610.00,4591.50,4591.50,35201.50,35201.50,'2024-12-13','2024-12-13','1','1','1','1','2024-12-17 06:46:35','2024-12-17 06:46:35','2024-12-17 06:46:35','2024-12-17 07:01:35','2024-12-17 07:01:35'),(386,109,'2','2','TRENCH FOR THE MV CABLE REPAIR OF THE MV CABLE NORTHWARDS ','TRENCH FOR THE MV CABLE REPAIR OF THE MV CABLE NORTHWARDS ',NULL,NULL,42180.00,42180.00,6327.00,6327.00,48507.00,48507.00,'2024-12-13','2024-12-13','1','1','1','1','2024-12-17 06:50:47','2024-12-17 06:50:47','2024-12-17 06:50:47','2024-12-17 07:01:41','2024-12-17 07:01:41'),(387,110,'2','2','TRENCH FOR THE MV CABLE BETWEEN ARBOUR PARK &amp; YOOSTER','TRENCH FOR THE MV CABLE BETWEEN ARBOUR PARK &amp; YOOSTER',NULL,NULL,38970.00,38970.00,5845.50,5845.50,44815.50,44815.50,'2024-12-13','2024-12-13','1','1','1','1','2024-12-17 06:55:22','2024-12-17 06:55:22','2024-12-17 06:55:22','2024-12-17 07:02:05','2024-12-17 07:02:05'),(388,107,'2','2','TRENCH FOR THE REPAIR OF THE MV-CABLE @KWAMATHUKUZA','TRENCH FOR THE REPAIR OF THE MV-CABLE @KWAMATHUKUZA',NULL,NULL,39950.00,39950.00,5992.50,5992.50,45942.50,45942.50,'2024-12-13','2024-12-13','1','1','1','1','2024-12-17 06:43:30','2024-12-17 06:43:30','2024-12-17 07:01:26','2024-12-17 07:02:38','2024-12-17 07:02:38'),(389,108,'2','2','TRENCH FOR THE REPAIR OF THE MV CABLE @HLUHLUWE M/S','TRENCH FOR THE REPAIR OF THE MV CABLE @HLUHLUWE M/S',NULL,NULL,30610.00,30610.00,4591.50,4591.50,35201.50,35201.50,'2024-12-13','2024-12-13','1','1','1','1','2024-12-17 06:46:35','2024-12-17 06:46:35','2024-12-17 07:01:35','2024-12-17 07:02:47','2024-12-17 07:02:47'),(390,109,'2','2','TRENCH FOR THE MV CABLE REPAIR OF THE MV CABLE NORTHWARDS ','TRENCH FOR THE MV CABLE REPAIR OF THE MV CABLE NORTHWARDS ',NULL,NULL,42180.00,42180.00,6327.00,6327.00,48507.00,48507.00,'2024-12-13','2024-12-13','1','1','1','1','2024-12-17 06:50:47','2024-12-17 06:50:47','2024-12-17 07:01:41','2024-12-17 07:02:56','2024-12-17 07:02:56'),(391,110,'2','2','TRENCH FOR THE MV CABLE BETWEEN ARBOUR PARK &amp; YOOSTER','TRENCH FOR THE MV CABLE BETWEEN ARBOUR PARK &amp; YOOSTER',NULL,NULL,38970.00,38970.00,5845.50,5845.50,44815.50,44815.50,'2024-12-13','2024-12-13','1','1','1','1','2024-12-17 06:55:22','2024-12-17 06:55:22','2024-12-17 07:02:05','2024-12-17 07:03:05','2024-12-17 07:03:05'),(392,118,'2','2','Metarial Supply','Metarial Supply',NULL,NULL,11930.00,17430.00,1789.50,1789.50,13719.50,13719.50,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 10:01:32','2025-01-16 10:01:32'),(393,118,'2','2','Metarial Supply','Metarial Supply',NULL,NULL,17430.00,17430.00,1789.50,1789.50,13719.50,19844.06,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 10:01:32','2025-01-16 10:01:36','2025-01-16 10:01:36'),(394,118,'2','2','Metarial Supply','Metarial Supply',NULL,NULL,17430.00,17430.00,1789.50,2414.06,19844.06,19844.06,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 10:01:36','2025-01-16 10:02:01','2025-01-16 10:02:01'),(395,118,'2','2','Metarial Supply','120mm^2 Cable Joining and Supply',NULL,NULL,17430.00,17430.00,2414.06,2414.06,19844.06,19844.06,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 10:02:01','2025-01-16 10:16:48','2025-01-16 10:16:48'),(396,118,'2','2','120mm^2 Cable Joining and Supply','120mm^2 Cable Joining and Supply',NULL,NULL,17430.00,31248.50,2414.06,2414.06,19844.06,19844.06,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 10:16:48','2025-01-16 11:33:16','2025-01-16 11:33:16'),(397,118,'2','2','120mm^2 Cable Joining and Supply','120mm^2 Cable Joining and Supply',NULL,NULL,31248.50,31248.50,2414.06,4687.28,19844.06,19844.06,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 11:33:16','2025-01-16 11:33:54','2025-01-16 11:33:54'),(398,118,'2','2','120mm^2 Cable Joining and Supply','120mm^2 Cable Joining and Supply',NULL,NULL,31248.50,31248.50,4687.28,4687.28,19844.06,35935.78,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 11:33:54','2025-01-16 11:34:15','2025-01-16 11:34:15'),(399,118,'2','2','120mm^2 Cable Joining and Supply','Cable Termination Supply, Delivery and Install',NULL,NULL,31248.50,31248.50,4687.28,4687.28,35935.78,35935.78,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 11:34:15','2025-01-16 12:25:51','2025-01-16 12:25:51'),(400,118,'2','2','Cable Termination Supply, Delivery and Install','Cable Termination Supply, Delivery and Install',NULL,NULL,31248.50,35688.50,4687.28,4687.28,35935.78,35935.78,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 12:25:51','2025-01-16 12:29:28','2025-01-16 12:29:28'),(401,118,'2','2','Cable Termination Supply, Delivery and Install','Cable Termination Supply, Delivery and Install',NULL,NULL,35688.50,35688.50,4687.28,4687.28,35935.78,40631.36,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 12:29:28','2025-01-16 12:29:44','2025-01-16 12:29:44'),(402,118,'2','2','Cable Termination Supply, Delivery and Install','Cable Termination Supply, Delivery and Install',NULL,NULL,35688.50,35688.50,4687.28,4942.86,40631.36,40631.36,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 12:29:44','2025-01-16 12:30:10','2025-01-16 12:30:10'),(403,118,'2','2','Cable Termination Supply, Delivery and Install','Cable Termination Supply, Delivery and Install',NULL,NULL,35688.50,35688.50,4942.86,5353.28,40631.36,40631.36,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 12:30:10','2025-01-16 12:32:49','2025-01-16 12:32:49'),(404,118,'2','2','Cable Termination Supply, Delivery and Install','Cable Termination Supply, Delivery and Install',NULL,NULL,35688.50,35688.50,5353.28,5353.28,40631.36,41041.78,'2025-01-16','2025-01-16','1','1','1','1','2025-01-16 09:46:08','2025-01-16 09:46:08','2025-01-16 12:32:49','2025-01-16 12:32:54','2025-01-16 12:32:54'),(405,121,'2','1','Emadlangeni Project: Kaarpot-VO','Emadlangeni Project: Kaarpot-VO',NULL,NULL,86956.52,86956.52,13043.48,13043.48,100000.00,100000.00,'2025-01-17','2025-01-17','1','1','1','1','2025-01-17 09:38:55','2025-01-17 09:38:55','2025-01-17 09:38:55','2025-01-17 09:40:47','2025-01-17 09:40:47'),(406,123,'2','2','FSOD:EOH(HYMAX):CAPITEC 2028 MABO','FSOD:EOH(HYMAX):CAPITEC 2028 MABO',NULL,NULL,17669.61,12368.73,2650.44,2650.44,20320.05,20320.05,'2025-01-30','2025-01-30','1','1','1','1','2025-01-30 15:25:13','2025-01-30 15:25:13','2025-01-30 15:25:13','2025-01-30 16:17:31','2025-01-30 16:17:31'),(407,123,'2','2','FSOD:EOH(HYMAX):CAPITEC 2028 MABO','FSOD:EOH(HYMAX):CAPITEC 2028 MABO',NULL,NULL,12368.73,12368.72,2650.44,2650.44,20320.05,20320.05,'2025-01-30','2025-01-30','1','1','1','1','2025-01-30 15:25:13','2025-01-30 15:25:13','2025-01-30 16:17:31','2025-01-30 16:17:37','2025-01-30 16:17:37'),(408,123,'2','2','FSOD:EOH(HYMAX):CAPITEC 2028 MABO','FSOD:EOH(HYMAX):CAPITEC 2028 MABO',NULL,NULL,12368.72,12368.72,2650.44,1855.31,20320.05,20320.05,'2025-01-30','2025-01-30','1','1','1','1','2025-01-30 15:25:13','2025-01-30 15:25:13','2025-01-30 16:17:37','2025-01-30 16:19:03','2025-01-30 16:19:03'),(409,123,'2','2','FSOD:EOH(HYMAX):CAPITEC 2028 MABO','FSOD:EOH(HYMAX):CAPITEC 2028 MABO',NULL,NULL,12368.72,12368.73,1855.31,1855.31,20320.05,20320.05,'2025-01-30','2025-01-30','1','1','1','1','2025-01-30 15:25:13','2025-01-30 15:25:13','2025-01-30 16:19:03','2025-01-30 16:19:07','2025-01-30 16:19:07'),(410,123,'2','2','FSOD:EOH(HYMAX):CAPITEC 2028 MABO','FSOD:EOH(HYMAX):CAPITEC 2028 MABO',NULL,NULL,12368.73,12368.73,1855.31,1855.31,20320.05,14224.04,'2025-01-30','2025-01-30','1','1','1','1','2025-01-30 15:25:13','2025-01-30 15:25:13','2025-01-30 16:19:07','2025-01-30 16:19:25','2025-01-30 16:19:25'),(411,123,'2','2','FSOD:EOH(HYMAX):CAPITEC 2028 MABO','FSOD:EOH(HYMAX):CAPITEC 2028 MABO',NULL,NULL,12368.73,12368.73,1855.31,1855.31,14224.04,14224.04,'2025-01-30','2025-01-30','1','1','1','1','2025-01-30 15:25:13','2025-01-30 15:25:13','2025-01-30 16:19:25','2025-01-30 16:25:01','2025-01-30 16:25:01');
+/*!40000 ALTER TABLE `invoice_audit` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `invoice_costs`
+--
+
+DROP TABLE IF EXISTS `invoice_costs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `invoice_costs` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `invoice_id` int NOT NULL,
+  `title` varchar(145) DEFAULT NULL,
+  `amount` varchar(45) DEFAULT NULL,
+  `date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=118 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='This table is for extra costs like commissions and other deductiions';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `invoice_costs`
+--
+
+LOCK TABLES `invoice_costs` WRITE;
+/*!40000 ALTER TABLE `invoice_costs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `invoice_costs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `item_task`
+--
+
+DROP TABLE IF EXISTS `item_task`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `item_task` (
+  `item_id` int NOT NULL AUTO_INCREMENT,
+  `task_id` int DEFAULT NULL,
+  `item_name` varchar(255) DEFAULT NULL,
+  `item_quantity` int DEFAULT NULL,
+  `item_start_date` date DEFAULT NULL,
+  `item_end_date` date DEFAULT NULL,
+  `item_qnt_done` int DEFAULT '0',
+  `item_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`item_id`),
+  KEY `task_id` (`task_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `item_task`
+--
+
+LOCK TABLES `item_task` WRITE;
+/*!40000 ALTER TABLE `item_task` DISABLE KEYS */;
+/*!40000 ALTER TABLE `item_task` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `items`
+--
+
+DROP TABLE IF EXISTS `items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `items` (
+  `item_id` int NOT NULL AUTO_INCREMENT,
+  `item_invoice` varchar(10) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `item_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `item_unit` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `item_price` double NOT NULL,
+  `item_amount` double NOT NULL,
+  `item_discount` double DEFAULT NULL,
+  `item_date` date NOT NULL,
+  `item_created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`item_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=195 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `items`
+--
+
+LOCK TABLES `items` WRITE;
+/*!40000 ALTER TABLE `items` DISABLE KEYS */;
+INSERT INTO `items` VALUES (1,'13','Electricification','1',133536.49,133536.49,0,'2024-01-30','2024-02-13 22:40:14'),(2,'14','Electricification','1',113137.96,113137.96,0,'2023-12-12','2024-02-13 22:40:14'),(3,'15','Steel Palisade fencing','1',86956.52,86956.52,0,'2023-12-29','2024-02-13 22:49:01'),(66,'40','35mm2 ABC Conductor Dual Phase + Bare Nuetral','1',40000,40000,NULL,'0000-00-00','2024-04-19 05:40:54'),(65,'39','Project','1',281109.22,281109.22,0,'0000-00-00','2024-04-12 08:28:28'),(64,'38','Project','1',114514.25,114514.25,0,'0000-00-00','2024-04-12 08:10:56'),(63,'37','Project','1',178260.87,178260.87,NULL,'2024-02-29','2024-04-12 08:07:01'),(62,'36','JM23HDGP, KZ68BTGP','1',49014,49014,0,'0000-00-00','2024-04-08 08:31:02'),(61,'35','Service connection @ Nagtegaal st','1',34323.25,34323.25,0,'0000-00-00','2024-04-04 11:35:29'),(60,'34','Service connection @ Jenkins ','1',39934,39934,0,'0000-00-00','2024-04-04 11:32:45'),(59,'33','Service connection @ Hospital','1',42589.75,42589.75,0,'0000-00-00','2024-04-04 11:29:17'),(58,'32','Service connection @  Hluhluwe st','1',34536.25,34536.25,0,'0000-00-00','2024-04-04 11:26:31'),(57,'31','Service connection @ Umngeni  st','1',41691,41691,0,'0000-00-00','2024-04-04 11:07:12'),(35,'20','Surveyor','1',134687.13,134687.13,NULL,'0000-00-00','2024-02-21 10:34:46'),(36,'20','Design','1',121187.72,121187.72,NULL,'0000-00-00','2024-02-21 10:34:46'),(55,'29','item 2','10',9000,9000,NULL,'0000-00-00','2024-03-26 08:09:07'),(56,'30','JM 23 HD-GP, KZ 68 BT-GP','1',53640,53640,0,'2024-04-04','2024-04-04 05:59:27'),(54,'29','item 1','5',2000,1000,NULL,'0000-00-00','2024-03-26 08:09:07'),(53,'28','KW42XK-GP,KZ68BT-GP','1',100889.565,100889.57,0,'0000-00-00','2024-03-25 09:51:17'),(52,'12','KW42XK-GP,KZ68BT-GP','1',113701.25,113701.25,NULL,'2024-01-02','2024-03-25 09:28:44'),(51,'27','Consultant','1',13043.48,13043.48,0,'0000-00-00','2024-03-22 09:19:26'),(50,'26','NEWCASTLE Project','1',205970,205970,0,'0000-00-00','2024-03-08 08:56:39'),(49,'22','Project','1',239032.76,239032.76,0,'0000-00-00','2024-03-08 08:47:53'),(48,'24','KZ-68-BT-GP,  JM-23-HD-GP','1',29430,29430,0,'0000-00-00','2024-03-05 06:48:44'),(47,'21','JM23HDGP, KZ68BTGP, KW42XKGP','1',25119,25119,0,'0000-00-00','2024-03-01 06:47:48'),(67,'40','Transport','1',9500,9500,NULL,'0000-00-00','2024-04-19 05:40:54'),(68,'41','LH37VKGP 2 Trips','1',3200,3200,0,'0000-00-00','2024-04-23 09:20:57'),(69,'42','KZ68BTGP, JM23HDGP ','1',41427,41427,0,'0000-00-00','2024-05-01 05:45:53'),(70,'43','KZ68BTGP, JM23HDGP','1',9990,9990,0,'2024-05-02','2024-05-02 19:20:37'),(71,'44','JM23HDGP, KZ68BTGP','1',22275,22275,0,'2024-05-06','2024-05-06 06:33:05'),(72,'45','LH37VKGP, KZ68BTGP','1',7600,7600,0,'2024-05-07','2024-05-07 09:48:31'),(73,'46','Trips','1',8250,8250,0,'0000-00-00','2024-05-08 06:20:35'),(74,'47','LM47JHGP','1',2700,2700,0,'0000-00-00','2024-05-09 07:11:28'),(75,'48','MSDU2920517','1',1600,1600,NULL,'2024-05-21','2024-05-21 14:06:37'),(76,'000','TEMU0995723','1',2500,2500,NULL,'2024-05-21','2024-05-21 16:04:37'),(77,'48','TCLU6846530','1',2200,2200,NULL,'2024-05-21','2024-05-21 16:04:37'),(78,'48','KKFU7829202','1',2500,2500,NULL,'2024-05-21','2024-05-21 16:04:37'),(79,'000','ALRU3577438','1',2500,2500,NULL,'2024-05-21','2024-05-21 16:04:37'),(80,'48','TGBU6220796','1',2600,2600,NULL,'2024-05-21','2024-05-21 16:04:37'),(81,'48','MSMU7363730','1',2600,2600,NULL,'2024-05-21','2024-05-21 16:04:37'),(82,'49','Newcastle  Project ','1',147271.26,147271.26,0,'0000-00-00','2024-05-23 08:28:48'),(83,'50','Trips','1',53640,53640,0,'0000-00-00','2024-05-23 08:40:15'),(84,'51','NEWCASTLE PROJECT','1',193074.25,193074.25,0,'0000-00-00','2024-05-23 09:24:24'),(85,'52','1 Preliminarier and General','1',21246,21246,0,'0000-00-00','2024-05-28 13:02:44'),(86,'52','2 Medium Voltage Switchgear, Sectionaliser, trosnformer','1',0,0,0,'0000-00-00','2024-05-28 13:02:44'),(87,'52','Medium Voltage Overhead Distribution System','1',73433.5,73433.5,0,'0000-00-00','2024-05-28 13:02:44'),(88,'52','LV Overhead Distribution Lines','1',7091.3,7091.3,0,'0000-00-00','2024-05-28 13:02:44'),(89,'52','Support For Overhead Reticulation','1',0,0,0,'0000-00-00','2024-05-28 13:02:44'),(90,'52','','1',0,0,0,'0000-00-00','2024-05-28 13:02:44'),(91,'53','LH37ZBGP','1',1650,1650,0,'0000-00-00','2024-06-10 09:37:29'),(92,'54','Trips','1',24500,24500,0,'0000-00-00','2024-06-10 11:31:59'),(93,'55','Trips','1',110605,110605,0,'0000-00-00','2024-06-10 12:49:58'),(94,'56','Senzomix','1',36750,36750,0,'0000-00-00','2024-06-10 13:03:10'),(95,'57','MRKU7319312 ','1',2500,2500,0,'0000-00-00','2024-06-11 07:02:11'),(96,'58','Trench in meters','33',70,2310,0,'0000-00-00','2024-06-14 10:13:21'),(97,'58','Paving in meters','33',45,1485,0,'0000-00-00','2024-06-14 10:13:21'),(98,'59',' Trip','1',3960,3960,0,'0000-00-00','2024-06-14 13:09:51'),(99,'60','Trips','1',28000,28000,0,'0000-00-00','2024-06-14 13:18:43'),(100,'61','Service cable fault @Woodrange','1',40940.25,40940.25,0,'0000-00-00','2024-06-18 13:11:43'),(101,'62','PRELIMINARIES AND GENERAL','1',21246,21246,0,'0000-00-00','2024-06-20 07:42:22'),(105,'63','Service Cable Fault @Drankensberg','1',30228.25,30228.25,0,'0000-00-00','2024-06-25 14:01:27'),(103,'62','MEDIUM VOLTAGE OVERHEAD DISTRIBUTION SYSTEM','1',11380,11380,0,'0000-00-00','2024-06-20 07:42:22'),(104,'62','LV OVERHEAD DISTRIBUTION LINES','1',7091.3,7091.3,0,'0000-00-00','2024-06-20 07:42:22'),(106,'64','Service Cable Fault @Titan','1',30389.75,30389.75,0,'0000-00-00','2024-06-25 14:07:29'),(107,'65','Trips','1',24790,24790,0,'0000-00-00','2024-07-02 07:19:36'),(108,'66','Trips','1',12250,12250,0,'0000-00-00','2024-07-02 08:58:30'),(109,'67','Trips','1',101500,101500,0,'0000-00-00','2024-07-05 09:33:07'),(110,'68','Trips','1',18465.22,18465.22,0,'0000-00-00','2024-07-05 09:40:04'),(111,'69','Trips','1',136077.63,136077.63,0,'0000-00-00','2024-07-05 09:44:17'),(112,'70','Service Cable repairs','1',30150,30150,0,'0000-00-00','2024-07-11 12:59:47'),(113,'71','Service Cable repairs','1',42180,42180,0,'0000-00-00','2024-07-11 13:06:30'),(114,'72','Service cable faults','1',39740,39740,0,'0000-00-00','2024-07-11 13:07:51'),(115,'73','Service cable repair','1',33720,33720,0,'0000-00-00','2024-07-11 13:13:00'),(116,'74','Service cable','1',36360,36360,0,'0000-00-00','2024-07-11 13:13:49'),(117,'75','Service Cable faults','1',33770,33770,0,'0000-00-00','2024-07-11 13:18:41'),(118,'76','Service Cable faults','1',41410,41410,0,'0000-00-00','2024-07-11 13:25:16'),(119,'77','Service Cable repairs','1',55580,55580,0,'0000-00-00','2024-07-11 13:25:59'),(120,'78','Project ','1',52173.91,52173.91,0,'2024-07-16','2024-07-16 13:36:21'),(123,'80',' Period: (2024-07-01 to 2024-07-25)','1',131600,131600,0,'2024-07-25','2024-07-25 21:18:01'),(124,'81','Fourways','1',1921.74,1921.74,0,'2024-08-01','2024-08-01 11:36:11'),(125,'82','Fourways','1',4484.04,4484.04,0,'2024-08-01','2024-08-01 11:43:51'),(126,'83','June ','1',214309.39,214309.39,0,'2024-07-31','2024-08-06 08:18:37'),(127,'84','June ','1',14345,14345,0,'2024-07-31','2024-08-06 08:20:08'),(128,'85','Retention Released','1',52456,52456,0,'2024-09-18','2024-09-18 10:08:32'),(129,'86','Hiring ','1',4500,4500,0,'2024-09-20','2024-09-20 08:18:29'),(130,'87','Retention Released','1',26228,26228,0,'2024-09-20','2024-09-20 09:25:25'),(131,'88','Service Cable repairs','1',38525.5,38525.5,0,'2024-09-30','2024-10-02 12:14:43'),(132,'89','Trench for the repair','1',39860,39860,0,'2024-09-30','2024-10-02 12:25:26'),(133,'90','Trench for the repair','1',37260,37260,0,'2024-09-30','2024-10-02 12:26:42'),(134,'91','Trench for the repair','1',33240,33240,0,'2024-09-30','2024-10-02 12:27:45'),(135,'92','Trench for the repair','1',39950,39950,0,'2024-09-30','2024-10-02 12:29:06'),(136,'93','Trench for the repair','1',37388.75,37388.75,0,'2024-09-30','2024-10-02 12:31:05'),(137,'94','Service Cable Repair','1',41700,41700,0,'2024-09-30','2024-10-02 12:32:42'),(138,'95','Trench for the repair','1',53710,53710,0,'2024-09-30','2024-10-02 12:35:25'),(139,'96','Crane hire ','',5500,5500,0,'2024-10-15','2024-10-15 07:56:58'),(140,'97','Design','',150000,150000,0,'2024-10-15','2024-10-15 13:21:43'),(141,'98','Project ','',26228,26228,0,'2024-09-26','2024-10-18 07:22:48'),(142,'99','Project ','',39717.3,39717.3,0,'2024-09-05','2024-10-18 07:25:23'),(143,'100','Project','',1304347.83,1304347.83,0,'2024-10-22','2024-11-25 14:12:39'),(144,'101','BASIC FIXED SERVICE','1',204.07,204.07,0,'2024-11-25','2024-11-25 16:12:33'),(145,'101','3 LIGHT 5 MAN TEAM 0-50km','168',16.47,2766.96,0,'2024-11-25','2024-11-25 16:12:33'),(146,'101','2 LIGHT 2 MAN TEAM 0-50km','84',12.1,1016.4,0,'2024-11-25','2024-11-25 16:12:33'),(147,'101','CI4.40,OPTIC FBR TRMNTD,1-10KM','2',123.63,247.26,0,'2024-11-25','2024-11-25 16:12:33'),(148,'101','22,SPLICG','2',56.76,113.52,0,'2024-11-25','2024-11-25 16:12:33'),(149,'101',' FO CABL LBLG','3',80.19,240.57,0,'2024-11-25','2024-11-25 16:12:33'),(150,'101','PREP JNT FO ALL','24',15,360,0,'2024-11-25','2024-11-25 16:12:33'),(151,'101','INSTL,CBL:CI2.10','30',15,450,0,'2024-11-25','2024-11-25 16:12:33'),(152,'101','INSTL,CBL:CI2.15,FBR PUSH-IN','30',7.24,217.2,0,'2024-11-25','2024-11-25 16:12:33'),(153,'101','EXPOS,TRNCH:CI1.1,0.45X0.8M NORM SOIL','12',140.69,1688.28,0,'2024-11-25','2024-11-25 16:12:33'),(154,'102','Project','1',165910,165910,0,'2024-10-16','2024-11-26 13:55:13'),(155,'103','Trips','1',115107.27,115107.27,0,'2024-10-01','2024-11-26 14:17:53'),(156,'104','PRELIMINARY AND GENERAL','1',109760.68,109760.68,0,'2024-10-21','2024-12-03 12:24:47'),(157,'104','LOW VOLTAGE OVERHEAD DISTRIBUTION SYSTEM','1',161395.95,161395.95,0,'2024-10-21','2024-12-03 12:24:47'),(158,'104','Proffessional services (Design and design approvals)','1',31911.8,31911.8,0,'2024-10-21','2024-12-03 12:24:47'),(159,'105','Mapping','1',123000,123000,0,'2024-12-05','2024-12-05 12:49:30'),(160,'105','Pegging	','1',131278,131278,0,'2024-12-05','2024-12-05 12:49:30'),(161,'105','Preliminary design	','1',53500,53500,0,'2024-12-05','2024-12-05 12:49:30'),(162,'106','Truck','1',196521.74,196521.74,0,'2024-12-09','2024-12-09 12:49:26'),(163,'107','TRENCH FOR THE REPAIR','1',39950,39950,0,'2024-12-13','2024-12-17 06:43:30'),(164,'108','TRENCH FOR THE REPAIR','1',30610,30610,0,'2024-12-13','2024-12-17 06:46:35'),(165,'109','TRENCH FOR THE REPAIR','1',42180,42180,0,'2024-12-13','2024-12-17 06:50:47'),(166,'110','TRENCH FOR THE REPAIR','1',38970,38970,0,'2024-12-13','2024-12-17 06:55:22'),(167,'111','Trips','1',84914.04,84914.04,0,'2024-12-24','2024-12-27 16:26:17'),(168,'112','Trips','1',69754.72,69754.72,0,'2024-10-31','2024-12-27 16:41:07'),(169,'113','Trips','1',35150,35150,0,'2024-09-30','2024-12-27 16:45:52'),(170,'114','Trip','1',67050.33,67050.33,0,'2024-08-31','2024-12-30 08:39:06'),(171,'115','Trips','1',76475,76475,0,'2024-08-31','2024-12-30 08:49:39'),(172,'116','Trip','1',2800,2800,0,'2024-10-31','2024-12-30 15:30:15'),(173,'117','Project ','1',303068.43,303068.43,0,'2024-12-31','2025-01-15 05:31:32'),(174,'118','Material and Labour','1',6800,6800,0,'2025-01-16','2025-01-16 09:46:08'),(175,'118','Transport','660',14.5,9570,0,'2025-01-16','2025-01-16 09:46:08'),(176,'118','Cable pressure testing','1',5500,5500,NULL,'2024-01-16','2025-01-16 10:03:21'),(177,'118','5m X 120mm^2 PILC Cable','1',13818.5,13818.5,NULL,'2025-01-16','2025-01-16 10:03:21'),(180,'120','Minisub precast typr B Plinth','1',21280.5,21280.5,0,'2025-01-16','2025-01-16 12:38:33'),(181,'120','500kVA 11/0.42kV type B minisub with 630A 43 MCCB','1',553725,553725,0,'2025-01-16','2025-01-16 12:38:33'),(182,'120','Transport','660',12.5,8250,0,'2025-01-16','2025-01-16 12:38:33'),(183,'121','Medium Voltage Overhead Distribution System','1',62053.5,62053.5,0,'2025-01-17','2025-01-17 09:38:55'),(184,'121','Support For Overhead Reticulation','1',24903.02,24903.02,0,'2025-01-17','2025-01-17 09:38:55'),(185,'122',' PAY,FEE:G9.1 BSC FXD SERV','1',204.07,204.07,0,'2025-01-23','2025-01-23 18:33:24'),(186,'122','PAY,FEE:G10.3 LGHT 5 MAN TEAM 0-50KM','148',16.47,2437.56,0,'2025-01-23','2025-01-23 18:33:24'),(187,'122','PAY,FEE:G10.2 LGHT 2 MAN TEAM 0-50KM','74',12.1,895.4,0,'2025-01-23','2025-01-23 18:33:24'),(188,'122','CI4.22 SPLC FO','1',56.76,56.76,0,'2025-01-23','2025-01-23 18:33:24'),(189,'122','CI4.23 PREP JNT FO ALL','2',15,30,0,'2025-01-23','2025-01-23 18:33:24'),(190,'122','CI2.10 OVHL CABL>10-200PR/48-144FBR/2-4DUCT','30',15,450,0,'2025-01-23','2025-01-23 18:33:24'),(191,'122','CI2.15 INSTLN FBR CABL PUSH-IN','50',7.24,362,0,'2025-01-23','2025-01-23 18:33:24'),(192,'122','CI1.1 TRNCH & LAY 0.45x0.8m NORM SOIL','12',140.69,1688.28,0,'2025-01-23','2025-01-23 18:33:24'),(193,'123','Aqua Project','1',12368.727,12368.727,0,'2025-01-30','2025-01-30 15:25:13'),(194,'124','Fibre Project','1',4189.27,4189.27,0,'2025-02-06','2025-02-06 19:51:24');
+/*!40000 ALTER TABLE `items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `lk_purpose_expense`
+--
+
+DROP TABLE IF EXISTS `lk_purpose_expense`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lk_purpose_expense` (
+  `purpose_expense_id` int NOT NULL AUTO_INCREMENT,
+  `purpose_expense_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`purpose_expense_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `lk_purpose_expense`
+--
+
+LOCK TABLES `lk_purpose_expense` WRITE;
+/*!40000 ALTER TABLE `lk_purpose_expense` DISABLE KEYS */;
+INSERT INTO `lk_purpose_expense` VALUES (1,'Stationary'),(2,'Office Sundry'),(3,'Fuel'),(4,'House Expense'),(5,'Salary'),(6,'Repair');
+/*!40000 ALTER TABLE `lk_purpose_expense` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `load_stack_assignments`
+--
+
+DROP TABLE IF EXISTS `load_stack_assignments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `load_stack_assignments` (
+  `load_stack_assignment_id` int NOT NULL AUTO_INCREMENT,
+  `load_stack_id` int NOT NULL,
+  `driver_id` int NOT NULL,
+  `assignment_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`load_stack_assignment_id`),
+  KEY `load_stack_id` (`load_stack_id`),
+  KEY `driver_id` (`driver_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `load_stack_assignments`
+--
+
+LOCK TABLES `load_stack_assignments` WRITE;
+/*!40000 ALTER TABLE `load_stack_assignments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `load_stack_assignments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `load_stacks`
+--
+
+DROP TABLE IF EXISTS `load_stacks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `load_stacks` (
+  `load_stack_id` int NOT NULL AUTO_INCREMENT,
+  `load_stack_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `client_id` int NOT NULL,
+  `driver_rate` decimal(10,2) NOT NULL,
+  `trip_rate` decimal(10,2) NOT NULL,
+  `container_size_id` int NOT NULL,
+  `container_type_id` int NOT NULL,
+  `expiry` datetime NOT NULL,
+  `date_created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`load_stack_id`),
+  KEY `client_id` (`client_id`),
+  KEY `container_size_id` (`container_size_id`),
+  KEY `container_type_id` (`container_type_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `load_stacks`
+--
+
+LOCK TABLES `load_stacks` WRITE;
+/*!40000 ALTER TABLE `load_stacks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `load_stacks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `location_data`
+--
+
+DROP TABLE IF EXISTS `location_data`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `location_data` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_agent` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `location_lat` decimal(10,6) DEFAULT NULL,
+  `location_lng` decimal(10,6) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `location_data`
+--
+
+LOCK TABLES `location_data` WRITE;
+/*!40000 ALTER TABLE `location_data` DISABLE KEYS */;
+INSERT INTO `location_data` VALUES (1,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36','::1',-25.756572,28.191382,'2024-08-16 13:28:52'),(2,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36','::1',-25.756572,28.191382,'2024-08-16 13:38:29');
+/*!40000 ALTER TABLE `location_data` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `logging`
+--
+
+DROP TABLE IF EXISTS `logging`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `logging` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `detail` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `login_time` datetime NOT NULL,
+  `logout_time` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `logging`
+--
+
+LOCK TABLES `logging` WRITE;
+/*!40000 ALTER TABLE `logging` DISABLE KEYS */;
+INSERT INTO `logging` VALUES (1,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-16 12:37:08','0000-00-00 00:00:00'),(2,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-16 12:44:37','0000-00-00 00:00:00'),(3,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-16 13:01:33','0000-00-00 00:00:00'),(4,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-16 13:12:27','0000-00-00 00:00:00'),(5,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-16 13:26:40','0000-00-00 00:00:00'),(6,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-16 13:27:36','0000-00-00 00:00:00'),(7,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-16 17:21:55','0000-00-00 00:00:00'),(8,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-16 17:22:27','0000-00-00 00:00:00'),(9,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-16 17:23:03','0000-00-00 00:00:00'),(10,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-16 17:25:20','0000-00-00 00:00:00'),(11,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-23 06:57:34','0000-00-00 00:00:00'),(12,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-23 07:46:50','0000-00-00 00:00:00'),(13,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-23 07:47:14','0000-00-00 00:00:00'),(14,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-23 11:05:56','0000-00-00 00:00:00'),(15,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-23 14:59:28','0000-00-00 00:00:00'),(16,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-24 16:24:22','0000-00-00 00:00:00'),(17,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-24 16:34:10','0000-00-00 00:00:00'),(18,0,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-24 16:37:58','0000-00-00 00:00:00'),(19,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-24 16:39:09','0000-00-00 00:00:00'),(20,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-24 16:40:00','0000-00-00 00:00:00'),(21,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-29 13:07:33','0000-00-00 00:00:00'),(22,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-11-30 14:52:39','0000-00-00 00:00:00'),(23,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36','2023-12-07 10:37:57','0000-00-00 00:00:00'),(24,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2023-12-11 09:56:34','0000-00-00 00:00:00'),(25,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2023-12-11 13:17:18','0000-00-00 00:00:00'),(26,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2023-12-13 07:21:53','0000-00-00 00:00:00'),(27,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2023-12-13 18:34:27','0000-00-00 00:00:00'),(28,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2023-12-15 07:13:00','0000-00-00 00:00:00'),(29,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2023-12-16 08:58:34','0000-00-00 00:00:00'),(30,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2023-12-18 21:43:07','0000-00-00 00:00:00'),(31,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2024-01-01 05:04:45','0000-00-00 00:00:00'),(32,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2024-01-02 05:06:20','0000-00-00 00:00:00'),(33,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0','2024-01-02 08:43:31','0000-00-00 00:00:00'),(34,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2024-01-02 16:51:10','0000-00-00 00:00:00'),(35,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2024-01-02 16:51:21','0000-00-00 00:00:00'),(36,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2024-01-02 16:51:38','0000-00-00 00:00:00'),(37,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2024-01-02 17:47:30','0000-00-00 00:00:00'),(38,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2024-01-08 07:19:07','0000-00-00 00:00:00'),(39,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2024-01-08 07:21:21','0000-00-00 00:00:00'),(40,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2024-01-10 06:15:28','0000-00-00 00:00:00'),(41,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2024-01-17 06:36:38','0000-00-00 00:00:00'),(42,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36','2024-01-23 08:59:24','0000-00-00 00:00:00'),(43,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36','2024-01-26 03:38:21','0000-00-00 00:00:00'),(44,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36','2024-02-15 08:03:24','0000-00-00 00:00:00'),(45,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36','2024-02-24 13:50:49','0000-00-00 00:00:00'),(46,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36','2024-02-26 08:02:06','0000-00-00 00:00:00'),(47,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36','2024-03-07 07:10:06','0000-00-00 00:00:00'),(48,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36','2024-03-13 06:44:27','0000-00-00 00:00:00'),(49,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36','2024-03-13 07:40:19','0000-00-00 00:00:00'),(50,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36','2024-03-13 11:07:51','0000-00-00 00:00:00'),(51,7,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36','2024-03-14 07:20:08','0000-00-00 00:00:00');
+/*!40000 ALTER TABLE `logging` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `lp_vehicle_expense_type`
+--
+
+DROP TABLE IF EXISTS `lp_vehicle_expense_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lp_vehicle_expense_type` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `lp_vehicle_expense_type`
+--
+
+LOCK TABLES `lp_vehicle_expense_type` WRITE;
+/*!40000 ALTER TABLE `lp_vehicle_expense_type` DISABLE KEYS */;
+INSERT INTO `lp_vehicle_expense_type` VALUES (1,'fuel','2024-01-02 05:54:27'),(2,'maintenance','2024-01-02 05:54:27'),(3,'depreciation','2024-01-02 05:54:27'),(4,'insurance','2024-01-02 05:54:27');
+/*!40000 ALTER TABLE `lp_vehicle_expense_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `lv_structures`
+--
+
+DROP TABLE IF EXISTS `lv_structures`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lv_structures` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `STRUCTURE` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `POLES_SIZE` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `M16_PITAILS` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `ABC_STRAIN_CLAMPS` int DEFAULT NULL,
+  `ABC_SUSPENSION_CLAMPS` int DEFAULT NULL,
+  `STAYRODS_PLATES` varchar(1000) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `STAY_BRACKETS` int DEFAULT NULL,
+  `STAY_THIMBLES` int DEFAULT NULL,
+  `LV_GUYGRIPS` int DEFAULT NULL,
+  `M16_EYENUTS` int DEFAULT NULL,
+  `M20x350` int DEFAULT NULL,
+  `STRUT_BRACKET` int DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `lv_structures`
+--
+
+LOCK TABLES `lv_structures` WRITE;
+/*!40000 ALTER TABLE `lv_structures` DISABLE KEYS */;
+INSERT INTO `lv_structures` VALUES (1,'1100,1145 \n& 1153 SUSPENSION','7/9M','1',0,1,'0',0,0,0,0,0,0),(2,'1120,1146 & \n1154 TERMINATION','7/9M','1',1,0,'1',1,2,4,0,0,0),(3,'1157,1149 & 1140\n T-OFF','7/9M','2',3,0,'1',1,2,4,0,0,0),(4,'1155,1147 & \n1121 ANGLE','7/9M','2 OR 3',2,0,'2',2,4,8,1,0,0),(5,'STRUT POLE','9/10M','0',0,0,'0',0,0,0,0,4,1),(6,'TAKE-OFF','0','1',1,0,'1',1,2,4,0,0,0);
+/*!40000 ALTER TABLE `lv_structures` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `menu`
+--
+
+DROP TABLE IF EXISTS `menu`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `menu` (
+  `menu_id` int NOT NULL AUTO_INCREMENT,
+  `menu_name` varchar(45) DEFAULT NULL,
+  `menu_type` varchar(45) DEFAULT NULL,
+  `menu_page` varchar(145) DEFAULT NULL,
+  `menu_icon` varchar(85) DEFAULT NULL,
+  `menu_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`menu_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `menu`
+--
+
+LOCK TABLES `menu` WRITE;
+/*!40000 ALTER TABLE `menu` DISABLE KEYS */;
+/*!40000 ALTER TABLE `menu` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `menu_drop`
+--
+
+DROP TABLE IF EXISTS `menu_drop`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `menu_drop` (
+  `menu_drop_id` int NOT NULL AUTO_INCREMENT,
+  `menu_drop_name` varchar(45) DEFAULT NULL,
+  `menu_drop` int DEFAULT NULL,
+  `menu_drop_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`menu_drop_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `menu_drop`
+--
+
+LOCK TABLES `menu_drop` WRITE;
+/*!40000 ALTER TABLE `menu_drop` DISABLE KEYS */;
+/*!40000 ALTER TABLE `menu_drop` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `method`
+--
+
+DROP TABLE IF EXISTS `method`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `method` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `me_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `me_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `me_update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `method`
+--
+
+LOCK TABLES `method` WRITE;
+/*!40000 ALTER TABLE `method` DISABLE KEYS */;
+INSERT INTO `method` VALUES (1,'DEBIT CARD','2023-09-06 06:22:47','2023-09-06 06:22:47'),(2,'CASH','2023-09-06 06:22:47','2023-09-06 06:22:47'),(3,'CREDIT','2023-09-06 06:23:01','2023-09-06 06:23:01');
+/*!40000 ALTER TABLE `method` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `mv_structures`
+--
+
+DROP TABLE IF EXISTS `mv_structures`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `mv_structures` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `STRUCTURES` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `POLES_SIZE` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `XARMS_25M` int DEFAULT NULL,
+  `M20x350` int DEFAULT NULL,
+  `M20x600` int DEFAULT NULL,
+  `CLEVIS_THIMBLES` int DEFAULT NULL,
+  `PREFORM_DEAD_ENDS` int DEFAULT NULL,
+  `D_SHACKLES` int DEFAULT NULL,
+  `LONGRODS` int DEFAULT NULL,
+  `FLAT_BARS_BRAISINGS` int DEFAULT NULL,
+  `M20x400_EYEBOLTS` int DEFAULT NULL,
+  `M20xEYENUTS` int DEFAULT NULL,
+  `POST_INSULATOR` int DEFAULT NULL,
+  `POLE_TOP_BRACKETS` int DEFAULT NULL,
+  `MV_DOUBLE_WRAP` int DEFAULT NULL,
+  `MV_GUYGRIPS` int DEFAULT NULL,
+  `STAY_INSULATOR` int DEFAULT NULL,
+  `RAPLOCK_TIES` int DEFAULT NULL,
+  `RAPTOR_PROTECTOR` int DEFAULT NULL,
+  `SHORT_SPINDLES` int DEFAULT NULL,
+  `LONG_SPINDLES` int DEFAULT NULL,
+  `COACH_STREWS` int DEFAULT NULL,
+  `STAYRODS_PLATES` varchar(1000) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `STAY_THIMBLES` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `CUTOUT_BASE` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `TUBE_LINKS_INCL_16A_FUSES` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `BIMETAL_LUGS` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `MV_STRUT_BRACKET` int DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `mv_structures`
+--
+
+LOCK TABLES `mv_structures` WRITE;
+/*!40000 ALTER TABLE `mv_structures` DISABLE KEYS */;
+INSERT INTO `mv_structures` VALUES (1,'1340','1 x 11,12/13M',1,3,1,0,0,0,0,2,0,0,2,0,0,0,0,2,0,0,2,0,'0','0','0','0','0',0),(2,'1740','1 x 11,12/13M',1,5,1,0,0,0,0,2,0,0,3,1,0,0,0,3,1,1,2,0,'0','0','0','0','0',0),(3,'1343','1 x 11,12/13M',1,3,1,4,4,4,4,2,2,2,0,0,2,6,2,0,0,0,0,6,'2','2','0','0','0',0),(4,'1743','1 x 11,12/13M',1,3,1,6,6,6,6,2,3,3,1,1,2,6,2,1,0,1,0,6,'2','2','0','0','0',0),(5,'1344','1 x 11,12/13M',1,3,1,4,4,4,4,2,2,2,1,0,3,9,3,1,0,0,1,9,'3','3','0','0','0',0),(6,'1744','1 x 11,12/13M',1,3,1,6,6,6,6,2,2,2,2,1,3,9,3,2,0,1,1,9,'3','3','0','0','0',0),(7,'1345/1804','1 x 11,12/13M',2,6,2,4,4,4,4,4,4,0,1,0,2,6,2,1,0,0,1,6,'2','2','0','0','0',0),(8,'1745/1804','1 x 11,12/13M',2,4,2,6,6,6,6,4,6,0,2,0,2,6,2,2,0,0,2,6,'2','2','0','0','0',0),(9,'1848[LINKS]','0',1,5,1,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,'0','0','2 on 2PHASE   3 on 3PHASE','2 on 2PHASE   3 on 3PHASE','4 on 2PHASE \n6 on 3PHASE',0),(10,'1346','1 x 11,12/13M',1,3,1,2,2,2,2,2,2,0,0,0,1,3,1,0,0,0,0,3,'1','1','0','0','0',0),(11,'1746','1 x 11,12/13M',1,2,1,3,3,3,3,2,3,0,0,0,1,3,1,0,0,0,0,3,'1','1','0','0','0',0),(12,'FLY STAY','1 x 11,12/13M',0,0,0,0,0,0,0,0,2,0,0,0,1,7,2,0,0,0,0,3,'1','3','0','0','0',0),(13,'STRUT POLE','1 x 11,12/13M',0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'1 x plate','0','0','0','0',1),(14,'TAKE-OFF DUAL PHASE','0',1,3,1,2,2,2,2,2,2,0,0,0,1,3,1,0,0,0,0,3,'1','1','0','0','0',0),(15,'TAKE-OFF THREE PHASE','0',1,2,1,3,3,3,3,2,3,0,0,0,1,3,1,0,0,0,0,3,'1','1','0','0','0',0);
+/*!40000 ALTER TABLE `mv_structures` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `project`
+--
+
+DROP TABLE IF EXISTS `project`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project` (
+  `pro_id` int NOT NULL AUTO_INCREMENT,
+  `client_id` int NOT NULL,
+  `pro_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `pro_description` longtext COLLATE utf8mb4_general_ci,
+  `pro_manager` int NOT NULL,
+  `pro_amount` double DEFAULT NULL,
+  `pro_amount_paid` double DEFAULT NULL,
+  `pro_start` date DEFAULT NULL,
+  `estimate_end_date` date DEFAULT NULL,
+  `estimate_cost` double DEFAULT NULL,
+  `actual_cost` double DEFAULT NULL,
+  `pro_status` int DEFAULT NULL,
+  `company` int DEFAULT NULL,
+  `pro_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `pro_update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`pro_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `project`
+--
+
+LOCK TABLES `project` WRITE;
+/*!40000 ALTER TABLE `project` DISABLE KEYS */;
+INSERT INTO `project` VALUES (1,1,'West Acres Substation Phase 1','Repaint substation building wall, ceiling & floor slab with grey, green and yellow.',4,35000,0,'2023-08-08','2023-09-04',30000,37773.88,2,1,'2023-09-05 14:41:54','2024-04-15 07:41:03'),(2,6,'Nomulwethu Kmr','',4,436,0,'2023-08-01','2023-09-01',400000,0,2,1,'2023-11-16 18:02:09','2024-04-15 07:41:03'),(3,12,'NEWCASTLE WIRING PROJECT	','',4,205970,0,'2023-12-14','2023-12-20',50571.11,0,3,2,'2023-12-13 07:46:42','2024-04-15 07:41:03'),(4,14,'HOUGHTON ESTATE PROJECT','',4,5000,0,'2024-01-12','2024-01-12',2224,0,3,1,'2024-01-12 07:25:51','2024-04-15 07:41:03'),(5,0,'Reckitt','',4,243663,0,'2024-03-07','2024-03-29',134439.31,0,3,1,'2024-03-07 07:12:57','2024-04-15 07:41:03'),(6,0,'Kaarport','',4,243663,0,'2024-03-11','2024-03-29',134439.31,0,2,2,'2024-03-08 14:00:35','2024-04-15 07:41:03'),(7,0,'Tzaneen municipality','',4,0,0,'2024-03-20','2024-04-09',0,0,0,2,'2024-05-17 11:08:02','2024-07-12 07:54:59'),(8,12,'Newcastle Continuous Project','',2,0,0,'2023-12-01','2024-12-31',400000,0,0,2,'2024-05-22 06:49:37','2024-07-12 07:56:01'),(9,0,'Fibre Installation','',4,0,0,'2024-05-01','2024-05-31',30000,0,0,2,'2024-05-22 07:20:02','2024-07-12 07:54:59'),(10,0,'Hluvukani Project','',5,0,0,'2024-04-01','2024-06-30',0,0,0,2,'2024-05-24 10:18:53','2024-07-12 07:54:59'),(11,34,'Zombie Networx Fibre Optic','',8,120000,0,'2024-05-13','2024-08-31',100000,0,0,4,'2024-07-12 07:46:33','2024-07-12 07:56:01'),(12,35,'Nesher Fibre Project','',17,40000,0,'2024-03-01','2024-08-31',30000,0,0,4,'2024-07-12 07:53:22','2024-07-12 07:56:01'),(13,0,'Fourways','',17,5600,0,'2024-05-01','2024-05-31',5000,0,0,4,'2024-08-01 12:48:04','2024-08-01 12:48:04'),(14,35,'EXCLUSIVE HYDRAULICS DFAGAU23-28841 Boxberg ',NULL,17,5600,NULL,'2024-07-01','2024-07-31',1900,NULL,NULL,3,'2024-09-10 07:58:58','2024-09-10 11:20:00'),(15,36,'Nama Khoi',NULL,4,0,NULL,'2024-09-10','2024-10-31',0,NULL,NULL,3,'2024-09-10 08:23:40','2024-09-10 08:23:40'),(16,37,'Ga-Rankuwa',NULL,15,506250,NULL,'2024-09-16','2024-10-16',379687.5,NULL,NULL,4,'2024-09-10 09:59:45','2024-09-10 09:59:45'),(17,35,'STARK AYRES DFAGAU2430758',NULL,17,5600,NULL,'2024-08-01','2024-09-01',1900,NULL,NULL,4,'2024-09-10 11:21:42','2024-09-10 11:21:42'),(18,35,'SA SAFE EQUIP TERRANCE RD DFAGAU 24-30759',NULL,17,5600,NULL,'2024-07-29','2024-08-14',1900,NULL,NULL,4,'2024-09-10 11:29:28','2024-09-10 11:29:28'),(19,28,'Mapopani Capicet Fiber Project Aqua',NULL,17,13732.23,NULL,'2024-11-24','2024-11-29',8701.25,NULL,NULL,2,'2024-11-28 12:19:50','2024-11-28 12:19:50'),(20,28,'Silverton Block B',NULL,17,17500,NULL,'2024-11-27','2024-12-10',13000,NULL,NULL,2,'2024-12-06 10:04:55','2024-12-06 10:04:55'),(21,28,'Germiston MCT',NULL,17,21610,NULL,'2024-12-02','2024-12-10',16400,NULL,NULL,2,'2024-12-06 10:07:38','2024-12-06 10:07:38'),(22,35,'Boksburg',NULL,17,3615.2,NULL,'2024-11-27','2024-12-10',2711.4,NULL,NULL,2,'2024-12-06 10:11:45','2024-12-06 10:11:45'),(23,35,'RANDBURG DELAREY',NULL,17,331775.08,NULL,'2025-01-13','2025-01-31',300000,NULL,NULL,1,'2025-01-13 09:27:26','2025-01-13 09:27:26');
+/*!40000 ALTER TABLE `project` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `project_acquisitions`
+--
+
+DROP TABLE IF EXISTS `project_acquisitions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project_acquisitions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `project_id` int NOT NULL,
+  `acquisition_date` date NOT NULL,
+  `acquisition_type` enum('purchase','merger','joint_venture') NOT NULL,
+  `responsible_employee_id` int NOT NULL,
+  `acquiring_status` int NOT NULL DEFAULT '0',
+  `acquired_reject_reason` longtext NOT NULL,
+  `total_amount` decimal(10,2) NOT NULL,
+  `acquisition_notes` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`),
+  KEY `responsible_employee_id` (`responsible_employee_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `project_acquisitions`
+--
+
+LOCK TABLES `project_acquisitions` WRITE;
+/*!40000 ALTER TABLE `project_acquisitions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `project_acquisitions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `project_budget`
+--
+
+DROP TABLE IF EXISTS `project_budget`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project_budget` (
+  `pro_b_id` int NOT NULL AUTO_INCREMENT,
+  `project_b_id` double NOT NULL,
+  `pro_b_item` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `pro_b_purpose` int NOT NULL,
+  `pro_b_cost` double NOT NULL,
+  `pro_b_provider` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `pro_b_use_date` date NOT NULL,
+  `pro_b_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `pro_b_update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`pro_b_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `project_budget`
+--
+
+LOCK TABLES `project_budget` WRITE;
+/*!40000 ALTER TABLE `project_budget` DISABLE KEYS */;
+INSERT INTO `project_budget` VALUES (1,1,'Material',1,30000,'Chemical','2023-08-16','2023-09-05 15:09:57','2023-09-12 13:00:09'),(2,3,'10A 1-POLE 4.5kA C CURVE MINI RAIL MCB',1,5441.8,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(3,3,'20A 1-POLE 4.5kA C CURVE MINI RAIL MCB',1,2176.72,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(4,3,'32A 1-POLE 4.5kA C CURVE MINI RAIL MCB',1,3851.12,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(5,3,'40A 1-POLE 4.5kA C CURVE MINI RAIL MCB',1,167.44,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(6,3,'50A 1-POLE 4.5kA C CURVE MINI RAIL MCB',1,84.53,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(7,3,'63A 1-POLE 4.5kA C CURVE MINI RAIL MCB',1,167.44,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(8,3,'30A 2-POLE 4.5kA C CURVE MINI RAIL MCB',1,672.98,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(9,3,'40A 3-POLE 4.5kA C CURVE MINI RAIL MCB',1,2519.65,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(10,3,'63A 3-POLE 4.5kA C CURVE MINI RAIL MCB',1,503.93,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(11,3,'80A 3-POLE 6kA C CURVE MINI RAIL MCB 26mm WIDTH',1,1062.6,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(12,3,'100A 3-POLE 6kA C CURVE MINI RAIL MCB 26mm WIDTH',1,1117.34,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(13,3,'63A 30mA 4P RCD NO OVERLOAD',1,5924.8,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(14,3,'16A SWITCHED SOCKET 2x4 C/W WHITE STEEL COVER PLATE',1,2197.65,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(15,3,'16A SWITCHED SOCKET 4x4 C/W WHITE STEEL COVER PLATE',1,1512.94,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(16,3,'2.5mm x 2 CORE + E FLAT WHITE /1QOM',1,2005.54,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(17,3,'2.5mm x 2 CORE + E FLAT WHITE /50M',1,1368.96,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(18,3,'1.5mm x 2 CORE + E FLAT WHITE /1QOM',1,1230.67,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(19,3,'1.2M x M16 EARTH ROD.150 MICRONS COPPER.THREADED ON EACH END',1,1229.12,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(20,3,'DRIVING CAP',1,353.28,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(21,3,'DRIVING TIP',1,441.6,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(22,3,'70mm CLAMP',1,353.28,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(23,3,'10mm EARTH WIRE 125KG (288 METERS)',1,9237.72,'ACDC Express','0000-00-00','2023-12-13 08:24:14','2023-12-13 08:24:59'),(24,3,'FUEL',2,2500,'','0000-00-00','0000-00-00 00:00:00','2023-12-13 08:37:00'),(25,3,'ACCOMMODATION',3,1200,'','0000-00-00','0000-00-00 00:00:00','2023-12-13 08:37:00'),(26,3,'MEALS',4,800,'','0000-00-00','0000-00-00 00:00:00','2023-12-13 08:37:00'),(27,3,'D.B LABELS',1,1100,'','0000-00-00','0000-00-00 00:00:00','2023-12-13 08:37:00'),(28,3,'LABOUR',5,1350,'','0000-00-00','0000-00-00 00:00:00','2023-12-13 08:37:00'),(29,4,'Material',1,1724,'','0000-00-00','2024-01-12 07:28:42','2024-01-12 07:28:42'),(30,4,'fuel',2,500,'','0000-00-00','2024-01-12 07:28:42','2024-01-12 07:29:53'),(31,6,'labour',5,12183.15,'','0000-00-00','2024-04-08 13:00:10','2024-04-08 13:00:10'),(32,6,'Accomodation',3,2500,'','0000-00-00','2024-04-08 13:00:10','2024-04-08 13:00:10'),(33,6,'fuel',2,15000,'','0000-00-00','2024-04-08 13:00:10','2024-04-08 13:00:10'),(34,6,'Materials',1,92756.16,'','0000-00-00','2024-04-08 13:00:10','2024-04-08 13:00:10'),(35,6,'Rockhole',19,2000,'','0000-00-00','2024-04-08 13:00:10','2024-04-08 13:00:10'),(36,11,'Materials',1,50000,'','0000-00-00','2024-07-18 06:35:34','2024-07-18 06:35:34'),(37,11,'Fuel',2,15000,'','0000-00-00','2024-07-18 06:36:59','2024-07-18 06:36:59'),(38,11,'Food',3,1000,'','0000-00-00','2024-07-18 06:36:59','2024-07-18 06:36:59'),(39,15,'Material',1,80000,'ARB','2024-09-09','2024-10-03 10:24:37','2024-10-03 10:24:37'),(40,15,'Fuel',2,8000,'Engen','2024-09-11','2024-10-03 10:24:37','2024-10-03 10:24:37'),(41,15,'Food',3,800,'KFC','2024-09-10','2024-10-03 10:26:31','2024-10-03 10:26:31'),(42,15,'Hiring',15,8000,'.','2024-09-11','2024-10-03 10:26:31','2024-10-03 10:26:31');
+/*!40000 ALTER TABLE `project_budget` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `project_expense`
+--
+
+DROP TABLE IF EXISTS `project_expense`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project_expense` (
+  `pro_e_id` int NOT NULL AUTO_INCREMENT,
+  `project_id` int NOT NULL,
+  `pro_e_item` varchar(245) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `pro_e_amount` double NOT NULL,
+  `pro_e_date` date NOT NULL,
+  `pro_e_receipt` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `pro_e_purpose` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `pro_e_provider` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `pro_e_method` int NOT NULL,
+  `pro_e_account` int NOT NULL,
+  `pro_e_by` int NOT NULL,
+  `pro_ex_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `pro_e_update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`pro_e_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=543 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `project_expense`
+--
+
+LOCK TABLES `project_expense` WRITE;
+/*!40000 ALTER TABLE `project_expense` DISABLE KEYS */;
+INSERT INTO `project_expense` VALUES (1,1,'Chemical',620,'2023-08-16','9550','1','Xtreme Clean',2,1,4,'2023-09-05 16:20:55','2024-01-17 06:30:54'),(2,1,'SKI Rope',115,'2023-08-24','4880285723',' 1 ','Best Bulid Nelspruit',1,1,4,'2023-09-07 12:49:10','2023-09-07 12:49:10'),(3,1,'Lunch',84.78,'2023-08-25','1837252','13','Transa African Concessions',1,1,4,'2023-09-07 12:53:30','2024-01-24 06:50:44'),(4,1,'Lunch',126.61,'2023-08-25','552731','13','Transa African Concessions',1,1,4,'2023-09-07 12:54:33','2024-01-24 06:50:44'),(5,1,'Grocery',955.17,'2023-08-16','0164',' 4 ','Shoprite',1,1533,4,'2023-09-07 13:05:39','2023-09-07 13:05:39'),(6,1,'Water Fittings',171.005,'2023-08-16','132503501375',' 1 ','Plumblink',1,1037,4,'2023-09-07 13:12:44','2023-09-07 13:12:44'),(7,1,'Water Fittings',39.24,'2023-08-17','132503502543',' 1 ','Plumblink',1,1037,4,'2023-09-07 13:14:15','2023-09-07 13:14:50'),(8,1,'Supper',196.42,'2023-08-15','2159',' 4 ','Boxer',1,8024,4,'2023-09-07 13:18:24','2023-09-07 13:18:24'),(9,1,'Main Paint',977,'2023-08-30','B30300823103120',' 1 ','Builders',1,1037,4,'2023-09-07 13:21:02','2023-09-07 13:21:02'),(10,1,'Fuel',2283.05,'2023-08-15','69789',' 2 ','Total',1,1037,4,'2023-09-07 13:25:14','2023-09-07 13:25:14'),(11,1,'Liquid Soap',63.94,'2023-08-24','0969',' 1 ','SApar',1,1037,4,'2023-09-07 13:28:20','2023-09-07 13:28:20'),(12,1,'Lunch',155.47,'2023-08-15','C0186',' 4 ','Shoprite',1,1037,4,'2023-09-07 13:30:08','2023-09-07 13:30:08'),(13,1,'Lunch',188.13,'2023-08-26','C0127',' 4 ','Checkers',1,1037,4,'2023-09-07 13:31:39','2023-09-07 13:31:39'),(14,1,'Paint and Brushs',2448,'2023-08-22','0090',' 1 ','Builders',1,1037,4,'2023-09-07 13:34:20','2023-09-07 13:34:20'),(15,1,'Floor Paint and Brushes',1745,'2023-08-25','0021',' 1 ','Builders',1,1037,4,'2023-09-07 13:35:38','2023-09-07 13:35:38'),(16,1,'Tiles Replacement',866,'2023-08-25','0082',' 1 ','Builders',1,1037,4,'2023-09-07 13:36:40','2023-09-07 13:36:40'),(17,1,'Lunch',111.95,'2023-08-21','C0233',' 4 ','Shoprite',1,1037,4,'2023-09-07 13:37:39','2023-09-07 13:37:39'),(18,1,'Fuel',1287.74,'2023-08-18','4764',' 2 ','Total',1,1037,4,'2023-09-07 13:39:27','2023-09-07 13:39:27'),(19,1,'Ceiling Paint',2889,'2023-08-24','0016',' 1 ','Builders',1,1037,4,'2023-09-07 13:40:26','2023-09-07 13:40:26'),(20,1,'Ceiling Board',2455,'2023-08-24','4398',' 1 ','Best Bulid Nelspruit',1,1037,4,'2023-09-07 13:41:47','2023-09-07 13:41:47'),(21,1,'Tools',240,'2023-08-21','00031',' 1 ','China Cash and Carry',1,1037,4,'2023-09-07 13:44:49','2023-09-07 13:44:49'),(22,1,'Lunch',155.39,'2023-08-16','C0243',' 4 ','Shoprite',1,1037,4,'2023-09-07 13:45:56','2023-09-07 13:45:56'),(23,1,'Ceiling',100,'2023-08-30','PCS1000121',' 1 ','Best Bulid Nelspruit',1,1037,4,'2023-09-07 13:47:35','2023-09-07 13:47:35'),(24,1,'Cleaning Tools',121.97,'2023-09-01','C0244',' 1 ','Shoprite',1,1037,4,'2023-09-07 13:49:09','2023-09-07 13:49:09'),(25,1,'Fuel',1533.18,'2023-08-26','21987',' 2 ','engen',1,1037,4,'2023-09-07 13:53:56','2023-09-07 13:53:56'),(26,1,'Airtime (Data) Coordinates',283.68,'2023-08-26','C0124',' 1 ','Checkers',1,1037,4,'2023-09-07 13:56:31','2023-09-07 13:56:31'),(27,1,'Lunch',181.78,'2023-08-17','C0242',' 4 ','Shoprite',1,1037,4,'2023-09-07 13:57:34','2023-09-07 13:57:34'),(28,1,'Tollgate',45,'2023-08-15','1003712','13','Tollgate',1,1,4,'2023-09-07 14:01:41','2024-01-18 11:45:45'),(29,1,'Tools',344,'2023-08-21','0034',' 1 ','Builders',1,1037,4,'2023-09-07 14:05:03','2023-09-07 14:05:03'),(30,1,'PPE, Windows',1209.75,'2023-08-17','0102',' 1 ','Builders',1,1037,4,'2023-09-07 14:06:54','2023-09-07 14:06:54'),(31,1,'Headlight ',59.5,'2023-08-15','437936',' 2 ','Shell Ultra city',1,1037,4,'2023-09-07 14:08:29','2023-09-07 14:08:29'),(32,1,'Tollgate',112,'2023-08-15','1219475','13','Tollgate',1,1037,4,'2023-09-07 14:09:44','2024-01-18 11:45:45'),(33,1,'Tollgate',112,'2023-08-15','2050236','13','Tollgate',1,1,4,'2023-09-07 14:10:52','2024-01-18 11:45:45'),(34,1,'Tollgate',75,'2023-08-15','2175100','13','Tollgate',1,1037,4,'2023-09-07 14:13:04','2024-01-18 11:45:45'),(35,1,'Tollgate',75,'2023-08-15','2175107','13','Tollgate',1,1,4,'2023-09-07 14:14:12','2024-01-18 11:45:45'),(36,1,'Tollgate',45,'2023-08-15','1160770','13','Tollgate',1,1,4,'2023-09-07 14:14:47','2024-01-18 11:45:45'),(37,1,'Tollgate',45,'2023-08-31','1731294','13','Tollgate',1,1,4,'2023-09-07 14:15:20','2024-01-18 11:45:45'),(38,1,'Tollgate',45,'2023-09-01','143062','13','Tollgate',1,1,4,'2023-09-07 14:21:07','2024-01-18 11:45:45'),(39,1,'Tollgate',75,'2023-09-01','2122658','13','Tollgate',1,1,4,'2023-09-07 14:21:43','2024-01-18 11:45:45'),(40,1,'Tollgate',112,'2023-09-01','55370','13','Tollgate',1,1,4,'2023-09-07 14:22:15','2024-01-18 11:45:45'),(41,1,'Lunch',181.78,'2023-08-17','C0242',' 4 ','Shoprite',1,1037,4,'2023-09-07 14:24:27','2023-09-07 14:24:27'),(42,1,'Fuel',732.9,'2023-08-29','275827',' 2 ','Sasol',1,1037,4,'2023-09-07 14:25:28','2023-09-07 14:25:28'),(43,1,'Lunch',1413.85,'2023-09-01','569417',' 4 ','Shell Gateway Motors',1,1037,4,'2023-09-07 14:27:37','2023-09-07 14:27:37'),(44,1,'Lunch',230.82,'2023-08-25','C0243',' 4 ','Shoprite',1,1037,4,'2023-09-07 14:28:27','2023-09-07 14:28:27'),(45,1,'Lunch',207.56,'2023-08-23','4743',' 4 ','Spar',1,1037,4,'2023-09-07 14:29:21','2023-09-07 14:29:21'),(46,1,'Lunch',57,'2023-08-29','8846',' 4 ','Spar',1,1037,4,'2023-09-07 14:30:09','2023-09-07 14:30:09'),(47,1,'Chemical',291,'2023-08-17','9557',' 1 ','Xtreme Clean',1,1037,4,'2023-09-07 14:34:39','2023-09-07 14:34:39'),(48,1,'Fuel',1271.71,'2023-08-23','01-10221-6461',' 2 ','engen',1,1037,4,'2023-09-07 14:38:09','2023-09-07 14:38:09'),(49,1,'Lunch',80,'2023-08-29','18775',' 4 ','Chicken Licken',1,1037,4,'2023-09-07 14:39:51','2023-09-07 14:39:51'),(50,1,'Fuel',1230.65,'2023-08-20','467416',' 2 ','Reggies',1,1037,4,'2023-09-07 14:43:26','2023-09-07 14:43:26'),(51,1,'Fuel',1607.85,'2023-08-30','271094',' 2 ','Zam Riverside',1,1037,4,'2023-09-07 14:45:02','2023-09-07 14:45:02'),(52,1,'Ceiling Guys Payment',2300,'2023-08-24','Ewallet',' 5 ','Ceiling Guys',1,1,4,'2023-09-08 06:48:19','2023-09-08 06:48:19'),(53,1,'Ceiling Guys Payment',1200,'2023-08-25','Transfer',' 5 ','Ceiling Guys',1,1,4,'2023-09-08 06:49:09','2023-09-08 06:49:09'),(54,1,'Rent',3200,'2023-08-16','Cash Withdraw',' 3 ','Matsafeni',1,1,4,'2023-09-08 06:50:03','2023-09-08 06:50:03'),(55,1,'Casual Labor 2 people for 3 day',1020,'2023-09-01','Transfer',' 5 ','Casual Labor',1,1,4,'2023-09-08 06:53:30','2023-09-08 06:53:30'),(56,2,'Cab25x4',493.41,'2023-09-18','C00201',' 1 ','Lousique',1,1037,4,'2023-11-18 08:50:53','2023-11-18 08:50:53'),(57,2,'Food',103.78,'2023-09-18','4816',' 4 ','SuperSpar',2,1,4,'2023-11-18 09:00:05','2023-11-18 09:00:05'),(58,2,'Pump',34.99,'2023-10-27','2150',' 1 ','Agrimark',1,1,4,'2023-11-18 10:19:19','2023-11-18 10:19:19'),(59,2,'Tollgate',45,'2023-09-10','1559446','13','Transa African Concessions',2,1,4,'2023-11-18 10:27:57','2024-01-18 11:45:45'),(60,2,'Food',76.14,'2023-10-26','8692',' 1 ','SuperSpar',1,1,4,'2023-11-18 10:44:39','2023-11-18 10:44:39'),(61,2,'Food',41.99,'2023-10-27','0958',' 4 ','SuperSpar',1,1,4,'2023-11-18 10:45:21','2023-11-18 10:45:21'),(62,2,'Lodge',350,'2023-10-25','2627',' 3 ','Alsat Guest Lodge Kuruman',2,1,4,'2023-11-18 12:13:23','2023-11-18 12:13:23'),(63,2,'Fuel',1095.83,'2023-10-27','156471',' 2 ','CBK Trek-In Kuruman',1,1037,4,'2023-11-18 12:17:52','2023-11-18 12:17:52'),(64,2,'Lodge',350,'2023-11-26','2647',' 3 ','Alsat Guest Lodge Kuruman',2,1,4,'2023-11-18 12:26:04','2023-11-18 12:26:04'),(65,2,'Lodge',350,'2023-11-26','2647',' 3 ','Alsat Guest Lodge Kuruman',2,1,4,'2023-11-19 03:32:38','2023-11-19 03:32:38'),(78,3,'Black 4 1/2 Way Mini Rail Blanks 13mm',200.1,'2023-12-16','NCIN081012',' 1 ','ACDC Express',1,1037,4,'2024-01-17 06:31:04','2024-01-17 06:31:04'),(67,3,'fuel',33.6,'2023-12-13','535911037',' 2 ','Total Hyper',1,1037,4,'2023-12-13 12:54:08','2023-12-13 12:54:08'),(68,3,'Material',1095,'2023-12-12','5359',' 1 ','Goldwagen',1,1037,4,'2023-12-13 12:56:03','2023-12-13 12:56:03'),(69,3,'fuel',1240.35,'2023-12-13','500',' 2 ','Shell Westgate',1,1037,4,'2023-12-13 12:56:55','2023-12-13 13:30:59'),(70,3,'Lodge ',1200,'2023-12-13','Acc 00003','1','lodge',1,1037,4,'2023-12-13 18:36:13','2024-01-10 09:12:59'),(71,3,'Chicken',89.9,'2023-12-14','NWF001',' 4 ','PEDROS NEWCASTLE',1,9856,4,'2023-12-14 10:22:51','2023-12-14 10:22:51'),(72,3,'Material',726.92,'2023-12-15','NCIN080978','1','ACDC Express',1,9856,4,'2023-12-15 07:18:39','2024-01-17 06:34:18'),(73,3,'Material',444.36,'2023-12-15','MNW004',' 1 ','ACDC Express',1,9856,4,'2023-12-15 11:24:14','2023-12-15 11:24:14'),(74,3,'Meat',154,'2023-12-14','NWF002',' 4 ','BULELO BUTCHERY  MADADENI ',1,9856,4,'2023-12-15 12:22:48','2023-12-15 12:22:48'),(75,3,'CHICKEN',105,'2023-12-15','NWF003',' 4 ','CHICKEN LICKEN NEWCASTLE',1,9856,4,'2023-12-15 16:47:58','2023-12-15 16:47:58'),(77,3,'Brother label tape 9mm, Brother labelling machine H110',1769.85,'2023-12-13','DCS1340366',' 1 ','Brite Lighting and Electrical Wholesalers',1,1037,1,'2024-01-17 06:26:49','2024-01-17 06:26:49'),(79,3,'Energiser Max Battery AAA 1.5V LR03 (Pack of 4)',154.56,'2023-12-15','NCIN081002',' 1 ','ACDC Express',1,1037,4,'2024-01-17 06:33:14','2024-01-17 06:33:14'),(80,3,'22 items from ACDC ',42522.29,'2023-12-13','33291',' 1 ','ACDC Express',1,0,4,'2024-01-17 06:39:31','2024-01-17 06:39:31'),(81,3,'CHICKEN Selection',39.9,'2023-12-28','KSA455',' 4 ','KFC',2,1,4,'2024-01-17 06:50:29','2024-01-17 06:50:29'),(82,3,'Fuel',1038.55,'2023-12-13','3242',' 2 ','Shell Westgate',1,1037,4,'2024-01-17 06:52:42','2024-01-17 06:52:42'),(83,3,'C/Copy A3 SS',26,'2023-12-22','130781',' 10 ','Blood Sweet and Tears Trading',1,1037,4,'2024-01-17 06:56:22','2024-01-17 12:32:47'),(84,3,'Food',201.8,'2023-12-13','3242',' 4 ','Shell Westgate',1,1037,4,'2024-01-17 06:58:47','2024-01-17 06:58:47'),(85,3,'Fuel',1022.4,'2023-12-18','3325',' 2 ','Shell Westgate',1,1037,4,'2024-01-17 06:59:48','2024-01-17 06:59:48'),(86,3,'Food',115.9,'2023-12-18','3325',' 4 ','Shell Westgate',1,1037,4,'2024-01-17 07:01:47','2024-01-17 07:01:47'),(87,3,'Food',52.97,'2023-12-16','5518',' 4 ','SuperSpar',1,1037,4,'2024-01-17 12:30:55','2024-01-17 12:30:55'),(88,3,'Food',202.1,'2023-12-21','3603',' 4 ','Shell Westgate',1,1037,4,'2024-01-17 12:32:18','2024-01-17 13:21:55'),(89,3,'Fuel',1098.05,'2023-12-21','3603',' 2 ','Shell Westgate',1,1037,4,'2024-01-17 12:33:45','2024-01-17 13:21:55'),(90,3,'Fuel',1199,'2023-12-22','3144',' 2 ','Shell Westgate',1,1037,4,'2024-01-17 12:35:20','2024-01-17 12:35:20'),(91,1,'Food',110.2,'2023-12-22','3144',' 4 ','Shell Westgate',1,1037,4,'2024-01-17 12:36:18','2024-01-17 12:36:18'),(92,3,'Food',72.57,'2023-12-29','1229194842',' 4 ','PicknPay',1,1037,4,'2024-01-17 12:47:43','2024-01-17 12:47:43'),(93,3,'Food',68.37,'2023-12-28','1228113818',' 4 ','PicknPay',1,1037,4,'2024-01-17 12:49:30','2024-01-17 12:49:30'),(94,3,'Food',124.63,'2024-01-01','0112163343',' 4 ','PicknPay',1,1037,4,'2024-01-17 12:51:19','2024-01-17 12:51:19'),(95,3,'Food',87.9,'2023-12-28','1040015607',' 4 ','Total Gamalakhe',1,1037,4,'2024-01-17 12:53:47','2024-01-17 12:53:47'),(96,3,'Fuel',1190.6,'2023-12-28','1040015607',' 2 ','Total Gamalakhe',1,1037,4,'2024-01-17 12:56:13','2024-01-17 12:56:13'),(97,3,'sds, nail and anchor ',149.8,'2023-12-12','00/3/023203',' 1 ','Jacks Paint Bok',1,1037,4,'2024-01-17 13:08:09','2024-01-17 13:08:09'),(98,3,'Guest House',600,'2023-12-28','000',' 3 ','Gracelands Guest House',2,1,4,'2024-01-17 13:10:28','2024-01-17 13:10:28'),(99,3,'Brake Pad Set Front',535,'2023-12-22','100745732',' 6 ','Goldwagen Boksburg',1,1037,4,'2024-01-17 13:12:22','2024-01-17 13:12:22'),(100,3,'Rock my Soul',105,'2023-12-15','10542',' 4 ','CHICKEN LICKEN NEWCASTLE',1,1037,4,'2024-01-17 13:15:36','2024-01-17 13:15:36'),(101,3,'Fuel',1097.95,'2024-01-07','420894','1','Shell Westgate',1,1037,4,'2024-01-17 13:26:51','2024-01-17 13:30:29'),(102,3,'Fuel',1186.8,'2023-12-31','263819','1','Shell Westgate',1,1037,4,'2024-01-17 13:27:42','2024-01-17 13:29:50'),(103,3,'Food',183.9,'2023-12-31','263819',' 4 ','Shell Westgate',1,1037,4,'2024-01-17 13:29:16','2024-01-17 13:29:16'),(104,3,'Food',104.4,'2024-01-07','420894',' 4 ','Shell Westgate',1,1037,4,'2024-01-17 13:32:48','2024-01-17 13:32:48'),(105,3,'Material',57.99,'2023-12-15','178400',' 1 ','Build it',1,1037,4,'2024-01-17 13:41:11','2024-01-17 13:41:11'),(106,3,'Food',113.47,'2023-12-30','84546',' 4 ','PicknPay',1,1037,4,'2024-01-17 13:44:59','2024-01-17 13:44:59'),(107,3,'Food',40,'2024-01-07','679426',' 4 ','Shell Ultra',1,1037,4,'2024-01-17 13:47:48','2024-01-17 13:47:48'),(108,3,'Suspension Clamp',150,'2023-12-29','108','1','Kambula Electrical',1,1037,4,'2024-01-19 04:16:55','2024-01-19 04:16:55'),(109,3,'Tollgate',62,'2024-01-07','5947944','13','The SA National Road',2,1,4,'2024-01-19 05:13:52','2024-01-19 05:13:52'),(110,3,'Tollgate',62,'2024-01-07','900467','13','The SA National Road',2,1,4,'2024-01-19 05:14:42','2024-01-19 05:14:42'),(111,3,'Tollgate',83,'2024-01-07','1050043','13','Toll Concession',2,1,4,'2024-01-19 05:15:43','2024-01-19 05:15:43'),(112,3,'Tollgate',88,'2024-01-07','124474','13','Toll Concession',2,1,4,'2024-01-19 05:16:54','2024-01-19 05:16:54'),(113,3,'Tollgate',60,'2024-01-07','1195483','13','Toll Concession',2,1,4,'2024-01-19 05:17:35','2024-01-19 05:17:35'),(114,3,'Tollgate',14.5,'2023-12-21','6712136','13','The SA National Road',2,1,4,'2024-01-19 05:18:26','2024-01-19 05:18:26'),(115,3,'Tollgate',19,'2023-12-21','2991083','13','The SA National Road',2,1,4,'2024-01-19 05:19:17','2024-01-19 05:19:17'),(116,3,'Tollgate',62,'2023-12-21','1381698','13','Toll Concession',2,1,4,'2024-01-19 05:20:07','2024-01-19 05:20:07'),(117,3,'Tollgate',13.5,'2023-12-28','849078','13','The SA National Road',2,1,4,'2024-01-19 06:16:37','2024-01-19 06:16:37'),(118,3,'Tollgate',23.5,'2023-12-28','323686','13','The SA National Road',2,1,4,'2024-01-19 06:21:30','2024-01-19 06:21:30'),(119,3,'Tollgate',83,'2023-12-21','976513','13','Toll Concession',2,1,4,'2024-01-19 06:22:23','2024-01-19 06:22:23'),(120,3,'Tollgate',16.5,'2023-12-28','998250','13','The SA National Road',2,1,4,'2024-01-19 06:23:11','2024-01-19 06:23:11'),(121,3,'Tollgate',62,'2023-12-22','1071714','13','Toll Concession',2,1,4,'2024-01-19 06:24:16','2024-01-19 06:24:16'),(122,3,'Tollgate',88,'2023-12-22','807731','13','Toll Concession',2,1,4,'2024-01-19 06:25:00','2024-01-19 06:25:00'),(123,3,'Tollgate',83,'2023-12-22','763368','13','Toll Concession',2,1,4,'2024-01-19 06:25:47','2024-01-19 06:25:47'),(124,3,'Tollgate',14.5,'2023-12-22','5905690','13','The SA National Road',2,1,4,'2024-01-19 06:27:01','2024-01-19 06:27:01'),(125,3,'Tollgate',60,'2023-12-21','1162268','13','Toll Concession',2,1,4,'2024-01-19 06:27:51','2024-01-19 06:27:51'),(126,3,'Tollgate',19,'2023-12-28','3009122','13','The SA National Road',2,1,4,'2024-01-19 06:28:44','2024-01-19 06:28:44'),(127,3,'Tollgate',19,'2024-01-07','3032751','13','The SA National Road',2,1,4,'2024-01-19 06:29:23','2024-01-19 06:29:23'),(128,3,'Flat Twin + earth',604,'2024-01-12','1000065','1','Urban Hardware',1,1037,4,'2024-01-19 06:31:43','2024-01-19 06:31:43'),(129,3,'Food',127.49,'2023-12-13','030481','4','Checkers',1,1037,4,'2024-01-19 06:34:53','2024-01-19 06:34:53'),(130,3,'Food',18.6,'2023-12-30','029223','4','Schalk Van Heerden',1,1037,4,'2024-01-19 06:36:52','2024-01-19 06:36:52'),(131,3,'Tollgate',35.5,'2023-12-22','2642882','13','The SA National Road',2,1,4,'2024-01-19 06:38:12','2024-01-19 06:38:12'),(132,3,'Food',126.27,'2023-12-29','819634','4','PicknPay',2,1037,4,'2024-01-19 06:49:26','2024-01-19 06:49:26'),(133,3,'Accommodation',350,'2023-09-17','774','3','Alsat Guest Lodge Kuruman',2,1,4,'2024-01-24 06:47:01','2024-01-24 06:47:01'),(134,3,'Accommodation',1050,'2023-09-18','788','3','Alsat Guest Lodge Kuruman',2,1,4,'2024-01-24 06:47:01','2024-01-24 06:47:01'),(135,3,'Lodge',720,'2024-01-22','004','3','Gracelands Guest House',2,1,4,'2024-01-24 13:31:43','2024-01-24 13:31:43'),(136,3,'Material from ACDC',2483.07,'2024-01-19','36088','1','ACDC',3,0,4,'2024-01-24 13:33:17','2024-01-24 13:33:17'),(137,3,'Food',80,'2024-01-23','0054t002070530','4','KFC',1,1037,4,'2024-01-24 13:36:15','2024-01-24 13:36:15'),(138,3,'Food',38,'2024-01-23','6932924','4','Riverside Service Station',1,1037,4,'2024-01-24 13:40:25','2024-01-24 13:40:25'),(139,3,'Fuel',400,'2024-01-19','175875413','2','BP Fairland',1,2503,4,'2024-01-24 13:42:08','2024-01-24 13:42:08'),(140,3,'Material',305,'2024-01-22','152629','1','Fentons Engineering Suppliers',1,1037,4,'2024-01-24 13:43:59','2024-01-24 13:43:59'),(141,3,'CHICKEN',69.57,'2024-01-23','279','4','KFC',2,1,4,'2024-02-05 13:41:31','2024-02-05 13:41:31'),(142,3,'Fuel',400,'2024-01-19','0512','2','BP Fairland',1,2503,4,'2024-02-05 13:43:10','2024-02-05 13:43:10'),(143,5,'Aluminum Plate 210mmx105mm, Stainless Steel 80mmx40mm Cutting and Engraving',1805.5,'2024-03-04','INV00037','1','C and N Rapid Fibre',1,1,4,'2024-03-07 07:15:31','2024-03-07 07:15:31'),(144,6,'Earth rod, Damper, Ins Capper 22kv',5389.62,'2024-03-08','GMD-3039848','1','ARB ',1,1037,4,'2024-03-08 14:03:26','2024-03-08 14:03:26'),(145,6,'Fuse Holder, Stay/strain',1695.1,'2024-03-08','0091882-D02','1','Cual Engineering',1,1037,4,'2024-03-08 14:05:10','2024-03-08 14:05:10'),(146,6,'Food',400.8,'2024-03-08','0118263738','4','Sasol ',1,1037,4,'2024-03-08 14:07:23','2024-03-08 14:07:23'),(149,6,'Poles',40396.13,'2024-03-11','INV57028','1','Vuka Timbers (Pty) Ltd',1,1,4,'2024-03-13 06:39:59','2024-03-13 06:39:59'),(148,6,'Fuel',1424.95,'2024-03-12','23987','2','Engen Pretoria',1,1388,1,'2024-03-12 08:07:36','2024-03-12 08:07:36'),(150,6,'Material',40447.5,'2024-03-08','PMB-3627172','1','ARB',1,1,4,'2024-04-08 12:48:44','2024-04-08 12:48:44'),(151,6,'Labour ',8400,'2024-03-08','0','5','Casual Labour',2,1,4,'2024-04-08 12:50:38','2024-04-08 12:50:38'),(152,6,'Accomodation',2400,'2024-03-08','006','3','no name',2,1,4,'2024-04-08 13:51:44','2024-04-08 13:52:53'),(153,6,'fuel',4243.43,'2024-03-10','73B1EA9C','2','Caltex Mahem',1,1037,4,'2024-04-15 06:39:23','2024-04-15 06:39:23'),(154,6,'fuel',1160,'2024-03-12','31135','2','Shell Aloe Motors',1,1037,4,'2024-04-15 06:39:32','2024-04-15 06:41:58'),(155,6,'NITTO BLACK INSULATION',57,'2024-03-18','66220','1','Bonanza Electrical and Lighting ',1,1037,4,'2024-04-15 06:50:38','2024-04-15 06:50:38'),(156,6,'fuel',281.6,'2024-03-24','8325','2','Wakkersroom Motors',1,1037,4,'2024-04-15 06:52:26','2024-04-15 06:52:26'),(157,6,'fuel',1800,'2024-03-24','8085','2','Wakkersroom Motors',1,1037,4,'2024-04-15 06:54:02','2024-04-15 06:54:02'),(158,6,'fuel',4800,'2024-03-24','8324','2','Wakkersroom Motors',1,1037,4,'2024-04-15 06:54:50','2024-04-15 06:54:50'),(159,6,'fuel',800,'2024-03-24','8173','2','Wakkersroom Motors',1,1037,4,'2024-04-15 06:56:02','2024-04-15 06:56:02'),(160,6,'Food',276.4,'2024-03-10','38810','4','Total Volksrust',1,1037,4,'2024-04-15 06:58:22','2024-04-15 06:58:22'),(161,6,'Gloves',315.93,'2024-03-24','0437/00288298','1','Afgri Newcastle',1,1037,4,'2024-04-15 07:00:28','2024-04-15 07:00:28'),(162,6,'Food',1101.9,'2024-03-06','110324','1','Shoprite ',1,1037,4,'2024-04-15 07:04:56','2024-04-16 06:26:34'),(163,7,'Tollgate',15.5,'2024-03-25','003957','13','Bakwena Platinum Corrider',1,1,4,'2024-05-17 11:10:40','2024-05-17 11:10:40'),(164,7,'Tollgate',71,'2024-03-27','53646789','13','Bakwena Platinum Corrider',1,4155,4,'2024-05-17 11:13:07','2024-05-17 11:13:07'),(165,7,'Tollgate',19,'2024-03-25','09162318','13','Bakwena Platinum Corrider',1,1,4,'2024-05-17 11:14:45','2024-05-17 11:14:45'),(166,7,'Tollgate',71,'2024-03-25','12518726','13','Bakwena Platinum Corrider',1,1,4,'2024-05-17 11:15:33','2024-05-17 11:15:33'),(167,7,'Tollgate',73.5,'2024-03-27','1884126','13','The SA National Roads Agency',1,1,4,'2024-05-17 11:16:58','2024-05-17 11:16:58'),(168,7,'Tollgate',57,'2024-03-27','5859891','13','The SA National Roads Agency',1,1,4,'2024-05-17 11:17:38','2024-05-17 11:17:38'),(169,7,'Tollgate',73.5,'2024-03-25','5263984','13','The SA National Roads Agency',1,1,4,'2024-05-17 11:18:16','2024-05-17 11:18:16'),(170,7,'Tollgate',57,'2024-03-25','595479','13','The SA National Roads Agency',1,4155,4,'2024-05-17 11:18:52','2024-05-17 11:18:52'),(171,7,'Accomodation',1950,'2024-04-09','6442','3','Thully Teams',1,1037,4,'2024-05-17 11:22:58','2024-05-17 11:22:58'),(172,7,'Fuel',718.4,'2024-03-27','3039','2','Shell',1,1037,4,'2024-05-17 11:24:35','2024-05-17 11:24:35'),(173,7,'Food',77,'2024-03-25','35266','4','Chicken licken',1,1037,4,'2024-05-17 11:27:46','2024-05-17 11:27:46'),(174,7,'Food',77,'2024-03-27','401780','4','Chicken licken',1,1037,4,'2024-05-17 11:30:53','2024-05-17 11:30:53'),(175,7,'Food',60.11,'2024-03-25','1645370','4','Sugarloaf Maroela',1,1037,4,'2024-05-17 11:33:06','2024-05-17 11:33:06'),(176,7,'Food',137.93,'2024-03-31','20787','4','Shoprite',1,1037,4,'2024-05-17 11:34:33','2024-05-17 11:34:33'),(177,7,'Food',63.33,'2024-03-31','1879','4','Superspar',1,1037,4,'2024-05-17 11:36:06','2024-05-17 11:36:06'),(178,7,'Food',69,'2024-03-26','202','4','The Captain`s Combo',1,1037,4,'2024-05-17 11:39:24','2024-05-17 11:39:24'),(179,7,'Food',98.01,'2024-04-11','7736','4','Superspar',1,1037,4,'2024-05-17 11:41:24','2024-05-17 11:41:24'),(180,7,'Food',128.74,'2024-04-10','7074','4','Superspar',1,1037,4,'2024-05-17 11:43:32','2024-05-17 11:43:32'),(181,7,'Food',152,'2024-04-11','8618','4','Superspar',1,1037,4,'2024-05-17 11:44:23','2024-05-17 11:44:23'),(182,7,'Food',179.17,'2024-04-12','9894','4','Superspar',1,1037,4,'2024-05-17 11:46:43','2024-05-17 11:46:43'),(183,7,'Food',117.73,'2024-04-09','5370','4','Superspar',1,1037,4,'2024-05-17 11:48:00','2024-05-17 11:48:00'),(184,7,'Food',152,'2024-04-09','180327','4','The Captain`s Combo',1,1037,4,'2024-05-17 11:51:58','2024-05-17 11:51:58'),(185,7,'Food',99.98,'2024-04-12','294229','4','Fat Cake City',1,1037,4,'2024-05-17 11:58:38','2024-05-17 11:58:38'),(186,7,'Food',116.79,'2024-04-25','9352','4','Superspar',1,1037,4,'2024-05-17 12:02:22','2024-05-17 12:02:22'),(187,7,'Food',79.09,'2024-04-26','3035','4','Superspar',1,1037,4,'2024-05-17 12:02:54','2024-05-17 12:02:54'),(188,7,'Food',87.21,'2024-04-25','4309','4','Superspar',1,1037,4,'2024-05-17 12:03:40','2024-05-17 12:03:40'),(189,7,'Food',87.45,'2024-04-26','433484','4','Kranskop',1,1037,4,'2024-05-17 12:04:58','2024-05-17 12:04:58'),(190,7,'Food',104.05,'2024-04-23','2353','4','Shoprite',1,1037,4,'2024-05-17 12:07:04','2024-05-17 12:07:04'),(191,7,'Food',69,'2024-04-24','183130','4','The Captain`s Combo',1,1037,4,'2024-05-17 12:11:43','2024-05-17 12:11:43'),(192,7,'Food',137.16,'2024-04-23','068056','4','Hazyview Junction Checker',1,1037,4,'2024-05-17 12:14:36','2024-05-17 12:14:36'),(193,7,'Food',48.97,'2024-04-24','1548438','4','Lebamba Supermarket',1,1037,4,'2024-05-17 12:20:43','2024-05-17 12:20:43'),(194,7,'Food',72.9,'2024-04-26','512325','4','KFC',1,1037,4,'2024-05-17 12:22:25','2024-05-17 12:22:25'),(195,7,'Tollgate',73,'2024-04-26','65890','13','The SA National Roads Agency',1,1,4,'2024-05-20 07:34:35','2024-05-20 07:34:35'),(196,7,'Tollgate',57,'2024-04-26','5922316','13','The SA National Roads Agency',1,1,4,'2024-05-20 07:35:01','2024-05-20 07:35:01'),(197,7,'Tollgate',47,'2024-04-26','1476056','13','Trans African Concessions',1,1,4,'2024-05-20 07:37:51','2024-05-20 07:37:51'),(198,7,'Tollgate',19,'2024-04-23','9261933','13','Bakwena Platinum Corrider',1,1,4,'2024-05-20 07:38:40','2024-05-20 07:38:40'),(199,7,'Tollgate',71,'2024-04-26','53229445','13','Bakwena Platinum Corrider',1,1,4,'2024-05-20 07:39:14','2024-05-20 07:39:14'),(200,7,'Tollgate',118,'2024-04-23','1512895','13','Trans African Concessions',1,1,4,'2024-05-20 07:40:05','2024-05-20 07:40:05'),(201,7,'Tollgate',79,'2024-04-23','2775450','13','Trans African Concessions',1,1,4,'2024-05-20 07:40:32','2024-05-20 07:40:32'),(202,7,'Accomodation',1050,'2024-04-25','241391','3','Kaste Guest House',1,1,4,'2024-05-20 07:50:28','2024-05-20 07:50:28'),(203,7,'Fuel',680,'2024-04-23','252606895','2','Ikhokha',1,1037,4,'2024-05-20 07:57:12','2024-05-20 07:57:12'),(204,7,'Fuel',1098.3,'2024-04-26','376510','2','Kranskop South Petrol',1,1037,4,'2024-05-20 07:58:06','2024-05-20 07:58:06'),(205,7,'Fuel',1380.1,'2024-04-24','432910','2','Caltex',1,1037,4,'2024-05-20 07:58:48','2024-05-20 07:58:48'),(206,7,'Fuel',1701.7,'2024-04-23','3134','2','Loyalty',1,1037,4,'2024-05-20 08:00:50','2024-05-20 08:00:50'),(207,7,'Fuel',1093.3,'2024-03-25','90239','2','Loyalty',1,1037,4,'2024-05-20 08:01:37','2024-05-20 08:01:37'),(208,7,'Fuel',500,'2024-04-11','183043144','2','TotalEnergies',1,1037,4,'2024-05-20 08:03:25','2024-05-20 08:03:25'),(209,7,'Fuel',1679.65,'2024-04-12','901263','2','Loyalty',1,1037,4,'2024-05-20 08:04:02','2024-05-20 08:04:02'),(210,7,'Fuel',1642.45,'2024-04-09','100505','2','Loyalty',1,1037,4,'2024-05-20 08:04:33','2024-05-20 08:04:33'),(211,7,'Fuel',445.15,'2024-05-15','611068','2','Loyalty',1,1037,4,'2024-05-20 08:06:17','2024-05-20 08:06:17'),(212,7,'Tollgate',57,'2024-04-12','47951','13','The SA National Roads Agency',2,1,4,'2024-05-20 08:07:58','2024-05-20 08:07:58'),(213,7,'Tollgate',73.5,'2024-04-12','4288082','13','The SA National Roads Agency',2,1,4,'2024-05-20 08:09:28','2024-05-20 08:09:28'),(214,7,'Tollgate',19,'2024-04-09','9214375','13','Bakwena Platinum Corrider',2,1,4,'2024-05-20 08:14:09','2024-05-20 08:14:09'),(215,7,'Tollgate',57,'2024-04-09','1635364','13','The SA National Roads Agency',2,1,4,'2024-05-20 08:14:46','2024-05-20 08:14:46'),(216,7,'Tollgate',73.5,'2024-04-09','5300971','13','The SA National Roads Agency',2,1,4,'2024-05-20 08:15:15','2024-05-20 08:15:15'),(217,7,'Tollgate',71,'2024-04-09','12558724','13','Bakwena Platinum Corrider',2,1,4,'2024-05-20 08:16:11','2024-05-20 08:16:11'),(218,7,'Food',70,'2024-04-09','2577','4','Shop2shop',1,1037,4,'2024-05-20 08:23:44','2024-05-20 08:23:44'),(219,7,'Food',1048.7,'2024-04-24','38439','4','Shoprite',1,1037,4,'2024-05-20 08:36:22','2024-05-20 08:36:22'),(220,7,'Accomodation',1900,'2024-04-24','241424','3','Kaste Guest House',2,1,4,'2024-05-20 08:37:09','2024-05-20 08:37:09'),(221,7,'Accomodation',2850,'2024-04-09','241410','3','Kaste Guest House',2,1,4,'2024-05-20 08:37:55','2024-05-20 08:37:55'),(222,7,'Accomodation',1900,'2024-04-25','241391','3','Kaste Guest House',2,1,4,'2024-05-20 08:38:23','2024-05-20 08:38:23'),(223,8,'Material',4856,'2024-04-25','442149','1','Powerbuild',1,1,4,'2024-05-22 06:56:05','2024-05-22 07:12:41'),(224,8,'Poles',21022,'2024-04-19','009205','1','Automotor',1,1,4,'2024-05-22 06:57:26','2024-05-22 06:57:26'),(225,8,'Material',5813.25,'2024-04-23','0814','1','TCM',1,1037,4,'2024-05-22 07:11:23','2024-05-22 07:11:23'),(226,9,'Material',7592.19,'2024-04-25','0001/00140745','1','PHI',1,1388,4,'2024-05-22 07:22:49','2024-05-22 07:22:49'),(227,8,'220A 230 Strike Oil Cooled welder',1895,'2024-05-24','20B074529','1','Adendoff Machinery Mart',1,1037,4,'2024-05-24 10:04:20','2024-05-24 10:04:20'),(228,10,'Tollgate',47,'2024-05-18','1393474','13','Trans African Concessions',2,1,4,'2024-05-24 10:39:47','2024-05-24 10:39:47'),(229,10,'Tollgate',19,'2024-05-18','09347728','13','Bakwena Platinum Corrider',2,1,4,'2024-05-24 10:41:07','2024-05-24 10:41:07'),(230,10,'Tollgate',118,'2024-05-22','914293','13','Trans African Concessions',2,1,4,'2024-05-24 10:43:04','2024-05-24 10:43:04'),(231,10,'Tollgate',79,'2024-05-22','278630','13','Trans African Concessions',2,1,4,'2024-05-24 10:43:44','2024-05-24 10:43:44'),(232,10,'Tollgate',47,'2024-05-22','2004535','13','Trans African Concessions',2,1,4,'2024-05-24 10:44:50','2024-05-24 10:44:50'),(233,10,'Tollgate',79,'2024-05-18','1946219','13','Trans African Concessions',2,1,4,'2024-05-24 10:45:29','2024-05-24 10:45:29'),(234,10,'Tollgate',118,'2024-05-18','1877344','13','Trans African Concessions',2,1,4,'2024-05-24 10:46:37','2024-05-24 10:46:37'),(235,10,'Fuel',1694.3,'2024-05-18','607024','2','Loyalty',1,1037,4,'2024-05-24 10:48:56','2024-05-24 10:48:56'),(236,10,'Fuel',1627.8,'2024-05-22','93884','2','Loyalty',1,1037,4,'2024-05-24 10:49:39','2024-05-24 10:49:39'),(237,10,'Fuel',400.15,'2024-05-20','30567N','2','Loyalty',1,1037,4,'2024-05-24 10:50:56','2024-05-24 10:50:56'),(238,10,'Food',56.18,'2024-05-20','044658','4','SR Bushbuckridge',1,1037,4,'2024-05-24 10:55:43','2024-05-24 10:55:43'),(239,10,'Food',60.05,'2024-05-20','60075','4','Superspar',1,1037,4,'2024-05-24 10:56:55','2024-05-24 10:56:55'),(240,10,'Food',69.61,'2024-05-22','2353','4','Superspar',1,1037,4,'2024-05-24 10:58:07','2024-05-24 10:58:07'),(241,10,'Food',56.05,'2024-05-18','180','4','Superspar',1,1037,4,'2024-05-24 10:59:24','2024-05-24 10:59:24'),(242,10,'Food',78,'2024-05-22','162037','4','The Captain`s Combo',1,1037,4,'2024-05-24 11:01:04','2024-05-24 11:01:04'),(243,10,'Food',59.9,'2024-05-22','524186','4','The Captain`s Combo',1,1037,4,'2024-05-24 11:02:27','2024-05-24 11:02:27'),(244,10,'Food',147,'2024-05-20','7971','4','Medi Care Pharmacy',1,1037,4,'2024-05-24 11:03:50','2024-05-24 11:03:50'),(245,11,'Material',39131.4,'2024-07-08','010','1','Zombie',3,1,12,'2024-07-12 09:04:52','2024-07-12 09:04:52'),(246,11,'Fuel',200,'2024-07-01','130847','2','Total',3,1,8,'2024-07-12 09:06:30','2024-07-12 09:06:30'),(247,11,'Fuel',200,'2024-07-06','093607','2','Total',3,1,8,'2024-07-12 09:08:48','2024-07-12 09:08:48'),(248,11,'Fuel',200,'2024-07-04','346563','2','Maidstone',3,1,8,'2024-07-12 09:10:06','2024-07-12 09:10:06'),(249,11,'UNITWIST 22MM CXC',69.8,'2024-07-06','434328','1','Build it',3,1,8,'2024-07-12 09:11:48','2024-07-12 09:11:48'),(250,11,'Fuel',200.85,'2024-07-10','307352','2','Maidstone',3,1,8,'2024-07-12 09:12:49','2024-07-12 09:12:49'),(251,11,'Fuel',400,'2024-07-08','109171','2','Total',3,1,8,'2024-07-12 09:13:42','2024-07-12 09:13:42'),(252,11,'Fuel',200,'2024-07-09','093967','2','Total',3,1,8,'2024-07-12 09:14:14','2024-07-12 09:14:14'),(253,11,'Fuel',200,'2024-07-02','627264','2','Maidstone',3,1,8,'2024-07-12 09:18:58','2024-07-12 09:18:58'),(254,11,'Material',220,'2024-07-02','04097','1','Dicks Hardware',3,1,8,'2024-07-12 09:19:54','2024-07-12 09:19:54'),(255,11,'Material',889,'2024-07-02','254197','1','Metro Electrical & General',3,1,8,'2024-07-12 09:21:02','2024-07-12 09:21:02'),(256,11,'Material',15,'2024-07-01','15736','1','Sizaranti Motor Spares',3,1,8,'2024-07-12 09:22:16','2024-07-12 09:22:16'),(257,11,'Material',185.98,'2024-07-11','435101','1','Build it',3,1,8,'2024-07-12 09:23:27','2024-07-12 09:23:27'),(258,11,'Happy Letter',80,'2024-07-01','001','10','Happy Letter',3,1,8,'2024-07-12 09:25:55','2024-07-12 09:25:55'),(259,11,'Withdrawal',100,'2024-07-10','001','19','withdraw',3,1,8,'2024-07-12 09:40:29','2024-07-12 09:40:29'),(260,11,'Salaries',13020,'2024-06-30','001','9','Lealnet',3,1,12,'2024-07-12 09:43:53','2024-07-15 10:16:26'),(261,11,'Material',439.73,'2024-05-30','428582','1','Build it',1,1,8,'2024-07-15 07:56:40','2024-07-15 07:56:40'),(262,11,'blade',157.9,'2024-05-31','428582','1','Build it',1,1,8,'2024-07-15 07:57:19','2024-07-15 07:57:19'),(263,11,'Material',1378.85,'2024-05-02','428582','1','Build it',1,1,8,'2024-07-15 07:58:26','2024-07-15 07:58:26'),(264,11,'fuel',300,'2024-05-28','211398','1','Shakas',1,1,17,'2024-07-15 08:00:31','2024-07-15 08:01:05'),(265,11,'Material',255.78,'2024-05-08','427038','1','Shakas',1,1,8,'2024-07-15 08:02:26','2024-07-15 08:02:26'),(266,11,'Material',597.33,'2024-05-18','427033','1','Built it',1,1,8,'2024-07-15 08:03:07','2024-07-15 08:03:07'),(267,11,'Food',69.99,'2024-05-18','4444','4','Suerspar Stanger',1,1,17,'2024-07-15 08:05:14','2024-07-15 08:07:36'),(268,11,'Food',142.89,'2024-05-26','8544','4','Suerspar Stanger',1,1,8,'2024-07-15 08:08:46','2024-07-15 08:08:46'),(269,11,'Material',200,'2024-05-22','0001','1','Plumbing and Tile',1,1,8,'2024-07-15 08:11:58','2024-07-15 08:11:58'),(270,11,'Material',499.01,'2024-05-28','251915','1','ME&G',1,1,8,'2024-07-15 08:13:10','2024-07-15 08:13:10'),(271,11,'Food',120.05,'2024-05-18','5964','4','Suerspar Stanger',1,1,8,'2024-07-15 08:13:55','2024-07-15 08:13:55'),(272,11,'Material',740.93,'2024-05-18','426961','1','Build it',1,1,8,'2024-07-15 08:14:35','2024-07-15 08:14:35'),(273,11,'Material',461,'2024-05-26','S131260524102013','1','Builders',1,1,8,'2024-07-15 08:15:34','2024-07-15 08:15:34'),(274,11,'Electricity',50,'2024-05-19','241858','24','Kazang',1,1,8,'2024-07-15 08:20:38','2024-07-15 08:20:38'),(275,11,'Fuel',50,'2024-05-19','241858','2','Kazang',1,1,8,'2024-07-15 08:24:08','2024-07-15 08:24:08'),(276,11,'Fuel',299.5,'2024-05-22','152372','2','luthuli',1,1,8,'2024-07-15 08:32:34','2024-07-15 08:32:34'),(277,11,'Fuel',500,'2024-05-23','3459','2','Shakas',1,1,8,'2024-07-15 08:33:07','2024-07-15 08:33:07'),(278,11,'Food',346.66,'2024-05-23','0','4','Suerspar Stanger',1,1,8,'2024-07-15 08:34:38','2024-07-15 08:34:38'),(279,11,'Spares',1895,'2024-05-27','0','6','Midas',1,1,8,'2024-07-15 08:37:55','2024-07-15 08:37:55'),(280,11,'Food',729.1,'2024-05-27','0','4','Superspar Stanger',1,1,8,'2024-07-15 08:38:42','2024-07-15 08:38:42'),(281,11,'Fuel',300,'2024-05-31','0','1','Total',1,1,17,'2024-07-15 08:39:55','2024-07-15 08:40:47'),(282,11,'Food',299.85,'2024-05-21','0','4','Shell',1,1,8,'2024-07-15 08:42:51','2024-07-15 08:42:51'),(283,11,'Fuel',200,'2024-05-29','0096005','2','Total',1,1,8,'2024-07-15 08:44:06','2024-07-15 08:44:06'),(284,11,'Fuel',600,'2024-05-18','0096005','2','Cato ridge',1,3305,8,'2024-07-15 08:46:26','2024-07-15 08:46:26'),(285,11,'Fuel',100,'2024-05-28','921','2','Shakas',1,3305,8,'2024-07-15 08:47:10','2024-07-15 08:47:10'),(286,11,'Electricity',90,'2024-05-30','167193','24','Suerspar Stanger',1,3305,8,'2024-07-15 08:50:39','2024-07-15 08:50:39'),(287,11,'Braje Fluid',40,'2024-05-17','167193','6','Shell',1,3305,8,'2024-07-15 08:51:54','2024-07-15 08:51:54'),(288,11,'Fuel',300,'2024-05-11','48644','2','Palmview',1,3305,8,'2024-07-15 08:53:36','2024-07-15 08:53:36'),(289,11,'Material',1104.5,'2024-05-23','131','1','Builders',1,3305,8,'2024-07-15 08:56:45','2024-07-15 08:56:45'),(290,11,'Food',60,'2024-05-19','6110','4','Kazang',1,3305,8,'2024-07-15 09:00:01','2024-07-15 09:00:01'),(291,11,'Fuel',450,'2024-05-31','1690','2','Big Sky ',1,3305,8,'2024-07-15 09:08:22','2024-07-15 09:08:22'),(292,11,'Fuel',300,'2024-05-31','90124','2','Engen Coastal',1,3305,8,'2024-07-15 09:09:20','2024-07-15 09:09:20'),(293,11,'Fuel',300,'2024-05-20','1739','2','Total',1,3305,8,'2024-07-15 09:13:54','2024-07-15 09:13:54'),(294,11,'Material',67.08,'2024-05-25','1739091','1','Dicks',1,3305,8,'2024-07-15 09:28:49','2024-07-15 09:28:49'),(295,11,'Fuel',300,'2024-05-24','375313','2','Engen Coastal',1,3305,8,'2024-07-15 09:30:00','2024-07-15 09:30:00'),(296,11,'Fuel',100,'2024-05-12','375313','2','Stanger',1,3305,8,'2024-07-15 09:31:23','2024-07-15 09:31:23'),(297,11,'Electricity',60,'2024-06-14','18170','24','Flash',1,3305,8,'2024-07-15 09:33:38','2024-07-15 09:33:38'),(298,11,'Material',110,'2024-06-06','4737','1','Shop2Shop',1,3305,8,'2024-07-15 09:39:48','2024-07-15 09:39:48'),(299,11,'Food',403.06,'2024-06-12','268','4','Suerspar Stanger',1,3305,8,'2024-07-15 09:40:54','2024-07-15 09:40:54'),(300,11,'Food',371.9,'2024-06-06','429790','4','Build it',1,3305,8,'2024-07-15 09:42:53','2024-07-15 09:42:53'),(301,11,'Fuel',200,'2024-06-13','429790','2','Sasol ',1,3305,8,'2024-07-15 09:44:25','2024-07-15 09:44:25'),(302,11,'Salary',8000,'2024-05-31','0012','9','Laelnet',1,3305,8,'2024-07-15 09:45:17','2024-07-15 09:45:17'),(303,11,'Fuel',250,'2024-06-15','2066','2','Total',1,3305,8,'2024-07-15 09:48:42','2024-07-15 09:48:42'),(304,11,'Fuel',790,'2024-06-14','4399','2','ME&G',1,3305,8,'2024-07-15 09:49:46','2024-07-15 09:49:46'),(305,11,'Fuel',300,'2024-06-14','3843','2','Shell',1,3305,8,'2024-07-15 09:50:28','2024-07-15 09:50:28'),(306,11,'Fuel',200,'2024-06-06','1755','2','KUZA',1,3305,8,'2024-07-15 09:51:14','2024-07-15 09:51:14'),(307,11,'Fuel',300,'2024-06-06','1753','2','Total',1,3305,8,'2024-07-15 09:51:47','2024-07-15 09:51:47'),(308,11,'Fuel',300,'2024-06-14','1709','2','Total',1,3305,8,'2024-07-15 09:52:16','2024-07-15 09:52:16'),(309,11,'Fuel',300,'2024-06-07','6946','2','Shakas',1,3305,8,'2024-07-15 09:53:07','2024-07-15 09:53:07'),(310,11,'Fuel',100,'2024-06-08','550','2','Shakas',1,3305,8,'2024-07-15 09:53:33','2024-07-15 09:53:33'),(311,11,'Fuel',300,'2024-06-10','165575','2','Sasol ',1,3305,8,'2024-07-15 09:54:17','2024-07-15 09:54:17'),(312,11,'Fuel',300.9,'2024-06-10','272899','2','Shell',1,3305,8,'2024-07-15 09:55:02','2024-07-15 09:55:02'),(313,11,'Fuel',200,'2024-06-14','215277','2','Shakas',1,3305,8,'2024-07-15 09:55:39','2024-07-15 09:55:39'),(314,11,'Fuel',200,'2024-06-16','3875','2','Total',1,3305,8,'2024-07-15 09:59:09','2024-07-15 09:59:09'),(315,11,'Material',50,'2024-06-14','253035','1','ME&G',1,3305,8,'2024-07-15 10:00:05','2024-07-15 10:00:05'),(316,11,'Material',260,'2024-06-06','252382','1','ME&G',1,3305,8,'2024-07-15 10:00:51','2024-07-15 10:00:51'),(317,11,'Material',48,'2024-06-14','252385','1','ME&G',1,3305,8,'2024-07-15 10:01:58','2024-07-15 10:01:58'),(318,11,'Food',638.01,'2024-06-17','9152','4','Suerspar Stanger',1,3305,8,'2024-07-15 10:03:10','2024-07-15 10:03:10'),(319,11,'Withdraw',150,'2024-06-15','0000','23','Cashexpress',1,3305,8,'2024-07-15 10:05:42','2024-07-15 10:05:42'),(320,11,'Material',236,'2024-06-15','03179','1','Dicks',1,3305,8,'2024-07-15 10:06:41','2024-07-15 10:06:41'),(321,11,'Material',138,'2024-06-15','03265','1','Dicks',1,3305,8,'2024-07-15 10:07:14','2024-07-15 10:07:14'),(322,11,'Material',1200,'2024-07-16','255223','1','ME&G',1,3305,8,'2024-07-16 11:02:46','2024-07-16 11:02:46'),(323,11,'Accomodation',1500,'2024-06-30','001','3','Rent',1,1,8,'2024-07-18 06:38:49','2024-07-18 06:38:49'),(324,13,'Fuel',800,'2024-05-15','11','2','Total',1,1,12,'2024-08-01 12:53:11','2024-08-01 12:53:11'),(325,13,'Fuel',250,'2024-05-15','11','2','Total',1,1,12,'2024-08-01 13:04:41','2024-08-01 13:04:41'),(326,13,'Data',50,'2024-05-05','1','25','data',1,1,17,'2024-08-01 13:12:14','2024-08-01 14:00:08'),(327,13,'Salary',8650,'2024-05-31','1','9','Laelnet',1,1,17,'2024-08-01 13:13:04','2024-08-01 13:13:04'),(328,13,'Printing',150,'2024-05-31','1','10','Laelnet',1,1,17,'2024-08-01 13:13:33','2024-08-01 13:13:33'),(329,11,'Brother tape',488.75,'2024-08-17','03167048','1','Voltex',1,3305,8,'2024-09-06 07:22:20','2024-09-06 07:22:20'),(330,11,'Material',490,'2024-08-16','19659','1','Macro Hardware',1,3305,8,'2024-09-06 07:27:34','2024-09-06 07:27:34'),(331,11,'Material',490,'2024-08-16','19659','1','Macro Hardware',1,3305,8,'2024-09-06 07:27:59','2024-09-06 07:27:59'),(332,11,'fuel',500.05,'2024-08-17','91121624','2','Shell',1,3305,8,'2024-09-06 07:33:03','2024-09-06 07:33:03'),(333,11,'fuel',200,'2024-08-17','91121623','2','Shell',1,3305,8,'2024-09-06 07:34:29','2024-09-06 07:34:29'),(334,11,'fuel',500,'2024-08-19','92671324','2','Shell',1,3305,8,'2024-09-06 07:35:51','2024-09-06 07:35:51'),(335,11,'fuel',400.15,'2024-08-16','0FBCDC10','2','Shell',1,3305,8,'2024-09-06 07:37:37','2024-09-06 07:37:37'),(336,11,'fuel',400,'2024-08-29','91121624','2','Shell',1,3305,8,'2024-09-06 07:39:24','2024-09-06 07:39:24'),(337,11,'Material',95,'2024-08-26','1530.2','1','Macro Hardware',1,3305,8,'2024-09-06 07:41:13','2024-09-06 07:41:13'),(338,11,'Material',243.18,'2024-08-26','BR1-IIV/00240435','1','Midlands Builders',1,3305,8,'2024-09-06 07:44:10','2024-09-06 07:44:10'),(339,11,'Material',491.4,'2024-08-15','INV00764961','1','Woodlands Builders',1,3305,8,'2024-09-06 07:46:03','2024-09-06 07:46:03'),(340,11,'Material',1200.7,'2024-08-26','PMB-3644285','1','ARB',1,3305,8,'2024-09-06 07:47:35','2024-09-06 07:47:35'),(341,11,'Material',119,'2024-08-26','PMB-3644289','1','ARB',1,3305,8,'2024-09-06 07:49:04','2024-09-06 07:49:04'),(342,11,'Material',344,'2024-08-19','139.2','1','Macro Hardware',1,3305,8,'2024-09-06 07:50:53','2024-09-06 07:50:53'),(343,11,'Material',270,'2024-08-20','1439.2','1','Macro Hardware',1,3305,8,'2024-09-06 07:55:08','2024-09-06 07:55:08'),(344,11,'Material',271,'2024-08-19','1398.2','1','Macro Hardware',1,3305,8,'2024-09-06 07:56:02','2024-09-06 07:56:02'),(345,11,'fuel',400,'2024-08-26','91066728','2','Engen',1,3305,8,'2024-09-06 07:57:42','2024-09-06 07:57:42'),(346,11,'fuel',100,'2024-08-23','92571529','2','Sasol',1,3305,8,'2024-09-06 07:58:54','2024-09-06 07:58:54'),(347,11,'fuel',400,'2024-08-30','9166723','2','Engen',1,3305,8,'2024-09-06 08:00:12','2024-09-06 08:00:12'),(348,11,'fuel',200,'2024-08-21','0683-0140','2','Engen',1,3305,8,'2024-09-06 08:01:48','2024-09-06 08:01:48'),(349,11,'Data',49,'2024-08-28','122345032','25','Spa',2,49,8,'2024-09-06 08:03:55','2024-09-06 08:03:55'),(350,11,'fuel',200,'2024-08-24','94379924','2','Engen',1,3305,8,'2024-09-06 08:05:39','2024-09-06 08:05:39'),(351,11,'fuel',200.05,'2024-08-31','91121622','2','Shell',1,3305,8,'2024-09-06 08:07:53','2024-09-06 08:07:53'),(352,11,'fuel',300,'2024-08-14','91121623','2','Shell',1,3305,8,'2024-09-06 08:09:11','2024-09-06 08:09:11'),(353,11,'fuel',500.05,'2024-08-15','289417','2','Shell',1,3305,8,'2024-09-06 08:10:32','2024-09-06 08:10:32'),(354,11,'Food',216.51,'2024-08-24','3043','4','Shoprite',2,217,8,'2024-09-06 08:13:47','2024-09-06 08:13:47'),(355,11,'Material',239,'2024-08-24','1466.2','1','Macro Hardware',1,3305,8,'2024-09-06 08:14:51','2024-09-06 08:14:51'),(356,11,'Material',70,'2024-08-19','1424.2','1','Macro Hardware',1,3305,8,'2024-09-06 08:16:03','2024-09-06 08:16:03'),(357,11,'Material',299.95,'2024-08-22','INV00726481','1','MBK AGENCIES',1,3305,8,'2024-09-06 08:18:06','2024-09-06 08:18:06'),(358,11,'Material',1600,'2024-08-25','1503.2','1','Macro Hardware',1,3305,8,'2024-09-06 08:29:06','2024-09-06 08:29:06'),(359,11,'Material',168,'2024-08-24','1473.2','1','Macro Hardware',1,3305,8,'2024-09-06 08:36:38','2024-09-06 08:36:38'),(360,11,'Material',750,'2024-08-20','2092.9','1','Macro Hardware',1,3305,8,'2024-09-06 08:38:11','2024-09-06 08:38:11'),(361,11,'Data',49,'2024-08-28','122345020','25','Spa',2,49,8,'2024-09-06 08:39:32','2024-09-06 08:39:32'),(362,11,'fuel',200.05,'2024-08-15','91121622','2','Shell',1,3305,8,'2024-09-06 08:42:13','2024-09-06 08:42:13'),(363,11,'fuel',400,'2024-08-28','91150626','2','Shell',1,3305,8,'2024-09-06 08:44:41','2024-09-06 08:44:41'),(364,11,'Tollgate',7,'2024-08-17','781994','13','The SA National Roads Agency SOC Ltd',2,7,8,'2024-09-06 08:49:05','2024-09-06 08:49:05'),(365,11,'Tollgate',7,'2024-08-14','1762269','13','The SA National Roads Agency SOC Ltd',2,7,8,'2024-09-06 08:58:52','2024-09-06 08:58:52'),(366,11,'Tollgate',7,'2024-08-28','806898','13','The SA National Roads Agency SOC Ltd',2,7,8,'2024-09-06 08:59:54','2024-09-06 08:59:54'),(367,11,'Tollgate',7,'2024-08-16','1766613','13','The SA National Roads Agency SOC Ltd',2,7,8,'2024-09-06 09:00:57','2024-09-06 09:00:57'),(368,11,'Tollgate',7,'2024-08-17','176975','13','The SA National Roads Agency SOC Ltd',2,7,8,'2024-09-06 09:01:44','2024-09-06 09:01:44'),(369,11,'Tollgate',7,'2024-08-14','774905','13','The SA National Roads Agency SOC Ltd',2,7,8,'2024-09-06 09:02:26','2024-09-06 09:02:26'),(370,11,'Tollgate',7,'2024-08-15','1764195','13','The SA National Roads Agency SOC Ltd',2,7,8,'2024-09-06 09:03:27','2024-09-06 09:03:27'),(371,11,'Tollgate',7,'2024-08-15','777606','13','The SA National Roads Agency SOC Ltd',2,7,8,'2024-09-06 09:05:41','2024-09-06 09:05:41'),(372,11,'Food',20,'2024-08-30','E800','4','Food Junction',1,3305,8,'2024-09-06 09:31:56','2024-09-06 09:31:56'),(373,11,'Food',98,'2024-08-28','00760945','4','Superspar',1,3305,8,'2024-09-06 09:33:27','2024-09-06 09:33:27'),(374,11,'Data',49,'2024-08-25','5729072013076250','25','Superspar',2,49,8,'2024-09-06 09:35:43','2024-09-06 09:35:43'),(375,11,'Material',439.73,'2024-05-30','INV428582','1','Build it',1,3305,8,'2024-09-06 09:38:32','2024-09-06 09:38:32'),(376,11,'Material',157.9,'2024-05-31','INV428736','1','Build it',1,3305,8,'2024-09-06 09:40:14','2024-09-06 09:40:14'),(377,11,'Material',371.9,'2024-06-06','INV429790','1','Build IT',1,3305,8,'2024-09-06 11:49:44','2024-09-06 11:49:44'),(378,11,'Material',1425.58,'2024-06-19','INV431654','1','Build IT',1,3305,8,'2024-09-06 11:51:11','2024-09-06 11:51:11'),(379,11,'Material',461,'2024-05-26','S131260524102013','1','Builders',1,3306,8,'2024-09-06 11:55:59','2024-09-06 11:55:59'),(380,11,'fuel',299.85,'2024-05-21','91121601','2','Shell',1,3305,8,'2024-09-06 11:59:46','2024-09-06 11:59:46'),(381,11,'grocery',729.1,'2024-05-19','3801','4','Superspa',2,729,8,'2024-09-06 12:03:10','2024-09-06 12:03:10'),(382,11,'Material',1104.5,'2024-05-23','S1312305241071','1','Builders',1,3305,8,'2024-09-06 12:05:38','2024-09-06 12:05:38'),(383,11,'Material',1378.85,'2024-05-02','INV427467','1','Build IT',1,3305,8,'2024-09-06 12:08:12','2024-09-06 12:08:12'),(384,11,'Material',255.78,'2024-05-08','INV427038','','Build IT',1,3305,8,'2024-09-06 12:09:53','2024-09-06 12:09:53'),(385,11,'Material',420,'2024-07-22','ME&G0054','1','ME&G',2,420,8,'2024-09-06 12:13:11','2024-09-06 12:13:11'),(386,11,'Data',49,'2024-07-28','102323137','25','SpaR',2,49,8,'2024-09-06 12:16:11','2024-09-06 12:16:11'),(387,11,'fuel',200,'2024-07-25','95500725','2','Shell',1,3305,8,'2024-09-06 12:17:59','2024-09-06 12:17:59'),(388,11,'fuel',200,'2024-07-29','91121624','2','Shell',1,3305,8,'2024-09-06 12:19:44','2024-09-06 12:19:44'),(389,11,'Accomodation',50,'2024-07-20','5174660017','3','Shell',2,50,8,'2024-09-06 12:22:25','2024-09-06 12:22:25'),(390,11,'Material',220,'2024-07-02','04097','1','Dicks Hardware',1,3305,8,'2024-09-06 12:25:03','2024-09-06 12:25:03'),(391,11,'fuel',200,'2024-07-23','91047529','2','Engen',1,3305,8,'2024-09-06 12:31:50','2024-09-06 12:31:50'),(392,11,'fuel',200,'2024-07-20','91047521','2','Engen',1,3305,8,'2024-09-06 12:33:43','2024-09-06 12:33:43'),(393,11,'fuel',200,'2024-07-22','aea7cf10','2','Shell',1,3305,8,'2024-09-06 12:36:42','2024-09-06 12:36:42'),(394,15,'Material',1770.83,'2024-09-09','IN33727271','1','MCE Electric',1,3449,5,'2024-09-10 08:47:05','2024-09-10 08:47:05'),(395,15,'Material',22243.9,'2024-09-09','GER-3007698','1','ARB Electrical',1,3449,5,'2024-09-10 08:48:52','2024-09-10 08:48:52'),(396,15,'Fuel',150.03,'2024-09-02','04001','2','Caltex',1,3449,5,'2024-09-10 08:51:34','2024-09-10 08:51:34'),(397,15,'Fuel',400,'2024-09-09','635AA142','2','Caltex',1,3449,5,'2024-09-10 08:53:38','2024-09-10 08:53:38'),(398,15,'Tollgate',12,'2024-09-09','040688898','13','Bakwena Platinum',2,12,5,'2024-09-10 08:55:09','2024-09-10 08:55:09'),(399,16,'Training',20000,'2024-08-15','0001','27','WHSE',1,1,2,'2024-09-10 10:07:53','2024-09-10 10:07:53'),(400,16,'Certificate',3000,'2024-08-15','0002','27','WHSE',1,1,2,'2024-09-10 10:08:41','2024-09-10 10:08:41'),(401,16,'Certificate',1260,'2024-08-15','0003','27','Oceans',1,1,2,'2024-09-10 10:09:47','2024-09-10 10:09:47'),(402,16,'Transport',100,'2024-08-18','0004','2','',1,8620,12,'2024-09-10 10:12:29','2024-09-10 10:12:29'),(403,16,'Transport',60,'2024-08-19','0005','2','',1,8620,12,'2024-09-10 10:13:41','2024-09-10 10:13:41'),(404,16,'Transport',450,'2024-08-17','0006','2','',1,8620,12,'2024-09-10 10:14:18','2024-09-10 10:14:18'),(405,16,'Transport',100,'2024-08-16','0007','2','',1,8620,12,'2024-09-10 10:15:01','2024-09-10 10:15:01'),(406,16,'Transport',96,'2024-08-15','0008','2','',1,8620,12,'2024-09-10 10:15:26','2024-09-10 10:15:26'),(407,14,'Concrete',600,'2024-07-11','0023','1',' .',2,1,17,'2024-09-10 10:16:08','2024-09-10 10:16:08'),(408,14,'Cement',200,'2024-07-11','0024','1',' .',2,1,17,'2024-09-10 10:16:35','2024-09-10 10:16:35'),(409,14,'Fuel',400,'2024-07-11','0025','2',' .',2,1,17,'2024-09-10 10:17:01','2024-09-10 10:17:01'),(410,16,'Data',60,'2024-08-13','0010','25','',1,8620,12,'2024-09-10 10:17:31','2024-09-10 10:17:31'),(411,16,'Fuel',300,'2024-08-01','0011','2','',1,8620,12,'2024-09-10 10:19:28','2024-09-10 10:19:28'),(412,16,'Fuel',500,'2024-08-02','0012','2','',1,8620,12,'2024-09-10 10:25:10','2024-09-10 10:25:10'),(413,16,'Certificate',3500,'2024-08-21','0013','27','WHSE',1,8620,2,'2024-09-10 10:26:37','2024-09-10 10:26:37'),(414,16,'Transport',500,'2024-08-23','0014','2','',1,8620,12,'2024-09-10 10:27:42','2024-09-10 10:27:42'),(415,16,'Transport',370,'2024-08-23','0014','2','',1,8620,12,'2024-09-10 10:28:12','2024-09-10 10:28:12'),(418,16,'Trailer',5000,'2024-09-06','0016','17','',1,8620,12,'2024-09-10 10:34:23','2024-09-10 10:34:23'),(417,16,'Repairs',500,'2024-09-06','0015','6','',1,8620,12,'2024-09-10 10:31:49','2024-09-10 10:31:49'),(419,16,'Fuel',300,'2024-09-07','0017','2','',1,8620,12,'2024-09-10 10:35:23','2024-09-10 10:35:23'),(420,16,'Harness',800,'2024-09-04','0018','26','',1,8620,12,'2024-09-10 10:36:13','2024-09-10 10:36:13'),(421,16,'Harness',800,'2024-09-04','0019','26','',1,8620,12,'2024-09-10 10:36:31','2024-09-10 10:36:31'),(422,16,'Transport',50,'2024-08-08','0020','2','',1,8620,12,'2024-09-10 10:37:28','2024-09-10 10:37:28'),(423,16,'Fuel',600,'2024-08-21','0021','2','',1,8620,12,'2024-09-10 10:39:08','2024-09-10 10:39:08'),(424,16,'She File, Gladys',6000,'2024-03-06','0022','5','',1,8620,2,'2024-09-10 10:40:39','2024-09-10 10:40:39'),(425,16,'She File, Gladys',6000,'2024-04-10','0023','5','',1,8620,2,'2024-09-10 10:41:20','2024-09-10 10:41:20'),(426,16,'She File, Gladys',400,'2024-03-22','0024','5','',1,8620,2,'2024-09-10 10:41:54','2024-09-10 10:41:54'),(427,16,'She File, Gladys',5000,'2024-08-22','0024','5','',1,8620,2,'2024-09-10 10:42:30','2024-09-10 10:42:30'),(428,16,'She File, Gladys',600,'2024-04-04','0025','5','',1,8620,2,'2024-09-10 10:43:20','2024-09-10 10:43:20'),(429,16,'She File, Gladys',4500,'2024-08-01','0026','5','',1,8620,2,'2024-09-10 10:44:03','2024-09-10 10:44:03'),(430,16,'Fuel',550,'2024-09-09','0027','2','',1,8620,12,'2024-09-10 10:45:07','2024-09-10 10:45:07'),(431,16,'Medicals',3000,'2024-08-20','0028','27','',1,8620,12,'2024-09-10 10:46:04','2024-09-10 10:46:04'),(432,16,'Insurance',1800,'2024-09-02','0028','8','',1,8620,12,'2024-09-10 10:46:53','2024-09-10 10:46:53'),(433,16,'Insurance',1800,'2024-09-02','0028','8','',1,8620,12,'2024-09-10 10:53:33','2024-09-10 10:53:33'),(434,16,'COIDA',6000,'2024-05-31','','28','',1,8620,12,'2024-09-10 10:54:35','2024-09-10 10:54:35'),(435,16,'Insurance',10500,'2024-07-31','0030','8','',1,8620,12,'2024-09-10 10:55:31','2024-09-10 10:55:31'),(436,16,'Fuel',1300,'2024-07-23','0031','2','',1,8620,12,'2024-09-10 10:56:06','2024-09-10 10:56:06'),(437,16,'Certificate, Trailer towing & Defensive driving',3250,'2024-08-08','','27','',1,1,2,'2024-09-10 10:58:18','2024-09-10 10:58:18'),(438,16,'Miscellaneous',1800,'2024-08-30','0033','19','',1,8620,12,'2024-09-10 11:00:04','2024-09-10 11:00:04'),(439,14,'Labour ',800,'2024-07-11','0026','5',' .',2,1,17,'2024-09-10 11:18:59','2024-09-10 11:18:59'),(440,17,'fuel',800,'2024-08-02','00027','2','.',2,1,17,'2024-09-10 11:22:48','2024-09-10 11:22:48'),(441,17,'Labour ',600,'2024-08-02','00027','5','.',2,1,17,'2024-09-10 11:23:14','2024-09-10 11:23:14'),(442,17,'Material',700,'2024-08-02','00028','1','.',2,1,17,'2024-09-10 11:23:37','2024-09-10 11:23:37'),(443,16,'Fuel',400,'2024-09-16','0035','2','Caltex',2,400,17,'2024-09-17 08:13:00','2024-09-17 08:13:00'),(444,16,'Thabang Fuel',600,'2024-09-17','0036','2','Caltex',2,600,15,'2024-09-17 08:14:13','2024-09-17 08:14:13'),(445,15,'Material',7061,'2024-09-13','40038807','1','Continental Cables',1,1037,5,'2024-09-17 19:50:05','2024-09-17 19:50:05'),(446,15,'Material',594.32,'2024-09-13','217130','1','Kuso Electrical Wholesalers',1,1037,5,'2024-09-17 19:52:10','2024-09-17 19:52:10'),(447,11,'Fuel',200,'2024-08-10','91121627','2','SHELL',1,3305,8,'2024-09-17 19:54:30','2024-09-17 19:54:30'),(448,11,'Airtime',49,'2024-08-09','5226180173','25','kazang',2,1,8,'2024-09-17 19:59:41','2024-09-17 19:59:41'),(449,11,'Fuel',200,'2024-08-10','91121627','2','SHELL',1,3305,8,'2024-09-17 20:03:13','2024-09-17 20:03:13'),(450,11,'Fuel',300,'2024-08-08','91126926','2','SHELL',1,3305,8,'2024-09-17 20:05:29','2024-09-17 20:05:29'),(451,11,'Fuel',300,'2024-08-01','92532023','2','SHELL',1,3305,8,'2024-09-17 20:06:57','2024-09-17 20:06:57'),(452,11,'Fuel',300,'2024-08-03','92532024','2','SHELL',1,3305,8,'2024-09-17 20:08:14','2024-09-17 20:08:14'),(453,11,'Material',269,'2024-08-08','24229','1','Bassa Hardware',2,1,8,'2024-09-17 20:16:03','2024-09-17 20:16:03'),(454,11,'Material',39.5,'2024-08-02','INV001-210119','1','Bassas Hardware',2,40,8,'2024-09-17 20:19:47','2024-09-17 20:19:47'),(455,11,'Fuel',300,'2024-08-10','92500723','2','Shakaskraal',1,3305,8,'2024-09-17 20:21:50','2024-09-17 20:21:50'),(456,11,'Fuel',300,'2024-08-02','F7A90EC3','2','Newlands city service',1,3305,8,'2024-09-17 20:23:44','2024-09-17 20:23:44'),(457,11,'Material',69.8,'2024-07-06','INV434328','1','Build it',1,3305,8,'2024-09-17 20:27:41','2024-09-17 20:27:41'),(458,11,'Material',1200,'2024-07-16','256223','1','MCE Electric',1,3305,8,'2024-09-17 20:29:37','2024-09-17 20:29:37'),(459,11,'Material',399,'2024-07-17','256294','1','MCE Electric',1,3305,8,'2024-09-17 20:31:15','2024-09-17 20:31:15'),(460,11,'Material',740.93,'2024-05-05','INV426961','1','Build it',1,3305,8,'2024-09-17 20:32:51','2024-09-17 20:32:51'),(461,11,'Data',99,'2024-07-17','7357-003','25','PEP',1,3305,8,'2024-09-17 20:35:17','2024-09-17 20:35:17'),(462,11,'Material',185.95,'2024-07-11','INV435101','1','Build it',1,3305,8,'2024-09-17 20:36:49','2024-09-17 20:36:49'),(463,11,'Fuel',300,'2024-07-12','91047529','2','Engen',1,3305,8,'2024-09-17 20:39:04','2024-09-17 20:39:04'),(464,11,'Material',587.33,'2024-05-18','INV427033','1','Build it',1,3305,8,'2024-09-17 20:45:04','2024-09-17 20:45:04'),(465,11,'Food',346.66,'2024-05-29','0055','4','Superspar',1,3305,8,'2024-09-17 20:46:52','2024-09-17 20:46:52'),(466,11,'Fuel',300.2,'2024-07-24','92157225','2','SHELL',1,3305,8,'2024-09-17 20:49:00','2024-09-17 20:49:00'),(467,11,'Fuel',200,'2024-07-18','91121624','2','SHELL',1,3305,8,'2024-09-17 20:50:13','2024-09-17 20:50:13'),(468,11,'Material',899,'2024-07-02','254197','1','MCE Electric',1,3305,8,'2024-09-17 20:51:35','2024-09-17 20:51:35'),(469,11,'Material',295,'2024-07-16','04506','1','Dicks Hardware',1,3305,8,'2024-09-17 21:02:12','2024-09-17 21:02:12'),(470,11,'Material',69,'2024-07-13','04469','1','Dicks Hardware',1,3305,8,'2024-09-17 21:03:15','2024-09-17 21:03:15'),(471,11,'Material',340,'2024-07-24','05056','1','Dicks Hardware',1,3305,8,'2024-09-17 21:04:10','2024-09-17 21:04:10'),(472,11,'Material',60,'2024-07-22','04872','1','Dicks Hardware',1,3305,8,'2024-09-17 21:05:26','2024-09-17 21:05:26'),(473,11,'Material',236,'2024-06-15','03179','1','Dicks Hardware',1,3305,8,'2024-09-17 21:06:44','2024-09-17 21:06:44'),(474,11,'Material',110,'2024-06-26','03726','1','Dicks Hardware',1,3305,8,'2024-09-17 21:07:35','2024-09-17 21:07:35'),(475,11,'Material',138,'2024-06-15','03265','1','Dicks Hardware',1,3305,8,'2024-09-17 21:08:53','2024-09-17 21:08:53'),(476,11,'Fuel',300,'2024-05-28','9200723','2','Shakaskraal',1,3305,8,'2024-09-17 21:11:08','2024-09-17 21:11:08'),(477,11,'Fuel',300,'2024-05-05','105211','2','Total',1,3305,8,'2024-09-17 21:12:39','2024-09-17 21:12:39'),(478,16,'Stationary',800,'2024-09-18','0040','10','Waltons',2,800,2,'2024-09-18 12:05:13','2024-09-18 12:05:13'),(479,16,'Transport. Tshepo',550,'2024-09-18','0041','2','Taxi',2,550,15,'2024-09-18 12:09:03','2024-09-18 12:09:03'),(480,15,'Food',134.9,'2024-09-17','KSA312','4','KFC',1,1037,4,'2024-09-19 13:27:53','2024-09-19 13:27:53'),(481,15,'Material',182,'2024-09-15','71598','1','Cosave Powerbuild',1,1037,4,'2024-09-19 13:30:39','2024-09-19 13:30:39'),(482,15,'Food',155.69,'2024-09-17','0389','4','Superspar',1,1037,4,'2024-09-19 13:33:59','2024-09-19 13:33:59'),(483,15,'Food',177.12,'2024-09-16','5c5a01b9','4','Superspar',1,1037,4,'2024-09-19 13:35:04','2024-09-19 13:35:04'),(484,15,'Food',170.15,'2024-09-16','c523d564','4','Superspar',1,1037,4,'2024-09-19 13:36:09','2024-09-19 13:36:09'),(485,15,'Fuel',1592.01,'2024-09-18','99901901','2','Engen',1,1037,4,'2024-09-19 13:37:46','2024-09-19 13:37:46'),(486,15,'Fuel',1720.5,'2024-09-18','92448801','2','Engen',1,1037,4,'2024-09-19 13:38:48','2024-09-19 13:38:48'),(487,15,'Fuel',1760.89,'2024-09-15','002043220934780','2','Sasol',1,1037,4,'2024-09-19 13:41:21','2024-09-19 13:41:21'),(488,15,'Fuel',500,'2024-09-16','92448824','2','Engen',1,1037,4,'2024-09-19 13:42:34','2024-09-19 13:42:34'),(489,15,'Food',149.3,'2024-09-18','37af28d4','4','Durban Curry House',1,1037,4,'2024-09-19 13:44:13','2024-09-19 13:44:13'),(490,15,'Material',120,'2024-09-17','234342','1','L&D Electrical ',1,1037,4,'2024-09-19 13:45:46','2024-09-19 13:45:46'),(491,15,'Fuel',1323.95,'2024-09-15','00033478','2','Elegant',1,1037,4,'2024-09-19 13:48:22','2024-09-19 13:48:22'),(492,16,'Transport, Sabasaba',50,'2024-09-26','GAR001','2','Taxi',2,50,11,'2024-09-26 12:29:06','2024-09-26 12:29:06'),(493,16,'Tools',6291.72,'2024-09-26','179388','26','PHI',1,61,11,'2024-09-27 06:26:20','2024-09-27 06:26:20'),(494,16,'T-shirts',500,'2024-09-26','GR008','26','Reyan Best Price',2,500,11,'2024-09-27 06:35:17','2024-09-27 06:35:17'),(495,16,'T-shirts Printing',300,'2024-09-26','0230','26','SN Embroidery & Signs',2,300,11,'2024-09-27 06:37:29','2024-09-27 06:37:29'),(496,16,'Tools',545.9,'2024-09-21','131826','26','Build it',1,1,11,'2024-09-27 07:21:01','2024-09-27 07:21:01'),(497,16,'Fuel',500,'2024-09-20','88121112','2','Caltex',1,6462,15,'2024-09-27 07:23:00','2024-09-27 07:23:00'),(498,16,' Trailer towing & Defensive driving',3250,'2024-09-13','09132024','27','Topgear',1,2702,11,'2024-09-30 16:33:23','2024-09-30 16:33:23'),(499,16,'Fuel T shirt',40,'2024-09-25','09252024','2','Topgear',1,2702,11,'2024-09-30 16:35:18','2024-09-30 16:35:18'),(500,16,'Tools',1528.4,'2024-10-01','CAS2101382481','26','Tools',1,1,2,'2024-10-01 14:08:37','2024-10-01 14:08:37'),(501,16,'Tools',1528.4,'2024-10-01','CAS2101382481','26','Tools',1,1,2,'2024-10-01 14:09:12','2024-10-01 14:09:12'),(502,16,'Catridge',5823.98,'2024-10-02','41104352','26','FTTX',1,6561,11,'2024-10-03 06:29:43','2024-10-03 06:29:43'),(503,16,'Fuel',500,'2024-10-02','4E1E6246','2','Caltex',1,6561,11,'2024-10-03 06:55:58','2024-10-03 06:55:58'),(504,15,'transformer ',45000,'2024-09-13','tr001','1','Private',2,1,4,'2024-10-03 09:44:44','2024-10-03 09:44:44'),(505,15,'poles  and TLB├é┬á',1500,'2024-09-13','pt002','1','Private',2,1,4,'2024-10-03 09:45:25','2024-10-03 09:45:25'),(506,15,'Crane Truck',8225,'2024-09-13','cr003','17','Afren Solar Electric (Pty) Ltd',2,1,4,'2024-10-03 09:48:46','2024-10-03 09:48:46'),(507,16,'Todi Transport',170,'2024-08-14','00024','2','Cash send',2,1,12,'2024-10-04 12:01:06','2024-10-04 12:01:06'),(508,16,'Todi Transport',175,'2024-08-14','00025','2','Cash send',2,1,12,'2024-10-04 12:01:19','2024-10-04 12:01:19'),(509,16,'Nokia Material Transport',1000,'2024-08-14','0663','2','Cash send',1,1037,4,'2024-10-04 12:03:23','2024-10-04 12:03:23'),(510,16,'Food',140,'2024-10-06','2099','4','Caltex',1,3251,11,'2024-10-09 20:02:21','2024-10-09 20:02:21'),(511,16,'Fuel',500,'2024-10-07','721100','2','Caltex',1,3251,11,'2024-10-09 20:03:49','2024-10-09 20:03:49'),(512,16,'Stationary, Map',130,'2024-10-05','555041','10','Postnet',1,3251,11,'2024-10-09 20:06:13','2024-10-09 20:06:13'),(513,16,'Fuel',500,'2024-10-06','162845','2','Caltex',1,3251,11,'2024-10-09 20:07:30','2024-10-09 20:07:30'),(514,16,'Food',304.14,'2024-10-07','GAU201202C','4','Shoprite',1,3251,11,'2024-10-09 20:10:54','2024-10-09 20:10:54'),(515,16,'Fuel',500,'2024-10-05','0800','2','Caltex',1,3251,11,'2024-10-09 20:12:10','2024-10-09 20:12:10'),(516,16,'Transport',240,'2024-10-03','55574918ZA1124-1633','2','Bolt',2,240,11,'2024-10-09 20:17:14','2024-10-09 20:17:14'),(517,16,'Gas detector Carli',3650,'2024-10-06','0056','26','Gas Detector',1,8620,11,'2024-10-09 20:20:28','2024-10-09 20:20:28'),(518,16,'Saba saba',200,'2024-10-04','0056','1','Absa',1,8620,11,'2024-10-09 20:23:08','2024-10-09 20:23:08'),(519,19,'AIRTIME',60,'2024-11-28','MCA001','25','ABSA',1,1,12,'2024-11-28 12:35:48','2024-11-28 12:35:48'),(520,19,'CTS Test results',1800,'2024-12-06','120','19','Chris Fiber Technology',1,3305,12,'2024-12-06 07:19:44','2024-12-06 07:19:44'),(521,19,'CTS Test results',1800,'2024-12-06','120','19','Chris Fiber Technology',1,3305,12,'2024-12-06 08:59:48','2024-12-06 08:59:48'),(522,19,'FUEL',400,'2024-12-11','MCA003','2','ABSA',1,3305,12,'2024-12-18 08:23:31','2024-12-18 08:23:31'),(523,20,'FUEL',500,'2024-12-09','SBB001','2','ABSA',1,3305,12,'2024-12-18 08:25:05','2024-12-18 08:25:05'),(524,22,'FUEL',300,'2024-12-06','BOK001','2','ABSA',1,3305,12,'2024-12-18 08:27:59','2024-12-18 08:27:59'),(525,23,'FUEL',1000,'2025-01-13','RBD001','2','ABSA',1,3305,12,'2025-01-13 09:30:22','2025-01-13 09:30:22'),(526,23,'Fuel',1000,'2025-01-14','0002','2','Capitec',1,1,17,'2025-01-14 08:30:44','2025-01-14 08:30:44'),(527,23,'HIRING TO OFFLOAD',400,'2025-01-14','RBD002','17','ABSA',1,3305,12,'2025-01-14 09:49:24','2025-01-14 09:49:24'),(528,23,'PUSHRODS NEWLANDS',2500,'2025-01-14','RBD003','26','ABSA',1,3305,12,'2025-01-15 14:55:36','2025-01-15 14:55:36'),(529,23,'AIRTIME',100,'2025-01-14','RBD005','25','ABSA',1,3305,12,'2025-01-15 14:57:06','2025-01-15 14:57:06'),(530,23,'Fuel',300,'2025-01-15','0003','2','Caltex',1,1,17,'2025-01-15 17:05:40','2025-01-15 17:05:40'),(531,23,'PUSHRODS NEWLANDS',300,'2025-01-15','RBD006','17','ABSA',1,3305,12,'2025-01-16 06:35:46','2025-01-16 06:35:46'),(532,23,'FUEL',300,'2025-01-16','RBD007','2','ABSA',1,3305,12,'2025-01-16 06:38:32','2025-01-16 06:38:32'),(533,23,'PRINTING',75,'2025-01-15','RBD008','10','ABSA',1,3305,12,'2025-01-16 06:43:04','2025-01-16 06:43:04'),(534,23,'FUEL',525,'2025-01-15','RBD009','2','ABSA',1,3305,12,'2025-01-16 06:43:53','2025-01-16 06:43:53'),(535,23,'BANK CHARGES',600,'2025-01-15','RBD010','15','ABSA',1,3305,12,'2025-01-16 06:45:43','2025-01-16 06:45:43'),(536,23,'PRINTING',300,'2025-01-13','RBD011','10','ABSA',1,3305,12,'2025-01-16 06:50:40','2025-01-16 06:50:40'),(537,23,'FUEL',650,'2025-01-13','RBD012','2','ABSA',1,3305,12,'2025-01-16 06:53:17','2025-01-16 06:53:17'),(538,23,'FUEL',150,'2025-01-16','RBD012','2','ABSA',1,3305,17,'2025-01-21 16:04:00','2025-01-21 16:04:00'),(539,23,'TOOLS',100,'2025-01-16','RBD013','26','ABSA',1,3305,17,'2025-01-21 16:05:23','2025-01-21 16:05:23'),(540,23,'FUEL',50,'2025-01-16','RBD014','2','ABSA',1,3305,17,'2025-01-21 16:06:30','2025-01-21 16:06:30'),(541,23,'FUEL',140,'2025-01-17','RBD015','2','ABSA',1,3305,17,'2025-01-21 16:07:27','2025-01-21 16:07:27'),(542,23,'FUEL',200,'2025-01-17','RBD016','2','ABSA',1,3305,17,'2025-01-21 16:08:42','2025-01-21 16:08:42');
+/*!40000 ALTER TABLE `project_expense` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `project_invoice`
+--
+
+DROP TABLE IF EXISTS `project_invoice`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project_invoice` (
+  `pro_inv_id` int NOT NULL AUTO_INCREMENT,
+  `pro_inv_project` int NOT NULL,
+  `pro_inv_date` date NOT NULL,
+  `pro_inv_receipt` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `pro_inv_amount` double NOT NULL,
+  `pro_inv_method` int NOT NULL,
+  `pro_inv_account` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `pro_inv_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `pro_inv_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`pro_inv_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `project_invoice`
+--
+
+LOCK TABLES `project_invoice` WRITE;
+/*!40000 ALTER TABLE `project_invoice` DISABLE KEYS */;
+INSERT INTO `project_invoice` VALUES (1,1,'2023-08-01','0012',35000,1,'4900','2023-10-03 07:03:09','2023-10-03 07:03:09'),(2,2,'2023-09-01','00021',436472.69,1,'62416497198','2023-11-16 18:04:25','2024-01-24 12:10:48'),(3,3,'2023-12-14','3',205970,1,'4900','2024-01-11 08:15:43','2024-01-11 08:15:43'),(5,3,'2024-01-19','Fr',12000,1,'1','2024-01-23 09:04:58','2024-01-25 08:57:16'),(6,11,'2024-07-08','inv-003',42000,1,'1','2024-07-12 07:57:42','2024-07-12 07:57:42'),(7,11,'2024-06-20','inv-002',24000,1,'1','2024-07-12 07:59:14','2024-07-12 07:59:14'),(8,11,'2024-06-11','inv-001',42000,1,'1','2024-07-12 07:59:51','2024-07-12 07:59:51'),(9,13,'2024-08-01','81',7366.65,1,'1','2024-08-01 12:50:01','2024-08-01 12:50:01'),(10,15,'2024-09-03','91',314554.77,1,'1','2024-10-03 10:21:20','2024-10-03 10:21:20');
+/*!40000 ALTER TABLE `project_invoice` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `project_status`
+--
+
+DROP TABLE IF EXISTS `project_status`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project_status` (
+  `pro_st_id` int NOT NULL AUTO_INCREMENT,
+  `pro_st_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `pro_st_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `pro_st_update_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`pro_st_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `project_status`
+--
+
+LOCK TABLES `project_status` WRITE;
+/*!40000 ALTER TABLE `project_status` DISABLE KEYS */;
+INSERT INTO `project_status` VALUES (1,'Not Started','2023-09-04 13:44:17','2023-09-04 13:44:17'),(2,'In Progess','2023-09-04 13:44:17','2023-09-04 13:44:17'),(3,'Finished','2023-09-04 13:44:17','2023-09-04 13:44:17');
+/*!40000 ALTER TABLE `project_status` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `project_tools`
+--
+
+DROP TABLE IF EXISTS `project_tools`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project_tools` (
+  `pro_tool_id` int NOT NULL AUTO_INCREMENT,
+  `pro_id` int DEFAULT NULL,
+  `tool_id` int DEFAULT NULL,
+  `pro_tool_number` int DEFAULT NULL,
+  `pro_tool_user` int DEFAULT NULL,
+  `pro_tool_date` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`pro_tool_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `project_tools`
+--
+
+LOCK TABLES `project_tools` WRITE;
+/*!40000 ALTER TABLE `project_tools` DISABLE KEYS */;
+/*!40000 ALTER TABLE `project_tools` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `provinces`
+--
+
+DROP TABLE IF EXISTS `provinces`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `provinces` (
+  `province_id` int NOT NULL AUTO_INCREMENT,
+  `province_name` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`province_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `provinces`
+--
+
+LOCK TABLES `provinces` WRITE;
+/*!40000 ALTER TABLE `provinces` DISABLE KEYS */;
+INSERT INTO `provinces` VALUES (1,'Eastern Cape'),(2,'Free State'),(3,'Gauteng'),(4,'KwaZulu-Natal'),(5,'Limpopo'),(6,'Mpumalanga'),(7,'Northern Cape'),(8,'North West'),(9,'Western Cape');
+/*!40000 ALTER TABLE `provinces` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `quality`
+--
+
+DROP TABLE IF EXISTS `quality`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `quality` (
+  `qual_id` int NOT NULL AUTO_INCREMENT,
+  `qual_tender_id` int DEFAULT NULL,
+  `qual_task` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `qual_assigned_to` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `qual_description` text COLLATE utf8mb4_general_ci NOT NULL,
+  `qual_respond` text COLLATE utf8mb4_general_ci NOT NULL,
+  `qual_date` date NOT NULL,
+  `qual_status` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `qual_respond_date` date DEFAULT NULL,
+  `qual_created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `qual_update_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`qual_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `quality`
+--
+
+LOCK TABLES `quality` WRITE;
+/*!40000 ALTER TABLE `quality` DISABLE KEYS */;
+/*!40000 ALTER TABLE `quality` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `quote`
+--
+
+DROP TABLE IF EXISTS `quote`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `quote` (
+  `quote_id` int NOT NULL AUTO_INCREMENT,
+  `quote_type` int DEFAULT '0',
+  `quote_contract` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `quote_number` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
+  `quote_company` int NOT NULL,
+  `quote_customer` int NOT NULL,
+  `quote_name` text COLLATE utf8mb4_general_ci NOT NULL,
+  `quote_date` date NOT NULL,
+  `quote_subtotal` double NOT NULL,
+  `quote_vat` double NOT NULL,
+  `quote_total` double NOT NULL,
+  `quote_notes` text COLLATE utf8mb4_general_ci,
+  `quote_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `quote_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`quote_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `quote`
+--
+
+LOCK TABLES `quote` WRITE;
+/*!40000 ALTER TABLE `quote` DISABLE KEYS */;
+INSERT INTO `quote` VALUES (1,0,'A055-2020/21','2023/100',2,12,'MV-Cable between Holiday inn SS and Pioneer Park SS','2023-12-19',42586,6387.9,48973.9,NULL,'2024-02-23 02:44:35','2024-02-23 02:44:35'),(2,0,'A055-2020/21','2023/103',2,12,'LV Cable repairs @ Titan st','2023-12-12',30389.25,4558.39,34947.64,NULL,'2024-02-23 05:19:30','2024-02-23 05:19:30'),(3,0,'A055-2020/21','2023/105',2,12,'LV Cable repairs @ Drakensberg st','2023-12-13',30214.25,4532.14,34746.39,NULL,'2024-02-23 05:19:30','2024-03-11 12:28:29'),(4,0,'A055-2020/21','2023/106',2,12,'Service connection @ Umngeni  st','2023-12-14',41691,6253.65,47944.65,NULL,'2024-02-23 05:19:30','2024-03-11 12:24:38'),(5,0,'A055-2020/21','2023/108',2,12,'Service connection @  Hluhluwe st','2023-12-19',34536.25,5180.44,39716.69,NULL,'2024-02-23 05:19:30','2024-03-11 12:24:38'),(6,0,'A055-2020/21','2023/110',2,12,'Service connection @ Hospital','2023-12-21',42589.75,6388.46,48978.21,NULL,'2024-02-23 05:19:30','2024-03-11 12:24:38'),(7,0,'A055-2020/21','2024/111',2,12,'Service connection @ Jenkins ','2024-01-08',39934,5990.1,45924.1,NULL,'2024-02-23 05:19:30','2024-03-11 12:24:38'),(8,0,'A055-2020/21','2024/112',2,12,'Service connection @ Nagtegaal st','2024-01-10',34323.25,5148.4875,39471.7375,NULL,'2024-02-23 05:19:30','2024-03-11 12:24:38'),(9,0,'A055-2020/21','2024/113	',2,12,'LV Cable repairs @ Woodrange','2024-01-12',40940.5,6141.075,47081.575,NULL,'2024-02-23 05:19:30','2024-02-23 06:53:11'),(10,0,NULL,'20',2,15,'Hluvukani Electrication (600)','2024-02-21',639687.13,95953.07,735640.2,'The payment terms are as follows:\n  - A deposit of 40% of the total cost is required to start the project.\n  - A second installment of 20% of the total cost is due by the end of March.\n  - A third installment of 20% of the total cost is due by the end of April','2024-02-23 09:38:24','2024-02-23 09:40:49'),(11,1,NULL,'19',2,12,'Supply To Newcastle','2024-02-19',94770,14215.5,108985.5,NULL,'2024-02-23 09:38:24','2024-05-21 07:14:51'),(12,0,NULL,'2024/041',2,16,'Electricial Installation','2024-02-26',71564.19,10734.63,82298.82,'The payment terms are as follows:\n   - A deposit of 80% of the total cost is required to start the project.\n   - 20% after project┬ácommissioning','2024-02-26 10:57:34','2024-03-01 10:26:20'),(13,0,NULL,'GTK0056',1,17,'Cable route tracing and marking','2024-03-07',118655,17798.25,136453.25,NULL,'2024-03-07 10:26:41','2024-03-07 10:26:41'),(14,0,NULL,'14',3,24,'ABC Conductor','2024-04-17',49500,0,49500,NULL,'2024-04-17 08:56:03','2024-04-17 08:56:03');
+/*!40000 ALTER TABLE `quote` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `quote_items`
+--
+
+DROP TABLE IF EXISTS `quote_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `quote_items` (
+  `quote_item_id` int NOT NULL AUTO_INCREMENT,
+  `quote_id` int NOT NULL,
+  `quote_item` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `quote_item_name` varchar(110) COLLATE utf8mb4_general_ci NOT NULL,
+  `quote_item_price` double NOT NULL,
+  `quote_item_qnt` int NOT NULL,
+  `quote_item_labour` double DEFAULT NULL,
+  `quote_item_labour_total` double DEFAULT NULL,
+  `quote_item_material` double DEFAULT NULL,
+  `quote_item_material_total` double DEFAULT NULL,
+  `quote_item_discount` double DEFAULT NULL,
+  `quote_item_total` double NOT NULL,
+  `quote_item_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `quote_item_update` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`quote_item_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=138 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='ITEM 	Description					Quantity		UNIT COST	TOTAL COST\n';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `quote_items`
+--
+
+LOCK TABLES `quote_items` WRITE;
+/*!40000 ALTER TABLE `quote_items` DISABLE KEYS */;
+INSERT INTO `quote_items` VALUES (1,1,'25.5.4','Install barricading',50,42,NULL,NULL,NULL,NULL,NULL,2100,'2024-02-23 03:09:49',NULL),(2,1,'25.2.6','Laying of warning danger Tape (skull + bone)',2.75,44,NULL,NULL,NULL,NULL,NULL,121,'2024-02-23 03:09:49',NULL),(3,1,'14.10','TLB',500,19,NULL,NULL,NULL,NULL,NULL,9500,'2024-02-23 03:09:49',NULL),(4,1,'25.5.1','Excavation general trench 1m dp x 0.45m Wide',180,26,NULL,NULL,NULL,NULL,NULL,4680,'2024-02-23 03:09:49',NULL),(5,1,'28.2','Remove MV Cable I/D terminations',300,39,NULL,NULL,NULL,NULL,NULL,11700,'2024-02-23 03:09:49',NULL),(6,1,'25.5.8','Dispose of unused Excavated Material at approved disposal site',400,16,NULL,NULL,NULL,NULL,NULL,6400,'2024-02-23 03:09:49',NULL),(7,1,'15.6','PVC sleeve pipe 160mm',65,39,NULL,NULL,NULL,NULL,NULL,2535,'2024-02-23 03:09:49',NULL),(8,1,'4.1.0','95mm Al cable(MV Cable laid in ground ',30,44,NULL,NULL,NULL,NULL,NULL,1320,'2024-02-23 03:09:49',NULL),(9,1,'27.6','MV Cable Joint',250,2,NULL,NULL,NULL,NULL,NULL,500,'2024-02-23 03:09:49',NULL),(10,1,'14.1','LDV 4x2 to quote',10,63,NULL,NULL,NULL,NULL,NULL,630,'2024-02-23 03:09:49',NULL),(11,1,'14.1','LDV 4x2 to work',10,310,NULL,NULL,NULL,NULL,NULL,3100,'2024-02-23 03:09:49',NULL),(12,8,'25.5.4','Install barricading',50,64,NULL,NULL,NULL,NULL,NULL,3200,'2024-02-23 06:46:38',NULL),(13,8,'25.2.6','Laying of warning danger Tape (skull + bone)',2.75,63,NULL,NULL,NULL,NULL,NULL,173.25,'2024-02-23 06:46:38',NULL),(14,8,'1.2.0','Excavation hard material and back filling',180,64,NULL,NULL,NULL,NULL,NULL,11520,'2024-02-23 06:46:38',NULL),(15,8,'10.4','import soil to site',70,29,NULL,NULL,NULL,NULL,NULL,2030,'2024-02-23 06:46:38',NULL),(16,8,'6.3','Install pole',2000,1,NULL,NULL,NULL,NULL,NULL,2000,'2024-02-23 06:46:38',NULL),(17,8,'7.2','install Kiosk',1500,2,NULL,NULL,NULL,NULL,NULL,3000,'2024-02-23 06:46:38',NULL),(18,8,'14.1','LDV 4x2 to quote',10,50,NULL,NULL,NULL,NULL,NULL,500,'2024-02-23 06:46:38',NULL),(19,8,'14.1','LDV 4x2 to work',10,162,NULL,NULL,NULL,NULL,NULL,1620,'2024-02-23 06:46:38',NULL),(20,8,'10.2','Pavement  removal',200,11,NULL,NULL,NULL,NULL,NULL,2200,'2024-02-23 06:46:38',NULL),(21,8,'10.3','Pavement  replacement',200,11,NULL,NULL,NULL,NULL,NULL,2200,'2024-02-23 06:46:38',NULL),(22,8,'10.4','transport debris off and cable to site',140,42,NULL,NULL,NULL,NULL,NULL,5880,'2024-02-23 06:46:38',NULL),(23,9,'25.5.4','Install barricading',50,62,NULL,NULL,NULL,NULL,NULL,3100,'2024-02-23 06:46:38',NULL),(24,9,'25.2.6','Laying of warning danger Tape (skull + bone)',2.75,62,NULL,NULL,NULL,NULL,NULL,170.5,'2024-02-23 06:46:38',NULL),(25,9,'25.5.1','Excavation general trench 1m dp x 0.45m Wide(m3)',180,61,NULL,NULL,NULL,NULL,NULL,10980,'2024-02-23 06:46:38',NULL),(26,9,'15.5.0','Supply and Install 110mm PVC Sleeve pipes',55,54,NULL,NULL,NULL,NULL,NULL,2970,'2024-02-23 06:46:38',NULL),(27,9,'3.6','LV cable lay in ground ',10,61,NULL,NULL,NULL,NULL,NULL,610,'2024-02-23 06:46:38',NULL),(28,9,'5.8','cable joint',200,2,NULL,NULL,NULL,NULL,NULL,400,'2024-02-23 06:46:38',NULL),(29,9,'14.1','LDV 4x2 to quote',10,58,NULL,NULL,NULL,NULL,NULL,580,'2024-02-23 06:46:38',NULL),(30,9,'14.1','LDV 4x2 to work',10,175,NULL,NULL,NULL,NULL,NULL,1750,'2024-02-23 06:46:38',NULL),(31,9,'10.4','transport cable to site',70,57,NULL,NULL,NULL,NULL,NULL,3990,'2024-02-23 06:46:38',NULL),(32,9,'10.2','Removal and replacement  of pavement',400,31,NULL,NULL,NULL,NULL,NULL,12400,'2024-02-23 06:46:38',NULL),(33,9,'10.4','transport debris off site',70,57,NULL,NULL,NULL,NULL,NULL,3990,'2024-02-23 06:46:38',NULL),(34,7,'25.5.4','Install barricading',50,57,NULL,NULL,NULL,NULL,NULL,2850,'2024-02-23 06:46:38',NULL),(35,7,'25.2.6','Laying of warning danger Tape (skull + bone)',2.75,56,NULL,NULL,NULL,NULL,NULL,154,'2024-02-23 06:46:38',NULL),(36,7,'25.5.1','Excavation general trench 1m dp x 0.45m Wide(m3)',180,62,NULL,NULL,NULL,NULL,NULL,11160,'2024-02-23 06:46:38',NULL),(37,7,'15.4','Supply and install PVC sleeve pipe',365,34,NULL,NULL,NULL,NULL,NULL,12410,'2024-02-23 06:46:38',NULL),(38,7,'5.8','cable joint',200,2,NULL,NULL,NULL,NULL,NULL,400,'2024-02-23 06:46:38',NULL),(39,7,'10.6','Soft soil',120,14,NULL,NULL,NULL,NULL,NULL,1680,'2024-02-23 06:46:38',NULL),(40,7,'14.1','LDV 4x2 to quote',10,86,NULL,NULL,NULL,NULL,NULL,860,'2024-02-23 06:46:38',NULL),(41,7,'14.1','LDV 4x2 to work',10,160,NULL,NULL,NULL,NULL,NULL,1600,'2024-02-23 06:46:38',NULL),(42,7,'10.4','transport debris off and cable to site',140,63,NULL,NULL,NULL,NULL,NULL,8820,'2024-02-23 06:46:38',NULL),(43,6,'3.1','Install danger Tape (barricade)',50,69,NULL,NULL,NULL,NULL,NULL,3450,'2024-02-23 06:46:38',NULL),(44,6,'25.2.5','Laying of warning danger Tape (skull + bone)',2.75,69,NULL,NULL,NULL,NULL,NULL,189.75,'2024-02-23 06:46:38',NULL),(45,6,'25.2.7','Trench & backfill length long , 0,75m deep and 0,45 wide ',180,30,NULL,NULL,NULL,NULL,NULL,5400,'2024-02-23 06:46:38',NULL),(46,6,'15.5.0','Supply and Install 110mm PVC Sleeve pipes',55,68,NULL,NULL,NULL,NULL,NULL,3740,'2024-02-23 06:46:38',NULL),(47,6,'10.4','transport cable to site',70,62,NULL,NULL,NULL,NULL,NULL,4340,'2024-02-23 06:46:38',NULL),(48,6,'5.8','cable joint',200,1,NULL,NULL,NULL,NULL,NULL,200,'2024-02-23 06:46:38',NULL),(49,6,'29.2.2','16mm sq Bare Stranded Cu Conductor ',100,61,NULL,NULL,NULL,NULL,NULL,6100,'2024-02-23 06:46:38',NULL),(50,6,'14.1','LDV 4x2 to quote',10,77,NULL,NULL,NULL,NULL,NULL,770,'2024-02-23 06:46:38',NULL),(51,6,'15.1','LDV 4x2 to work',10,199,NULL,NULL,NULL,NULL,NULL,1990,'2024-02-23 06:46:38',NULL),(52,6,'10.2','Pavement  removal',200,30,NULL,NULL,NULL,NULL,NULL,6000,'2024-02-23 06:46:38',NULL),(53,6,'10.3','Pavement  replacement',200,30,NULL,NULL,NULL,NULL,NULL,6000,'2024-02-23 06:46:38',NULL),(54,6,'10.4','transport debris off site',70,63,NULL,NULL,NULL,NULL,NULL,4410,'2024-02-23 06:46:38',NULL),(55,5,'3.1','Install danger Tape (barricade)',50,75,NULL,NULL,NULL,NULL,NULL,3750,'2024-02-23 06:46:38',NULL),(56,5,'25.2.5','Laying of warning danger Tape (skull + bone)',2.75,75,NULL,NULL,NULL,NULL,NULL,206.25,'2024-02-23 06:46:38',NULL),(57,5,'15.5.0','Supply and Install 110mm PVC Sleeve pipes',55,18,NULL,NULL,NULL,NULL,NULL,990,'2024-02-23 06:46:38',NULL),(58,5,'11.4','16mm 4 Core SWA cable including trenching and laying',200,75,NULL,NULL,NULL,NULL,NULL,15000,'2024-02-23 06:46:38',NULL),(59,5,'7.2','Install distribution kiosk',1500,2,NULL,NULL,NULL,NULL,NULL,3000,'2024-02-23 06:46:38',NULL),(60,5,'14.1','LDV 4x2 to quote',10,64,NULL,NULL,NULL,NULL,NULL,640,'2024-02-23 06:46:38',NULL),(61,5,'15.1','LDV 4x2 to work',10,117,NULL,NULL,NULL,NULL,NULL,1170,'2024-02-23 06:46:38',NULL),(62,5,'10.2','Pavement  removal',200,15,NULL,NULL,NULL,NULL,NULL,3000,'2024-02-23 06:46:38',NULL),(63,5,'10.3','Pavement  replacement',200,15,NULL,NULL,NULL,NULL,NULL,3000,'2024-02-23 06:46:38',NULL),(64,5,'10.4','transport debris offand cable to site',140,27,NULL,NULL,NULL,NULL,NULL,3780,'2024-02-23 06:46:38',NULL),(65,4,'25.5.4','Install barricading',50,46,NULL,NULL,NULL,NULL,NULL,2300,'2024-02-23 06:46:38',NULL),(66,4,'25.2.6','Laying of warning danger Tape (skull + bone)',2.75,44,NULL,NULL,NULL,NULL,NULL,121,'2024-02-23 06:46:38',NULL),(67,4,'25.5.1','Excavation general trench 1m dp x 0.45m Wide(m3)',180,39,NULL,NULL,NULL,NULL,NULL,7020,'2024-02-23 06:46:38',NULL),(68,4,'15.5.0','Supply and Install 110mm PVC Sleeve pipes',55,34,NULL,NULL,NULL,NULL,NULL,1870,'2024-02-23 06:46:38',NULL),(69,4,'3.6','LV cable lay in ground ',10,42,NULL,NULL,NULL,NULL,NULL,420,'2024-02-23 06:46:38',NULL),(70,4,'5.8','cable joint',200,2,NULL,NULL,NULL,NULL,NULL,400,'2024-02-23 06:46:38',NULL),(71,4,'14.1','LDV 4x2 to quote',10,80,NULL,NULL,NULL,NULL,NULL,800,'2024-02-23 06:46:38',NULL),(72,4,'14.1','LDV 4x2 to work',10,150,NULL,NULL,NULL,NULL,NULL,1500,'2024-02-23 06:46:38',NULL),(73,4,'10.4','transport cable to site',70,88,NULL,NULL,NULL,NULL,NULL,6160,'2024-02-23 06:46:38',NULL),(74,4,'10.3','Pavement removal and replacement',400,30,NULL,NULL,NULL,NULL,NULL,12000,'2024-02-23 06:46:38',NULL),(75,4,'10.4','transport debris off site',70,130,NULL,NULL,NULL,NULL,NULL,9100,'2024-02-23 06:46:38',NULL),(76,3,'25.5.4','Install barricading',50,68,NULL,NULL,NULL,NULL,NULL,3400,'2024-02-23 06:46:38',NULL),(77,3,'25.2.5','Laying of warning danger Tape (skull + bone)',2.75,67,NULL,NULL,NULL,NULL,NULL,184.25,'2024-02-23 06:46:38',NULL),(78,3,'25.5.1','Excavation general trench 1m dp x 0.45m Wide(m3)',180,64,NULL,NULL,NULL,NULL,NULL,11520,'2024-02-23 06:46:38',NULL),(79,3,'29.2.2','16mm sq Bare Stranded Cu Conductor ',100,48,NULL,NULL,NULL,NULL,NULL,4800,'2024-02-23 06:46:38',NULL),(80,3,'14.1','LDV 4x2 to quote',10,41,NULL,NULL,NULL,NULL,NULL,410,'2024-02-23 06:46:38',NULL),(81,3,'14.1','LDV 4x2 to work',10,110,NULL,NULL,NULL,NULL,NULL,1100,'2024-02-23 06:46:38',NULL),(82,3,'10.3','Pavement removal and replacement',400,22,NULL,NULL,NULL,NULL,NULL,8800,'2024-02-23 06:46:38',NULL),(83,2,'3.1','Install danger Tape (barricade)',50,48,NULL,NULL,NULL,NULL,NULL,2400,'2024-02-23 06:46:38',NULL),(84,2,'25.2.6','Laying of warning danger Tape (skull + bone)',2.75,47,NULL,NULL,NULL,NULL,NULL,129.25,'2024-02-23 06:46:38',NULL),(85,2,'25.5.1','Excavation general trench 1m dp x 0.45m Wide(m3)',180,39,NULL,NULL,NULL,NULL,NULL,7020,'2024-02-23 06:46:38',NULL),(86,2,'28.2','Remove LV Kiosks',1000,3,NULL,NULL,NULL,NULL,NULL,3000,'2024-02-23 06:46:38',NULL),(87,2,'7.2','install Kiosk',1500,3,NULL,NULL,NULL,NULL,NULL,4500,'2024-02-23 06:46:38',NULL),(88,2,'','Lay cable',25,44,NULL,NULL,NULL,NULL,NULL,1100,'2024-02-23 06:46:38',NULL),(89,2,'10.6','Soft soil',120,11,NULL,NULL,NULL,NULL,NULL,1320,'2024-02-23 06:46:38',NULL),(90,2,'25.2.7','Trench & backfill',180,17,NULL,NULL,NULL,NULL,NULL,3060,'2024-02-23 06:46:38',NULL),(91,2,'10.2.3','Paving and Reinstatement',400,10,NULL,NULL,NULL,NULL,NULL,4000,'2024-02-23 06:46:38',NULL),(92,2,'14.1','LDV 4x2 to quote',10,106,NULL,NULL,NULL,NULL,NULL,1060,'2024-02-23 06:46:38',NULL),(93,2,'14.1','LDV 4x2 to work',10,280,NULL,NULL,NULL,NULL,NULL,2800,'2024-02-23 06:46:38',NULL),(114,11,NULL,'Anchorage Steel Wire',781,1,NULL,NULL,NULL,NULL,NULL,781,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(113,11,NULL,'Barrier net Orange 1m * 50m',613,3,NULL,NULL,NULL,NULL,NULL,1839,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(112,11,NULL,'Portable Earthing Kit | HV 11kV 66kV',18360,2,NULL,NULL,NULL,NULL,NULL,36720,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(110,11,NULL,'5 tonne webbing sling',1990,2,NULL,NULL,NULL,NULL,NULL,3980,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(111,11,NULL,'6.7 ton Adjustable G80 Alloy Steel Chain',5600,1,NULL,NULL,NULL,NULL,NULL,5600,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(109,10,NULL,'Project Manage',100000,1,NULL,NULL,NULL,NULL,NULL,100000,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(108,10,NULL,'Clerk of Works',70000,1,NULL,NULL,NULL,NULL,NULL,70000,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(107,10,NULL,'Design',390000,1,NULL,NULL,NULL,NULL,NULL,390000,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(106,10,NULL,'Surveyor',134687.13,1,NULL,NULL,NULL,NULL,NULL,134687.13,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(105,10,NULL,'Marketing',45000,1,NULL,NULL,NULL,NULL,NULL,45000,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(115,11,NULL,'Cable Locator',31350,1,NULL,NULL,NULL,NULL,NULL,31350,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(116,11,NULL,'Brush Cutter',5400,2,NULL,NULL,NULL,NULL,NULL,10800,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(117,11,NULL,'Phone cord 100m',3700,1,NULL,NULL,NULL,NULL,NULL,3700,'0000-00-00 00:00:00','2024-02-23 09:58:05'),(118,12,NULL,'P8000 trunking',0,35,208.3,7290.5,637,22295,NULL,29585.5,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(119,12,NULL,'Crabtrees 2x4 steel plugs ',0,37,49.6,1835.2,80.08,2962.96,NULL,4798.16,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(120,12,NULL,'Double trunking',0,12,208.3,2499.6,637,7644,NULL,10143.6,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(121,12,NULL,'P2000 trunking',0,10,111.3,1113,743.4,7434,NULL,8547,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(122,12,NULL,'Waterproof D.B 12way',0,1,148.5,148.5,960,960,NULL,1108.5,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(123,12,NULL,'Steel gland and shroud',0,2,129.5,259,99.47,198.94,NULL,457.94,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(124,12,NULL,'20mm steel conduit pipes',0,6,31.9,191.4,184.24,1105.44,NULL,1296.84,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(125,12,NULL,'90 degrees steel bend',0,18,11,198,39.2,705.6,NULL,903.6,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(126,12,NULL,'90 degrees external elbows trunking',0,2,20,40,68.6,137.2,NULL,177.2,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(127,12,NULL,'4mm x 2core surfix wire',0,50,11,550,76.34,3817,NULL,4367,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(128,12,NULL,'2.5mm x 2core surfix wire',0,100,10,1000,32.63,3263,NULL,4263,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(129,12,NULL,'D.B spacers (white)',0,50,0.6,30,4.8,240,NULL,270,'2024-02-26 10:59:52',NULL),(130,12,NULL,'D.B covers',0,2,23,46,780.9,1561.8,NULL,1607.8,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(131,12,NULL,'20mm PVC conduit pipes',0,6,8.5,51,30.4,182.4,NULL,233.4,'2024-02-26 10:59:52',NULL),(132,12,NULL,'3 pole isolator switch',0,3,125.6,376.8,322.35,967.05,NULL,1343.85,'2024-02-26 10:59:52','2024-03-01 10:18:20'),(133,12,NULL,'Transport',0,154,0,0,16,2460.8,NULL,2460.8,'2024-02-26 10:59:52',NULL),(134,13,'1','Cable route tracing and marking	',3194.4,36,NULL,NULL,NULL,NULL,NULL,115000,'2024-03-07 10:29:37','2024-03-07 10:43:56'),(135,13,'2','Transport',8.5,430,NULL,NULL,NULL,NULL,NULL,3655,'2024-03-07 10:29:37','2024-03-07 10:43:56'),(136,14,'1','35mm2 ABC Conductor Dual Phase + Bare Nuetral',40000,1,NULL,NULL,NULL,NULL,NULL,40000,'2024-04-17 08:58:04',NULL),(137,14,'2','Transport',9500,1,NULL,NULL,NULL,NULL,NULL,9500,'2024-04-17 08:58:04',NULL);
+/*!40000 ALTER TABLE `quote_items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair`
+--
+
+DROP TABLE IF EXISTS `repair`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair` (
+  `rep_id` int NOT NULL AUTO_INCREMENT,
+  `rep_asset` int NOT NULL,
+  `rep_add_value` int NOT NULL,
+  `rep_amount` double NOT NULL,
+  `rep_exp` int NOT NULL,
+  `rep_date` date NOT NULL,
+  `rep_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`rep_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair`
+--
+
+LOCK TABLES `repair` WRITE;
+/*!40000 ALTER TABLE `repair` DISABLE KEYS */;
+INSERT INTO `repair` VALUES (1,1,1,3,0,'2023-10-17','2023-10-26 10:04:12');
+/*!40000 ALTER TABLE `repair` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `report_task`
+--
+
+DROP TABLE IF EXISTS `report_task`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `report_task` (
+  `report_task_id` int NOT NULL AUTO_INCREMENT,
+  `task_id` int NOT NULL,
+  `report_date` date NOT NULL,
+  `report_description` text,
+  `report_quantity` int DEFAULT NULL,
+  `report_file` varchar(255) DEFAULT NULL,
+  `user_id` int DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`report_task_id`),
+  KEY `task_id` (`task_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `report_task`
+--
+
+LOCK TABLES `report_task` WRITE;
+/*!40000 ALTER TABLE `report_task` DISABLE KEYS */;
+/*!40000 ALTER TABLE `report_task` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `report_task_item`
+--
+
+DROP TABLE IF EXISTS `report_task_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `report_task_item` (
+  `report_task_item_id` int NOT NULL AUTO_INCREMENT,
+  `report_task_id` int NOT NULL,
+  `item_task_id` int NOT NULL,
+  `report_item_date` date NOT NULL,
+  `report_item_quantity` int DEFAULT NULL,
+  `report_item_status` int DEFAULT NULL,
+  PRIMARY KEY (`report_task_item_id`),
+  KEY `report_task_id` (`report_task_id`),
+  KEY `item_task_id` (`item_task_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `report_task_item`
+--
+
+LOCK TABLES `report_task_item` WRITE;
+/*!40000 ALTER TABLE `report_task_item` DISABLE KEYS */;
+/*!40000 ALTER TABLE `report_task_item` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `role`
+--
+
+DROP TABLE IF EXISTS `role`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `role` (
+  `ro_id` int NOT NULL AUTO_INCREMENT,
+  `ro_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `ro_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `ro_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ro_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `role`
+--
+
+LOCK TABLES `role` WRITE;
+/*!40000 ALTER TABLE `role` DISABLE KEYS */;
+INSERT INTO `role` VALUES (1,'Director','2023-09-04 13:39:55','2023-09-04 13:39:55'),(2,'Admin','2023-09-04 13:39:55','2023-09-04 13:39:55'),(3,'Accountant','2023-09-04 13:39:55','2023-09-04 13:39:55'),(4,'Project Manager','2023-09-04 13:39:55','2023-09-04 13:39:55'),(5,'Electrical Engineer','2023-09-04 13:39:55','2023-09-04 13:39:55'),(6,'Driver','2024-01-11 07:44:53','2024-01-11 07:44:53'),(7,'Motor Mechanic','2024-01-11 07:54:02','2024-01-11 07:54:02');
+/*!40000 ALTER TABLE `role` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `status`
+--
+
+DROP TABLE IF EXISTS `status`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `status` (
+  `status_id` int NOT NULL AUTO_INCREMENT,
+  `status_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`status_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `status`
+--
+
+LOCK TABLES `status` WRITE;
+/*!40000 ALTER TABLE `status` DISABLE KEYS */;
+INSERT INTO `status` VALUES (1,'Good and Working','2023-09-22 13:59:59'),(2,'Not Working','2023-09-22 13:59:59'),(3,'Bad but Working','2023-09-22 13:59:59');
+/*!40000 ALTER TABLE `status` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `status_tender`
+--
+
+DROP TABLE IF EXISTS `status_tender`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `status_tender` (
+  `status_tender_id` int NOT NULL AUTO_INCREMENT,
+  `status_tender_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`status_tender_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `status_tender`
+--
+
+LOCK TABLES `status_tender` WRITE;
+/*!40000 ALTER TABLE `status_tender` DISABLE KEYS */;
+INSERT INTO `status_tender` VALUES (1,'Not Started'),(2,'In Progress'),(3,'Submitted'),(4,'Cancelled'),(5,'Failed to be Submitted'),(6,'Successfull');
+/*!40000 ALTER TABLE `status_tender` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sub_contract_deducts`
+--
+
+DROP TABLE IF EXISTS `sub_contract_deducts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sub_contract_deducts` (
+  `sub_co_dedu_id` int NOT NULL AUTO_INCREMENT,
+  `sub_contractor` int DEFAULT NULL,
+  `sub_co_dedu_name` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `sub_co_dedu_date` date DEFAULT NULL,
+  `sub_co_dedu_amount` double DEFAULT NULL,
+  `sub_co_status` int DEFAULT '0',
+  `sub_co_dedu_create` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`sub_co_dedu_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sub_contract_deducts`
+--
+
+LOCK TABLES `sub_contract_deducts` WRITE;
+/*!40000 ALTER TABLE `sub_contract_deducts` DISABLE KEYS */;
+INSERT INTO `sub_contract_deducts` VALUES (1,1,'Ginner Tyres','2024-06-11',3000,1,'2024-06-13 18:27:06'),(2,1,'Addila fleet','2024-06-11',2400,1,'2024-06-14 07:42:46'),(3,1,'Rent','2024-06-01',3200,1,'2024-06-14 07:43:27'),(4,1,'Tracker','2024-06-01',920,1,'2024-06-14 07:44:32'),(5,1,'GIT','2024-06-01',3050,1,'2024-06-14 07:44:56'),(6,1,'volvo Pro-rata','2024-06-01',750,1,'2024-06-14 07:46:00'),(7,1,'Insurance','2024-06-15',5980,1,'2024-06-14 07:46:55'),(8,1,'Fixtyres repair','2024-07-04',1500,1,'2024-07-04 09:55:53'),(9,1,'Rent','2024-07-04',2875,1,'2024-07-04 10:13:49'),(10,1,'Security','2024-07-04',1666.5,1,'2024-07-04 10:14:13'),(11,1,'Insurance','2024-07-15',12997.14,1,'2024-07-17 14:41:12'),(12,1,'GIT','2024-07-05',3000,0,'2024-07-17 14:42:16'),(13,1,'Tracker','2024-07-15',960,0,'2024-07-17 14:42:40'),(14,1,'Rent','2024-07-31',2875,0,'2024-08-05 14:14:14'),(15,1,'Yard Security','2024-07-31',1666.5,0,'2024-08-05 14:20:46'),(16,1,'Toilet','2024-07-31',600,0,'2024-08-05 14:21:17');
+/*!40000 ALTER TABLE `sub_contract_deducts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sub_contract_expenses`
+--
+
+DROP TABLE IF EXISTS `sub_contract_expenses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sub_contract_expenses` (
+  `sub_co_id` int NOT NULL AUTO_INCREMENT,
+  `sub_co_company_id` int NOT NULL,
+  `sub_co_date` date NOT NULL,
+  `sub_co_amount` decimal(10,2) NOT NULL,
+  `sub_co_provider` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `sub_co_invoice_id` int NOT NULL,
+  `sub_co_paid_by` int NOT NULL,
+  `sub_co_payment_method` int NOT NULL,
+  `sub_co_rating` int NOT NULL,
+  `sub_co_status` tinyint(1) NOT NULL,
+  `sub_co_create` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `sub_co_update` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`sub_co_id`),
+  KEY `sub_co_company_id` (`sub_co_company_id`),
+  KEY `sub_co_invoice_id` (`sub_co_invoice_id`),
+  KEY `sub_co_paid_by` (`sub_co_paid_by`)
+) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sub_contract_expenses`
+--
+
+LOCK TABLES `sub_contract_expenses` WRITE;
+/*!40000 ALTER TABLE `sub_contract_expenses` DISABLE KEYS */;
+INSERT INTO `sub_contract_expenses` VALUES (1,3,'2024-06-06',1650.00,'1',53,12,1,1,1,'2024-06-10 12:39:36','2024-07-05 10:44:03'),(2,3,'2024-06-07',7350.00,'1',54,12,1,1,0,'2024-06-10 12:42:16','2024-07-17 14:48:37'),(3,3,'2024-06-07',17150.00,'6',54,12,1,1,0,'2024-06-10 12:44:18','2024-07-19 06:32:31'),(4,3,'2024-06-06',59905.00,'1',55,12,1,1,1,'2024-06-10 12:51:28','2024-07-05 10:44:03'),(5,3,'2024-06-06',28000.00,'1',60,12,1,1,1,'2024-06-14 13:21:34','2024-07-05 10:44:03'),(6,3,'2024-05-23',3500.00,'6',56,12,1,1,1,'2024-06-14 13:30:43','2024-07-17 15:12:08'),(7,3,'2024-05-23',14000.00,'3',56,12,1,1,1,'2024-06-14 13:36:22','2024-07-19 08:12:31'),(8,3,'2024-05-23',15750.00,'1',56,12,1,1,1,'2024-06-14 13:50:20','2024-07-17 14:49:50'),(9,3,'2024-05-30',3960.00,'1',60,12,1,1,1,'2024-06-14 13:53:36','2024-07-05 10:44:03'),(10,3,'2024-06-30',36400.00,'1',67,12,1,1,0,'2024-07-05 10:08:24',NULL),(11,3,'2024-06-30',19437.00,'1',68,12,1,1,1,'2024-07-05 10:09:16',NULL),(12,3,'2024-06-30',1750.00,'1',66,12,1,1,1,'2024-07-05 10:11:14','2024-07-17 14:49:50'),(13,3,'2024-06-30',101585.00,'1',69,12,1,1,1,'2024-07-05 10:22:46',NULL),(14,3,'2024-04-30',2500.00,'1',57,12,1,1,1,'2024-07-05 10:45:41',NULL),(15,3,'2024-05-30',9000.00,'1',48,12,1,1,1,'2024-07-05 12:33:16',NULL),(16,3,'2024-06-30',6700.00,'1',65,12,1,1,1,'2024-07-05 13:19:32','2024-07-17 14:49:50'),(17,3,'2024-06-30',14300.00,'3',67,12,1,1,0,'2024-07-08 09:15:41',NULL),(18,3,'2024-07-31',15100.00,'1',84,1,1,1,0,'2024-08-06 08:21:02','2024-08-06 08:26:58'),(19,3,'2024-07-31',113365.00,'1',83,1,1,1,1,'2024-08-06 08:22:30',NULL);
+/*!40000 ALTER TABLE `sub_contract_expenses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `supplier`
+--
+
+DROP TABLE IF EXISTS `supplier`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `supplier` (
+  `supplier_id` int NOT NULL AUTO_INCREMENT,
+  `supplier_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `supplier_tel` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `supplier_contact` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `supplier_contact_post` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `supplier_address` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `supplier_email` varchar(105) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `supplier_speciality` varchar(245) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `supplier_cell` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `supplier_website` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `supplier_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `supplier_update` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`supplier_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `supplier`
+--
+
+LOCK TABLES `supplier` WRITE;
+/*!40000 ALTER TABLE `supplier` DISABLE KEYS */;
+INSERT INTO `supplier` VALUES (1,'ARB Electrical Wholesalers','0114390000','Alwyn Madurai','Sales Representative','15-17 Poplar Crescent, Lords View Industrial Park, Chloorkop','alwynm@arb.co.za','Power and Instrumentation Cable Overhead Line Equipment and Conducts, General Electrical Contracting Materials, Lighting and Renewable Energy Solutions','0828942474','www.arb.co.za','2024-02-01 11:15:02',NULL);
+/*!40000 ALTER TABLE `supplier` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tables`
+--
+
+DROP TABLE IF EXISTS `tables`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tables` (
+  `id` int DEFAULT NULL,
+  `db` int DEFAULT NULL,
+  `table_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tables`
+--
+
+LOCK TABLES `tables` WRITE;
+/*!40000 ALTER TABLE `tables` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tables` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `task`
+--
+
+DROP TABLE IF EXISTS `task`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `task` (
+  `task_id` int NOT NULL AUTO_INCREMENT,
+  `task_project_id` varchar(45) DEFAULT NULL,
+  `task_name` varchar(145) DEFAULT NULL,
+  `task_qnt` int DEFAULT NULL,
+  `task_description` longtext,
+  `task_qnt_done` int DEFAULT '0',
+  `task_status` int DEFAULT '0',
+  `task_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`task_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `task`
+--
+
+LOCK TABLES `task` WRITE;
+/*!40000 ALTER TABLE `task` DISABLE KEYS */;
+/*!40000 ALTER TABLE `task` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `technical`
+--
+
+DROP TABLE IF EXISTS `technical`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `technical` (
+  `techn_id` int NOT NULL AUTO_INCREMENT,
+  `techn_tender_id` int DEFAULT NULL,
+  `techn_task` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `techn_assigned_to` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `techn_description` text COLLATE utf8mb4_general_ci NOT NULL,
+  `techn_respond` text COLLATE utf8mb4_general_ci NOT NULL,
+  `techn_date` date NOT NULL,
+  `techn_status` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `techn_respond_date` date DEFAULT NULL,
+  `techn_created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `techn_update_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`techn_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `technical`
+--
+
+LOCK TABLES `technical` WRITE;
+/*!40000 ALTER TABLE `technical` DISABLE KEYS */;
+/*!40000 ALTER TABLE `technical` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tender`
+--
+
+DROP TABLE IF EXISTS `tender`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tender` (
+  `te_id` int NOT NULL AUTO_INCREMENT,
+  `te_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `te_arrival` date NOT NULL,
+  `te_date` date NOT NULL,
+  `departure_date` date NOT NULL,
+  `te_from` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `te_by` int NOT NULL,
+  `specs` longtext COLLATE utf8mb4_general_ci NOT NULL,
+  `te_status` int NOT NULL,
+  `tender_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `te_update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`te_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tender`
+--
+
+LOCK TABLES `tender` WRITE;
+/*!40000 ALTER TABLE `tender` DISABLE KEYS */;
+INSERT INTO `tender` VALUES (1,'Tender 1','2023-09-06','0000-00-00','2023-09-18','tender',0,'e rhi                             ',0,'2023-09-05 13:33:42','2023-09-05 13:33:42');
+/*!40000 ALTER TABLE `tender` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tenders`
+--
+
+DROP TABLE IF EXISTS `tenders`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tenders` (
+  `te_id` int NOT NULL AUTO_INCREMENT,
+  `te_company` int DEFAULT NULL,
+  `te_client_id` int DEFAULT NULL,
+  `te_number` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `te_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `te_address` text COLLATE utf8mb4_general_ci,
+  `te_province` int DEFAULT NULL,
+  `te_issued_date` date DEFAULT NULL,
+  `te_closing_date` date DEFAULT NULL,
+  `te_send_date` date DEFAULT NULL,
+  `te_scope` text COLLATE utf8mb4_general_ci,
+  `te_requirements` text COLLATE utf8mb4_general_ci,
+  `te_assign_to` int DEFAULT NULL,
+  `te_status` int DEFAULT NULL,
+  `te_report` text COLLATE utf8mb4_general_ci,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`te_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tenders`
+--
+
+LOCK TABLES `tenders` WRITE;
+/*!40000 ALTER TABLE `tenders` DISABLE KEYS */;
+INSERT INTO `tenders` VALUES (1,1,1,'MPKRI10868GX',' MV and LV cables','Kriel Power Station Bethal - Ogies Road Kriel Witbank 2271',6,'2023-10-09','2023-11-20','2023-11-15','Cable testing, repairs and/ or replace if necessary, of MV and LV cables for the period of five years at Kriel Power Station on an ΓÇ£as and whenΓÇ¥ required basis','N',5,1,NULL,'2023-11-13 13:03:11'),(2,1,2,'CRES/NGP/010/10/2023','INSTALLATION OF GENERATORS','DARK GREY BUILDING\r\nCONNER 546 PAUL KRUGER AND SHEING STREET\r\nPRETORIA STATION PRECINT, PRETORIA',3,'2023-10-13','2023-11-14','2023-11-14','APPOINTMENT OF A 6-EP/6-EB OR HIGHER CONTRACTOR TO SUPPLY, INSTALL AND COMMISSION STANDBY GENERATORS AT PRETORIA NORTH AND WOLMERTON DEPOTS IN THE NORTHERN GAUTENG REGION','APPOINTMENT OF A 6-EP/6-EB OR HIGHER CONTRACTOR TO SUPPLY, INSTALL AND COMMISSION STANDBY GENERATORS AT PRETORIA NORTH AND WOLMERTON DEPOTS IN THE NORTHERN GAUTENG REGION',5,3,NULL,'2023-11-14 06:24:48'),(3,1,3,'UMK/SOLAR/201023','UMK Solar PV Installation Project.','Solar@UMK.co.za ',7,'2023-10-20','2023-12-06','2023-12-01','Design, supply, procurement, delivery, erection, testing, commissioning and handing \r\nover of a complete fully operational fixed tilt ground mounted 999 kVA (AC) solar photovoltaic (PV) \r\nplant, to the Employer, as well as the guarantee and comprehensive maintenance thereof for a \r\nfurther period of 12 months.','1. Completed inquiry document (PDF Tamper Proof File and Excel File);\r\nThe following will be mandatory for the \r\nContractorΓÇÖ personnel:\r\nΓÇó Induction for all employees\r\nΓÇó Operator Licences for all \r\noperators \r\nΓÇó First Aid \r\nΓÇó HIRA\r\nΓÇó Working at Heights ΓÇô for those \r\nemployees who will be using \r\nsafety harness. \r\nΓÇó SHE Rep Training for SHE \r\nRepresentatives \r\nΓÇó Red Seal for all artisans\r\na ContractorΓÇÖs Environmental Management \r\nPlan (CEMP).\r\nAUTHORITY OF SIGNATORY.\r\nCERTIFICATE OF ATTENDANCE AT COMPULSORY TENDER BRIEFING MEETING.\r\n4. STATEMENT OF COMPLIANCE OR OF QUALIFICATIONS BY TENDERER 7\r\n5. RECORD OF ADDENDA TO TENDER DOCUMENTS 8\r\n6. FORM OF DESIGN INDEMNITY 9\r\n7. ADJUSTMENTS FOR CHANGES IN COST 10\r\n7.1 GENERAL 10\r\n7.2 FIXED PORTION 10\r\n7.3 LOCAL MATERIAL AND LABOUR 10\r\n8. ADJUSTMENTS FOR CHANGES IN FOREIGN COST 12\r\n9. COMPANY INFORMATION 13\r\n10. COMPANY REGISTRATION DOCUMENTS 14\r\n11. B-BBEE CERTIFICATE 14\r\n12. TAX CLEARANCE CERTIFICATE 14\r\n13. VAT REGISTRATION CERTIFICATE 14\r\n14. LETTER OF GOODSTANDING (COID ACT) 14\r\n15. UIF REGISTRATION CERTIFICATE 14\r\n16. BANKING CONFIRMATION LETTER 14\r\n17. FINANCIAL INFORMATION 14\r\n18. PROOF OF LOCAL INFRASTRUCTURE 15\r\n19. UMK NON-DISCLOSURE AGREEMENT (NDA) 16\r\n20. UMK CODE OF ETHICS POLICY 21\r\n21. UMK ANTI-CORRUPTION POLICY 22\r\n22. STATEMENT OF ABSENCE OF CONFLICT OF INTEREST 23\r\n23. PROOF OF INSURANCE 24\r\n24. INDUSTRY ASSOCIATION CERTIFICATION 25\r\n25. LEGAL INFORMATION 25\r\n26. SHEQ INFORMATION 25\r\n27. PREVIOUS PROJECT EXPERIENCE WITH CONTACTABLE REFERENCES 27\r\n28. KEY PERSONNEL INFORMATION AND CVΓÇÖS 28\r\n29. PROGRAMME 30\r\n30. SCHEDULE OF LCOE AND PAYBACK CALCULATIONS 31\r\n30.1 INTEREST AND DEGRADATION VALUES USED IN CALCULATIONS 31\r\n30.2 YEAR 1 SYSTEM PERFORMANCE OUTPUT GUARANTEE 31\r\n30.3 YEAR 1 SYSTEM PERFORMANCE OUTPUT GUARANTEE ΓÇô MONTHLY BREAKDOWN 32\r\n',12,1,NULL,'2023-11-14 11:39:13'),(4,1,1,'MWP2213DX','Inspection and treatment of wooden poles','The Tender Office\r\nMegawatt Park Tender Office, Northside\r\nNo. 01 Maxwell Drive\r\nSunninghill\r\nGauteng',3,'2023-10-31','2023-11-21','2023-11-17','Inspection and treatment of wooden poles in Eskom Distribution Network, on an asand-\r\nwhen required basis for a period of 3 years in Gauteng Cluster.','Inspection and treatment of wooden poles in Eskom Distribution Network, on an asand-\r\nwhen required basis for a period of 3 years in Gauteng Cluster.',5,2,NULL,'2023-11-14 11:56:59'),(5,1,1,'83 OF 2023','Wooden Poles to Cement Poles','83 Krogh Street - Makhado - Makhado - 0920',5,'2023-10-23','2023-11-20','2023-11-16','	Appointment Of Electrical Contractor for Upgrading of Levubu-1 Line from Wooden Poles to Cement Poles','CIDB grading 06EP or higher ΓÇó Certified copy of a valid ORHVS certifi cate, with modules 1 to 10 or HVO-level 04 ΓÇó A certified copy of a valid wiremenΓÇÖs license (three phase/master installer) ΓÇó A letter/certificate as proof of being registered with the department of labour as an electrical contractor with IE or ME (installation or master electrician) number ΓÇó Attach latest three (3) years audited annual financial statements (only those that are required by law to be audited)',11,2,NULL,'2023-11-14 12:06:11'),(6,1,4,'ELM 52/2023','Panel Supply and Repair','Emalahleni Local Municipality\r\nP.O Box 3\r\nWitbank\r\n1035 ',6,'2023-10-10','2023-11-24','2023-11-21','PANEL OF CONTRACTORS FOR THE MAINTENANCE, SUPPLY, AND REPAIRS OF THE MEDIUM\r\nAND HIGH-TENSION ELECTRICAL INFRASTRUCTURE/ EQUIPMENT WITHIN THE ELECTRICAL\r\nMAINTENANCE DEPARTMENT AS AND WHEN REQUIRED, FOR A PERIOD OF 36 MONTHS','Original Tax Clearance / Tax compliance status Pin certificate\r\n∩é╖ Original Certified copy of company registration certificate (CK)\r\n∩é╖ Original certified ID copy(ies) of the Director(s) as detailed in the CIPC\r\n∩é╖ Municipal account statement attached (with all applicable rates and taxes) should not be in arrears more than 90\r\ndays as follows:\r\no All directors municipal accounts as per CIPC must be attached.\r\no Registered office municipal account of the company as per CIPC must be attached, if there is a lease\r\no A valid lease agreement signed by both parties must be attached with related municipal account where the\r\nregistered office is located.\r\n∩é╖ Copy of the latest detailed CSD report (Not Summary/Compliance history), not older than 30 days from the closing\r\ndate)\r\n∩é╖ Joint Ventures must be registered on CSD as Joint Venture\r\n∩é╖ Joint Venture Agreement (In case of a Joint Venture)\r\n∩é╖ All MBD forms where required are to be completed in full.\r\n∩é╖ Letter of Authority in the CompanyΓÇÖs letter head and signed is required.\r\n∩é╖ The tender document must be completed in full, areas and or pages not completed should be marked not applicable\r\n(N/A)\r\n∩é╖ All pages in the tender document and returnables must be initialled and completed in blank ink.\r\n∩é╖ Any alterations, scratching on the tender document must be initialled.\r\n∩é╖ No correction fluid is allowed.\r\n∩é╖ Must not be in the register of prohibited suppliers in the national treasury database.\r\n∩é╖ Must have not been disqualified due to gross misrepresentation or undue influence in the SCM processes as per\r\nSupply Chain Regulation.\r\n∩é╖ CIDB grading of 4EP/3EPPE or higher.\r\n∩é╖ Audited annual financial statements for the past 3 years.\r\n∩é╖ Meet minimum threshold of 60 points on Functionality evaluation.',5,2,NULL,'2023-11-14 12:24:07'),(7,1,1,'ELM 54/2023 ','PANEL OF CONTRACTORS FOR SUPPLY, MAINTENANCE AND REPAIR OF PUBLIC LIGHTING INFRASTRUCTURE','Emalahleni Local Municipality\r\nP.O Box 3\r\nWitbank\r\n1035 ',1,'2023-10-10','2023-11-24','2023-11-21','PANEL OF CONTRACTORS FOR SUPPLY, MAINTENANCE AND\r\nREPAIR OF PUBLIC LIGHTING INFRASTRUCTURE AS AND WHEN\r\nREQUIRED FOR A PERIOD OF 36 MONTHS','Original Tax Clearance / Tax compliance status Pin certificate\r\n∩é╖ Original Certified copy of company registration certificate (CK)\r\n∩é╖ Original certified ID copy(ies) of the Director(s) as detailed in the CIPC\r\n∩é╖ Municipal account statement attached (with all applicable rates and taxes) should not be in arrears more than 90\r\ndays as follows:\r\no All directors municipal accounts as per CIPC must be attached.\r\no Registered office municipal account of the company as per CIPC must be attached, if there is a lease\r\no A valid lease agreement signed by both parties must be attached with related municipal account where the\r\nregistered office is located.\r\n∩é╖ Copy of the latest detailed CSD report (Not Summary/Compliance history), not older than 30 days from the closing\r\ndate)\r\n∩é╖ Joint Ventures must be registered on CSD as Joint Venture\r\n∩é╖ Joint Venture Agreement (In case of a Joint Venture)\r\n∩é╖ All MBD forms where required are to be completed in full.\r\n∩é╖ Letter of Authority in the CompanyΓÇÖs letter head and signed is required.\r\n∩é╖ The tender document must be completed in full, areas and or pages not completed should be marked not applicable\r\n(N/A)\r\n∩é╖ All pages in the tender document and returnables must be initialled and completed in blank ink.\r\n∩é╖ Any alterations, scratching on the tender document must be initialled.\r\n∩é╖ No correction fluid is allowed.\r\n∩é╖ Must not be in the register of prohibited suppliers in the national treasury database.\r\n∩é╖ Must have not been disqualified due to gross misrepresentation or undue influence in the SCM processes as per\r\nSupply Chain Regulation.\r\n∩é╖ CIDB grading of 4EP/3EPPE or higher.\r\n∩é╖ Audited annual financial statements for the past 3 years.\r\n∩é╖ Meet minimum threshold of 60 points on Functionality evaluation.\r\n',12,2,NULL,'2023-11-14 12:40:26'),(8,1,5,'8/2/1/511','PANEL OF EXPERIENCED SERVICES ','AbaQulusi Municipality\r\nCorner of high and Mark street\r\nVryheid 3100\r\n',1,'2023-10-23','2023-11-21','2023-11-17','ESTABLISHMENT OF PANEL OF EXPERIENCED SERVICES PROVIDERS FOR CIVIL,\r\nMECHANICAL, ELECTRICAL, INSTRUMENTATION AND SCIENTIFIC SERVICES FOR A\r\nPeriod OF 36 MONTHS','Central Supplier Data base registration report ( Detailed)\r\n∩ü╢ Valid copy of company registration document\r\n∩ü╢ Specify which category you have An experience of not less than 5 years ( attach CV with contactable references)\r\n∩ü╢ Certified copy of Registration certificate with the authority ( Relevant boards)( ECSA,ISO9001)\r\n∩ü╢ An original current account in terms of water and electricity / rates and taxes obtainable from your local\r\nmunicipality must be submitted or lease agreement\r\n∩ü╢ Certified copies of identity documents of directors and owners of the company must be submitted\r\n∩ü╢ Failure to comply with these minimum requirements will result in immediate disqualification of the bid.\r\n',12,2,NULL,'2023-11-16 07:33:19'),(9,1,4,'ELM 53/2023','SUPPLY, MAINTENANCE AND REPAIRS OF ELECTRICAL PROTECTION ','Emalahleni Local Municipality\r\nP.O Box 3\r\nWitbank\r\n1035 ',1,'2023-10-23','2023-11-24','2023-11-22','PANEL OF CONTRACTORS FOR THE SUPPLY, MAINTENANCE AND REPAIRS OF ELECTRICAL PROTECTION AND SWITCHGEAR EQUIPMENT AS AND WHEN REQUIRED FOR A PERIOD OF 36 MONTHS','Original Tax Clearance / Tax compliance status Pin certificate\r\n∩é╖ Original Certified copy of company registration certificate (CK)\r\n∩é╖ Original certified ID copy(ies) of the Director(s) as detailed in the CIPC\r\n∩é╖ Municipal account statement attached (with all applicable rates and taxes) should not be in arrears more than 90\r\ndays as follows:\r\no All directors municipal accounts as per CIPC must be attached.\r\no Registered office municipal account of the company as per CIPC must be attached, if there is a lease\r\no A valid lease agreement signed by both parties must be attached with related municipal account where the\r\nregistered office is located.\r\n∩é╖ Copy of the latest detailed CSD report (Not Summary/Compliance history), not older than 30 days from the closing\r\ndate)\r\n∩é╖ Joint Ventures must be registered on CSD as Joint Venture\r\n∩é╖ Joint Venture Agreement (In case of a Joint Venture)\r\n∩é╖ All MBD forms where required are to be completed in full.\r\n∩é╖ Letter of Authority in the CompanyΓÇÖs letter head and signed is required.\r\n∩é╖ The tender document must be completed in full, areas and or pages not completed should be marked not applicable\r\n(N/A)\r\n∩é╖ All pages in the tender document and returnables must be initialled and completed in blank ink.\r\n∩é╖ Any alterations, scratching on the tender document must be initialled.\r\n∩é╖ No correction fluid is allowed.\r\n∩é╖ Must not be in the register of prohibited suppliers in the national treasury database.\r\n∩é╖ Must have not been disqualified due to gross misrepresentation or undue influence in the SCM processes as per\r\nSupply Chain Regulation.\r\n∩é╖ CIDB grading of 4EP/3EPPE or higher.\r\n∩é╖ Audited annual financial statements for the past 3 years.\r\n∩é╖ Meet minimum threshold of 60 points on the functionality evaluation.',11,2,NULL,'2023-11-18 14:51:25'),(10,1,8,'NKO: 84/2023','ELECTRICAL INFRASTRUCTURE TO RETICULATE 358 HOUSEHOLDS','NKOMAZI LOCAL MUNICIPALITY,\r\n9 PARK STREET,\r\nMALELANE,\r\n1320\r\n',6,'2023-10-25','2023-11-24','2023-11-23','SUPPLY, INSTALLATION, TESTING AND COMMISSIONING OF\r\nELECTRICAL INFRASTRUCTURE TO RETICULATE 358\r\nHOUSEHOLDS AT LANGELOOP','RETURNABLE SCHEDULES AND CERTIFICATES\r\n\r\nProof of Registration on the National Treasury Centralised\r\nSupplier Database (CSD) \r\nProof of tax compliance status and a valid SARS PIN \r\n\r\nBank Rating Letter \r\n\r\nPREFERENCING SCHEDULE: BROAD BASED\r\nBLACK ECONOMIC EMPOWERMENT\r\n \r\n\r\nWILL RENDER THE TENDER SUBMISSION NON-RESPONSIVE (COMPULSORY RETURNABLES)\r\nCertificate of Attendance at a Tender Site Meeting In case\r\nRequired Complete\r\nRecord of Addenda to Tender Documents (If applicable) Complete\r\nAmendments, Qualifications and Alternatives (If\r\napplicable) \r\nCertificate of Authority for Signature Complete\r\nCopy WorkmenΓÇÖs Compensation Registration Certificate\r\n(or proof of payment of contributions in terms of the\r\nCompensation for Occupational Injuries and Disease Act\r\nFully Completed MBD Forms: Complete\r\nK Municipal Declaration Complete\r\nINFORMATION REQUIRED FOR EVALUATION PURPOSES\r\nKey Personnel \r\nQualifications and Relevant Experience of the Contracts\r\nManager/ Site Agent (Curriculum Vitae Format) \r\nQualifications and Relevant Experience of the Foreman (Curriculum Vitae Format) \r\nRelevant Experience of the Safety Officer (Curriculum Vitae Format) \r\nRelevant Experience of the Plant Operator (Curriculum\r\nVitae Format) \r\nSummary of Tendering Firms Experience (Similar Work\r\nand Environment) \r\nProvisional Programme \r\nELECTRIFICATION OF LANGELOOP Tender 11\r\nPart T1: Tender Data\r\nDOCUMENT REF. DESCRIPTION ACTION\r\nSchedule of Plant and Equipment/Letter of Intent to Hire \r\nOccupational Health & Safety Plan \r\nCertified CIDB Grading Certificate ',11,3,NULL,'2023-11-24 06:46:18'),(11,1,8,'	NKO:83/2023','ELECTRICAL INFRASTRUCTURE TO RETICULATE 288 HOUSEHOLDS','Nkomazi Local Municipality\r\nPrivate Bag X101\r\nMalelane\r\n1300\r\n',6,'2023-10-25','2023-11-27','2023-11-24','SUPPLY, INSTALLATION, TESTING AND COMMISSIONING OF ELECTRICAL\r\nINFRASTRUCTURE TO\r\nRETICULATE 288 HOUSEHOLDS AT MDLADLA','RETURNABLE SCHEDULES AND CERTIFICATES<br>\r\nProof of Registration on the National Treasury Centralised\r\nSupplier Database (CSD) Attach\r\nProof of tax compliance status and a valid SARS PIN \r\nBank Rating Letter \r\nPREFERENCING SCHEDULE: BROAD BASED\r\nBLACK ECONOMIC EMPOWERMENT\r\nFAILURE TO SUBMIT/FULLY COMPLETE THE BELOW DOCUMENTS\r\nWILL RENDER THE TENDER SUBMISSION NON-RESPONSIVE\r\n(COMPULSORY RETURNABLES)\r\nCertificate of Attendance at a Tender Site Meeting In case\r\nRequired \r\nRecord of Addenda to Tender Documents (If applicable) \r\nAmendments, Qualifications and Alternatives (If applicable) Attach\r\nCertificate of Authority for Signature \r\nCopy WorkmenΓÇÖs Compensation Registration Certificate\r\n(or proof of payment of contributions in terms of the\r\nCompensation for Occupational Injuries and Disease Act No. 130 of 1993)\r\nAttach\r\nFully d MBD Forms: \r\nMunicipal Declaration \r\nINFORMATION REQUIRED FOR EVALUATION PURPOSES\r\nQualifications and Relevant Experience of the Contracts\r\nManager/ Site Agent (Curriculum Vitae Format) Attach\r\nQualifications and Relevant Experience of the Foreman\r\n(Curriculum Vitae Format) Attach\r\nRelevant Experience of the Safety Officer (Curriculum\r\nVitae Format) Attach\r\nRelevant Experience of the Plant Operator (Curriculum Vitae Format) Attach\r\nSummary of Tendering Firms Experience (Similar Work and Environment) Attach\r\nProvisional Programme Attach\r\nELECTRIFICATION OF MDLADLA\r\nTender 11\r\nPart T1: Tender Data\r\nDOCUMENT REF. DESCRIPTION ACTION\r\nSchedule of Plant and Equipment/Letter of Intent to Hire Attach\r\nOccupational Health & Safety Plan Attach\r\nCertified CIDB Grading Certificate A',5,2,NULL,'2023-11-24 07:02:04'),(12,1,8,'NKO: 82/2023','ELECTRICAL INFRASTRUCTURE TO RETICULATE 174 HOUSEHOLDS','Nkomazi Local Municipality\r\nPrivate Bag X101\r\nMalelane\r\n1300',6,'2023-10-25','2023-11-27','2023-11-27','SUPPLY, INSTALLATION, TESTING AND COMMISSIONING OF ELECTRICAL\r\nINFRASTRUCTURE TO\r\nRETICULATE 174 HOUSEHOLDS AT TONGA\r\n','RETURNABLE SCHEDULES AND CERTIFICATES<br>\r\nProof of Registration on the National Treasury Centralised\r\nSupplier Database (CSD) Attach\r\nProof of tax compliance status and a valid SARS PIN \r\nBank Rating Letter \r\nPREFERENCING SCHEDULE: BROAD BASED\r\nBLACK ECONOMIC EMPOWERMENT\r\nFAILURE TO SUBMIT/FULLY COMPLETE THE BELOW DOCUMENTS\r\nWILL RENDER THE TENDER SUBMISSION NON-RESPONSIVE\r\n(COMPULSORY RETURNABLES)\r\nCertificate of Attendance at a Tender Site Meeting In case\r\nRequired \r\nRecord of Addenda to Tender Documents (If applicable) \r\nAmendments, Qualifications and Alternatives (If applicable) Attach\r\nCertificate of Authority for Signature \r\nCopy WorkmenΓÇÖs Compensation Registration Certificate\r\n(or proof of payment of contributions in terms of the\r\nCompensation for Occupational Injuries and Disease Act No. 130 of 1993)\r\nAttach\r\nFully d MBD Forms: \r\nMunicipal Declaration \r\nINFORMATION REQUIRED FOR EVALUATION PURPOSES\r\nQualifications and Relevant Experience of the Contracts\r\nManager/ Site Agent (Curriculum Vitae Format) Attach\r\nQualifications and Relevant Experience of the Foreman\r\n(Curriculum Vitae Format) Attach\r\nRelevant Experience of the Safety Officer (Curriculum\r\nVitae Format) Attach\r\nRelevant Experience of the Plant Operator (Curriculum Vitae Format) Attach\r\nSummary of Tendering Firms Experience (Similar Work and Environment) Attach\r\nProvisional Programme Attach\r\nELECTRIFICATION OF MDLADLA\r\nTender 11\r\nPart T1: Tender Data\r\nDOCUMENT REF. DESCRIPTION ACTION\r\nSchedule of Plant and Equipment/Letter of Intent to Hire Attach\r\nOccupational Health & Safety Plan Attach\r\nCertified CIDB Grading Certificate A',12,2,NULL,'2023-11-24 13:15:38');
+/*!40000 ALTER TABLE `tenders` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tool`
+--
+
+DROP TABLE IF EXISTS `tool`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tool` (
+  `tool_id` int NOT NULL AUTO_INCREMENT,
+  `tool_catetory` int DEFAULT NULL,
+  `tool_name` varchar(45) DEFAULT NULL,
+  `tool_brand` varchar(45) DEFAULT NULL,
+  `tool_status` int DEFAULT NULL,
+  `tool_employee` int DEFAULT NULL,
+  `tool_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`tool_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tool`
+--
+
+LOCK TABLES `tool` WRITE;
+/*!40000 ALTER TABLE `tool` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tool` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tool_category`
+--
+
+DROP TABLE IF EXISTS `tool_category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tool_category` (
+  `tool_ca_id` int NOT NULL AUTO_INCREMENT,
+  `tool_ca_name` varchar(145) DEFAULT NULL,
+  `tool_ca_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`tool_ca_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tool_category`
+--
+
+LOCK TABLES `tool_category` WRITE;
+/*!40000 ALTER TABLE `tool_category` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tool_category` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transformer_material`
+--
+
+DROP TABLE IF EXISTS `transformer_material`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `transformer_material` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `STRUCTURE` int DEFAULT NULL,
+  `M20x350` int DEFAULT NULL,
+  `M20x600` int DEFAULT NULL,
+  `CLEVIS_THIMBLES` int DEFAULT NULL,
+  `LONGRODS` int DEFAULT NULL,
+  `D_SHACKLES` int DEFAULT NULL,
+  `PREFORM_DEAD_ENDS` int DEFAULT NULL,
+  `CUTOUTS` int DEFAULT NULL,
+  `FLAT_BARS_BRAISINGS` int DEFAULT NULL,
+  `TUBE_LINKS_INCL_16A_FUSES` int DEFAULT NULL,
+  `MV_SURGE_ARRESTORS` int DEFAULT NULL,
+  `LV_SURGE_ARRESTORS` int DEFAULT NULL,
+  `BIMETAL_LUGS` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LUGS_12x16` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `EARTHRODS_AND_CLAMPS` int DEFAULT NULL,
+  `BLACK_INSULATED_EARTHWIRE_16mm` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `BARE_EARTHWIRE_16mm` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `POLES_SIZE` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `XARMS` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `CHANNELS` int DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transformer_material`
+--
+
+LOCK TABLES `transformer_material` WRITE;
+/*!40000 ALTER TABLE `transformer_material` DISABLE KEYS */;
+INSERT INTO `transformer_material` VALUES (1,1860,3,1,2,2,2,2,0,2,0,2,1,'2 & 3','20-25',8,'30M','35M','1 x 11,12/13m','1 x 2.5m',0),(2,1861,4,2,3,3,3,3,0,0,0,3,1,'3','20-25',8,'30M','35M','2 x 11,12/13m','1 x 3.5M',1),(3,1866,6,2,6,6,6,6,3,4,3,3,1,'3','20-25',8,'30M','35M','1 x 10m','2 x 2.5m',0),(4,1865,6,3,6,6,6,6,3,2,3,3,1,'3','20-25',8,'30M','35M','2 x 10m','1 x 2.5m 1 x 3.5M',1);
+/*!40000 ALTER TABLE `transformer_material` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transformer_to_lv_material`
+--
+
+DROP TABLE IF EXISTS `transformer_to_lv_material`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `transformer_to_lv_material` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `ITEMS` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `QUANTITY_PER_MORSDOPHER_SINGLE_PHASE` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `QUANTITY_PER_MORSDOPHER_DUAL_PHASE` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `QUANTITY_PER_MORSDOPHER_THREE_PHASE` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transformer_to_lv_material`
+--
+
+LOCK TABLES `transformer_to_lv_material` WRITE;
+/*!40000 ALTER TABLE `transformer_to_lv_material` DISABLE KEYS */;
+/*!40000 ALTER TABLE `transformer_to_lv_material` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trip_client`
+--
+
+DROP TABLE IF EXISTS `trip_client`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trip_client` (
+  `trip_client_id` int NOT NULL AUTO_INCREMENT,
+  `trip_client_name` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_client_email` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_client_address` varchar(245) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_client_contact_person` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_client_phone` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_client_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `trip_client_update` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`trip_client_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trip_client`
+--
+
+LOCK TABLES `trip_client` WRITE;
+/*!40000 ALTER TABLE `trip_client` DISABLE KEYS */;
+INSERT INTO `trip_client` VALUES (1,'GRINDROD',NULL,NULL,NULL,NULL,'2024-06-25 12:22:12','2024-06-25 12:22:12'),(2,'MAXIMIZE',NULL,NULL,NULL,NULL,'2024-06-25 12:22:12','2024-06-25 12:22:12'),(3,'SENZOMIX',NULL,NULL,NULL,NULL,'2024-06-25 12:22:12','2024-06-25 12:22:12'),(4,'LIMECOAL',NULL,NULL,NULL,NULL,'2024-06-25 12:22:12','2024-06-25 12:22:12'),(5,'KALAHARA',NULL,NULL,NULL,NULL,'2024-06-25 12:22:12','2024-06-25 12:22:12'),(6,'ULUNGILE',NULL,NULL,NULL,NULL,'2024-06-25 12:22:12','2024-06-25 12:22:12'),(7,'RAMTHEL',NULL,NULL,NULL,NULL,'2024-06-26 08:47:38','2024-06-26 08:47:38'),(8,'SACD',NULL,NULL,NULL,NULL,'2024-06-26 08:49:02','2024-06-26 08:49:02'),(9,'Trace loads',NULL,NULL,NULL,NULL,'2024-06-26 09:16:22','2024-06-26 09:16:22'),(10,'G and P Logistics',NULL,NULL,NULL,NULL,'2024-06-30 07:10:51','2024-06-30 07:10:51'),(11,'CONTRANS LOGISTICS',NULL,NULL,NULL,NULL,'2024-07-01 12:06:24','2024-07-01 12:06:24'),(12,'Cybereye',NULL,NULL,NULL,NULL,'2024-08-03 04:24:59','2024-08-03 04:24:59'),(13,'EM FREIGHT',NULL,NULL,NULL,NULL,'2024-10-31 10:11:42','2024-10-31 10:11:42'),(14,'OCTRANS',NULL,NULL,NULL,NULL,'2024-10-31 11:13:30','2024-10-31 11:13:30'),(15,'BOLSTER',NULL,NULL,NULL,NULL,'2024-11-28 10:24:54','2024-11-28 10:24:54'),(16,'Silver Solutions',NULL,NULL,NULL,NULL,'2024-12-03 13:11:10','2024-12-03 13:11:10'),(17,'DCP',NULL,NULL,NULL,NULL,'2024-12-29 07:24:14','2024-12-29 07:24:14'),(18,'AH LOGISTICS',NULL,NULL,NULL,NULL,'2024-12-31 15:52:10','2024-12-31 15:52:10'),(19,'Coetzee Trans',NULL,NULL,NULL,NULL,'2025-01-01 09:52:39','2025-01-01 09:52:39'),(20,'LONGMINE',NULL,NULL,NULL,NULL,'2025-01-01 16:04:22','2025-01-01 16:04:22'),(21,'GANTRANS',NULL,NULL,NULL,NULL,'2025-01-29 05:47:28','2025-01-29 05:47:28'),(22,'SIYAYA LOG',NULL,NULL,NULL,NULL,'2025-02-03 06:15:31','2025-02-03 06:15:31'),(23,'GTI CARRIERS',NULL,NULL,NULL,NULL,'2025-02-03 14:11:45','2025-02-03 14:11:45');
+/*!40000 ALTER TABLE `trip_client` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trip_dupl`
+--
+
+DROP TABLE IF EXISTS `trip_dupl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trip_dupl` (
+  `trip_dupl_id` int NOT NULL AUTO_INCREMENT,
+  `trip_client` int DEFAULT NULL,
+  `trip_date` date DEFAULT NULL,
+  `trip_truck` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_name` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_container` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_size` varchar(10) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_amount` decimal(10,2) DEFAULT NULL,
+  `trip_driver_rate` decimal(10,2) DEFAULT NULL,
+  `trip_type` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_driver` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`trip_dupl_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=146 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='TRIP Duplicates	TRUCK REG	CONTAINER N0	SIZE	AMOUNT	RIVER RAT	TYPE	DRIVER';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trip_dupl`
+--
+
+LOCK TABLES `trip_dupl` WRITE;
+/*!40000 ALTER TABLE `trip_dupl` DISABLE KEYS */;
+INSERT INTO `trip_dupl` VALUES (1,NULL,'2020-04-15','5','P/EILAND-PORT','MRSU4883466','12M',755.00,NULL,'EMPTY',NULL),(2,NULL,'2020-04-19','2','P/EILAND-PORT','CLHU3789363','6M',950.00,NULL,'FULL',NULL),(3,NULL,'2020-04-19','2','P/EILAND-PORT','GLDU5610882','6M',950.00,NULL,'FULL',NULL),(4,NULL,'2020-04-19','2','P/EILAND-PORT','HLBU3018570','6M',950.00,NULL,'FULL',NULL),(5,NULL,'2020-04-19','2','P/EILAND-PORT','HLXU1411780','6M',950.00,NULL,'FULL',NULL),(6,NULL,'2020-04-19','2','P/EILAND-PORT','UACU3395452','6M',950.00,NULL,'FULL',NULL),(7,NULL,'2020-04-19','6','P/EILAND-PORT','CAIU2687921','6M',950.00,NULL,'FULL',NULL),(8,NULL,'2020-04-19','6','P/EILAND-PORT','SEGU3565910','6M',950.00,NULL,'FULL',NULL),(9,NULL,'2020-04-19','6','P/EILAND-PORT','TGBU2220761','6M',950.00,NULL,'FULL',NULL),(10,NULL,'2020-04-19','6','P/EILAND-PORT','UACU3757823','6M',950.00,NULL,'FULL',NULL),(11,NULL,'2020-04-19','6','P/EILAND-PORT','UACU3830225','6M',950.00,NULL,'FULL',NULL),(12,NULL,'2020-04-20','2','P/EILAND-PORT','CAIU3218277','6M',950.00,NULL,'FULL',NULL),(13,NULL,'2020-04-20','2','P/EILAND-PORT','FANU1371086','6M',950.00,NULL,'FULL',NULL),(14,NULL,'2024-03-04','6','Port-Stobel','ALRU3577438','6m',2500.00,NULL,'Full',NULL),(15,NULL,'2024-04-12','2','P/EILAND-PORT','MSKU4067672','6M',950.00,NULL,'FULL',NULL),(16,NULL,'2024-04-12','2','P/EILAND-PORT','MSKU5623903','6M',950.00,NULL,'FULL',NULL),(17,NULL,'2024-04-12','2','P/EILAND-PORT','TGHU1410840','6M',950.00,NULL,'FULL',NULL),(18,NULL,'2024-04-13','5','P/EILAND-PORT','BEAU5026638','12M',755.00,NULL,'EMPTY',NULL),(19,NULL,'2024-04-13','5','P/EILAND-PORT','MRKU0140665','12M',755.00,NULL,'EMPTY',NULL),(20,NULL,'2024-04-13','5','P/EILAND-PORT','MRKU2040541','12M',755.00,NULL,'EMPTY',NULL),(21,NULL,'2024-04-13','5','P/EILAND-PORT','MRKU2987453','12M',755.00,NULL,'EMPTY',NULL),(22,NULL,'2024-04-13','5','P/EILAND-PORT','MRSU4406191','12M',755.00,NULL,'EMPTY',NULL),(23,NULL,'2024-04-13','5','P/EILAND-PORT','PONU1690056','12M',755.00,NULL,'EMPTY',NULL),(24,NULL,'2024-04-15','3','SATL-PORT','MRKU3228528','12M',755.00,NULL,'EMPTY',NULL),(25,NULL,'2024-04-15','3','SATL-PORT','MRKU3500678','12M',755.00,NULL,'EMPTY',NULL),(26,NULL,'2024-04-15','3','SATL-PORT','MSKU9543658','12M',755.00,NULL,'EMPTY',NULL),(27,NULL,'2024-04-15','3','BELCON-PORT','SUDU4869964','12M',1850.00,NULL,'EMPTY',NULL),(28,NULL,'2024-04-15','3','SATL-PORT','TRHU4809970','12M',755.00,NULL,'EMPTY',NULL),(29,NULL,'2024-04-15','5','Port-Silver solutions','KKFU7829202','12m ',2500.00,NULL,'Full',NULL),(30,NULL,'2024-04-15','5','SATL-PORT','HASU4542578','12M',755.00,NULL,'EMPTY',NULL),(31,NULL,'2024-04-15','5','SATL-PORT','MRKU4709683','12M',755.00,NULL,'EMPTY',NULL),(32,NULL,'2024-04-15','5','BELCON-PORT','SUDU4864263','12M',1850.00,NULL,'EMPTY',NULL),(33,NULL,'2024-04-15','5','SATL-PORT','SUDU5946833','12M',755.00,NULL,'EMPTY',NULL),(34,NULL,'2024-04-16','3','CTMPT-KILLARNEY','MCAU6023076','12M',1580.00,NULL,'EMPTY',NULL),(35,NULL,'2024-04-16','3','CTMPT-KILLARNEY','MCAU6053928','12M',1580.00,NULL,'EMPTY',NULL),(36,NULL,'2024-04-16','3','CTMPT-KILLARNEY','MMAU1348654','12M',1580.00,NULL,'EMPTY',NULL),(37,NULL,'2024-04-16','3','CTMPT-KILLARNEY','MNBU3129232','12M',1580.00,NULL,'EMPTY',NULL),(38,NULL,'2024-04-16','5','MSC/P.E-Port','MSDU2920517','6m',1600.00,NULL,'Full',NULL),(39,NULL,'2024-04-16','4','CTMPT-KILLARNEY','MCAU6041418','12M',1580.00,NULL,'EMPTY',NULL),(40,NULL,'2024-04-16','4','CTMPT-KILLARNEY','MWCU6982451','12M',1580.00,NULL,'EMPTY',NULL),(41,NULL,'2024-04-16','6','CTMPT-KILLARNEY','MNBU4362980','12M',1580.00,NULL,'EMPTY',NULL),(42,NULL,'2024-04-16','6','CTMPT-KILLARNEY','SUDU6198757','12M',1580.00,NULL,'EMPTY',NULL),(43,NULL,'2024-04-17','3','COMBI-MAITLAND','MCAU6010850','12M',755.00,NULL,'EMPTY',NULL),(44,NULL,'2024-04-17','3','COMBI-MAITLAND','MCAU6049980','12M',755.00,NULL,'EMPTY',NULL),(45,NULL,'2024-04-17','3','COMBI-MAITLAND','SUDU5295808','12M',755.00,NULL,'EMPTY',NULL),(46,NULL,'2024-04-17','3','COMBI-MAITLAND','SUDU6288465','12M',755.00,NULL,'EMPTY',NULL),(47,NULL,'2024-04-17','5','I.C Solution-Port','TCLU6846530','6m',2200.00,NULL,'Full',NULL),(48,NULL,'2024-04-18','3','BELCON-PORT','MAEU4135450','12M',1850.00,NULL,'EMPTY',NULL),(49,NULL,'2024-04-18','5','BELCON-PORT','MAEU4177075','12M',1850.00,NULL,'EMPTY',NULL),(50,NULL,'2024-04-21','3','COMBI-KILLARNEY','MNBU3936430','12M',1580.00,NULL,'EMPTY',NULL),(51,NULL,'2024-04-21','3','COMBI-KILLARNEY','MNBU9155373','12M',1580.00,NULL,'EMPTY',NULL),(52,NULL,'2024-04-21','3','COMBI-KILLARNEY','SUDU6246834','12M',1580.00,NULL,'EMPTY',NULL),(53,NULL,'2024-04-21','5','COMBI-KILLARNEY','MCAU6012024','12M',1580.00,NULL,'EMPTY',NULL),(54,NULL,'2024-04-21','5','COMBI-KILLARNEY','MNBU3424731','12M',1580.00,NULL,'EMPTY',NULL),(55,NULL,'2024-04-21','5','COMBI-KILLARNEY','TEMU9753612','12M',1580.00,NULL,'EMPTY',NULL),(56,NULL,'2024-04-21','5','COMBI-MAITLAND','TLLU1217790','12M',755.00,NULL,'EMPTY',NULL),(57,NULL,'2024-04-21','6','COMBI-MAITLAND','MNBU0106681','12M',755.00,NULL,'EMPTY',NULL),(58,NULL,'2024-04-21','6','COMBI-MAITLAND','MNBU0303757','12M',755.00,NULL,'EMPTY',NULL),(59,NULL,'2024-04-21','6','COMBI-MAITLAND','MWCU5217041','12M',1580.00,NULL,'EMPTY',NULL),(60,NULL,'2024-04-22','3','COMBI-MAITLAND','MNBU4034804','12M',755.00,NULL,'EMPTY',NULL),(61,NULL,'2024-04-22','3','COMBI-MAITLAND','MSWU1011156','12M',755.00,NULL,'EMPTY',NULL),(62,NULL,'2024-04-22','2','COMBI-MAITLAND','MMAU1075349','12M',755.00,NULL,'EMPTY',NULL),(63,NULL,'2024-04-22','2','COMBI-MAITLAND','MWCU6850537','12M',755.00,NULL,'EMPTY',NULL),(64,NULL,'2024-04-22','5','COMBI-MAITLAND','MNBU4218756','12M',755.00,NULL,'EMPTY',NULL),(65,NULL,'2024-04-22','5','COMBI-MAITLAND','MNBU4312989','12M',755.00,NULL,'EMPTY',NULL),(66,NULL,'2024-04-22','6','MAITLAND-COMBI','MSDU1567719','6M',1100.00,NULL,'FULL',NULL),(67,NULL,'2024-04-24','2','P/EILAND-COMBI','MRKU7802589','6M',950.00,NULL,'FULL',NULL),(68,NULL,'2024-04-24','2','PORT-MAITLAND','MSNU2053329','6M',1100.00,NULL,'FULL',NULL),(69,NULL,'2024-04-24','5','CTCT-KILLARNEY','MMAU1409580','6M',1580.00,NULL,'EMPTY',NULL),(70,NULL,'2024-04-25','2','PORT-MAITLAND','MSNU2052507','6M',1100.00,NULL,'FULL',NULL),(71,NULL,'2024-04-27','3','PORT-KILLARNEY','MCAU6011917','12m',1580.00,NULL,'EMPTY',NULL),(72,NULL,'2024-04-27','3','CTMPT-KILLARNEY','MMAU1057290','12m',1580.00,NULL,'EMPTY',NULL),(73,NULL,'2024-04-27','3','CTMPT-KILLARNEY','MMAU1266725','12M',1580.00,NULL,'EMPTY',NULL),(74,NULL,'2024-04-27','3','CTCT-KILLARNEY','MMAU1307357','12m',1580.00,NULL,'EMPTY',NULL),(75,NULL,'2024-04-27','3','CTMPT-KILLARNEY','MNBU3180091','12m',1580.00,NULL,'EMPTY',NULL),(76,NULL,'2024-04-27','3','CTMPT-KILLARNEY','MNBU9008726','12m',1580.00,NULL,'EMPTY',NULL),(77,NULL,'2024-04-27','2','P.EILAND-PORT','BMOU2835042','6M',950.00,NULL,'FULL',NULL),(78,NULL,'2024-04-27','2','P.EILAND-PORT','CAAU2322160','6M',950.00,NULL,'FULL',NULL),(79,NULL,'2024-04-27','2','P.EILAND-PORT','CAIU6506390','6M',950.00,NULL,'FULL',NULL),(80,NULL,'2024-04-27','2','P.EILAND-PORT','FANU1330678','6M',950.00,NULL,'FULL',NULL),(81,NULL,'2024-04-27','2','P.EILAND-PORT','HLXU3543620','6M',950.00,NULL,'FULL',NULL),(82,NULL,'2024-04-27','5','CTMPT-KILLARNEY','MCAU6025356','12M',1580.00,NULL,'EMPTY',NULL),(83,NULL,'2024-04-27','5','CTCT-KILLARNEY','MMAU1324694','12M',1580.00,NULL,'EMPTY',NULL),(84,NULL,'2024-04-27','5','COMBI-KILLARNEY','MNBU9034978','12m',1580.00,NULL,'EMPTY',NULL),(85,NULL,'2024-04-27','6','P.EILAND-PORT','APZU3711362','6m',950.00,NULL,'FULL',NULL),(86,NULL,'2024-04-27','6','P.EILAND-PORT','HLBU1049885','6m',950.00,NULL,'FULL',NULL),(87,NULL,'2024-04-27','6','CTCT-KILLARNEY','MMAU1393458','12m',1580.00,NULL,'EMPTY',NULL),(88,NULL,'2024-04-27','6','CTCT-KILLARNEY','MMAU1427748','12m',1580.00,NULL,'EMPTY',NULL),(89,NULL,'2024-04-27','6','CTMPT-KILLARNEY','MNBU4039405','12m',1580.00,NULL,'EMPTY',NULL),(90,NULL,'2024-04-27','6','CTMPT-KILLARNEY','MNBU9098421','12m',1580.00,NULL,'EMPTY',NULL),(91,NULL,'2024-04-27','6','P.EILAND-COMBI','MRKU7026931','6m',950.00,NULL,'FULL',NULL),(92,NULL,'2024-04-27','6','MAITLAND-PORT','MSDU2644810','6m',1100.00,NULL,'FULL',NULL),(93,NULL,'2024-04-27','6','PORT-MAITLAND','MSNU2052699','6m',1100.00,NULL,'FULL',NULL),(94,NULL,'2024-04-27','6','P.EILAND-COMBI','SUDU1360398','6m',950.00,NULL,'FULL',NULL),(95,NULL,'2024-04-27','6','P.EILAND-COMBI','SUDU7982320','6m',950.00,NULL,'FULL',NULL),(96,NULL,'2024-04-27','6','P.EILAND-PORT','TGHU0456338','6m',950.00,NULL,'FULL',NULL),(97,NULL,'2024-04-29','6','P.EILAND-PORT','DFSU3137536','6m',950.00,NULL,'FULL',NULL),(98,NULL,'2024-04-29','6','P.EILAND-PORT','FANU1338581','6m',950.00,NULL,'FULL',NULL),(99,NULL,'2024-04-29','6','P.EILAND-PORT','HLXU1337929','6m',950.00,NULL,'FULL',NULL),(100,NULL,'2024-04-29','6','P.EILAND-PORT','TCKU1432247','6m',950.00,NULL,'FULL',NULL),(101,NULL,'2024-04-29','6','P.EILAND-PORT','TEMU1959016','6m',950.00,NULL,'FULL',NULL),(102,NULL,'2024-04-29','6','MAITLAND-PORT','TRHU2253178','6m',1100.00,NULL,'FULL',NULL),(103,NULL,'2024-05-01','14','Combi-Senzomix','MNBU4174679','12M',1750.00,NULL,'FULL',NULL),(104,NULL,'2024-05-01','16','Combi-Senzomix','SUDU8214918','12M',1750.00,NULL,'FULL',NULL),(105,NULL,'2024-05-01','16','Combi-Senzomix','MNBU3343964','12M',1750.00,NULL,'FULL',NULL),(106,NULL,'2024-05-01','15','Combi-Senzomix','MNBU4271874','12M',1750.00,NULL,'FULL',NULL),(107,NULL,'2024-05-01','15','Combi-Senzomix','MNBU0153554','12M',1750.00,NULL,'FULL',NULL),(108,NULL,'2024-05-01','3','Combi-Senzomix','MNBU0636070','12M',1750.00,NULL,'FULL',NULL),(109,NULL,'2024-05-01','3','Combi-Senzomix','MNBU355412','12M',1750.00,NULL,'FULL',NULL),(110,NULL,'2024-05-01','2','Combi-Senzomix','SUDU6180017','12M',1750.00,NULL,'FULL',NULL),(111,NULL,'2024-05-01','2','Combi-Senzomix','MNBU4288440','12M',1750.00,NULL,'FULL',NULL),(112,NULL,'2024-05-01','6','PORT-Senzomix','MNBU3856519','12M',1750.00,NULL,'FULL',NULL),(113,NULL,'2024-05-01','6','PORT-Senzomix','MNBU0404496','12M',1750.00,NULL,'FULL',NULL),(114,NULL,'2024-05-01','6','PORT-Senzomix','MNBU3619219','12M',1750.00,NULL,'FULL',NULL),(115,NULL,'2024-05-02','3','Port-Client','SUDU8521956','12M',2450.00,NULL,'FULL',NULL),(116,NULL,'2024-05-03','14','PORT-Senzomix','MNBU0592475','12M',1750.00,NULL,'FULL',NULL),(117,NULL,'2024-05-03','14','PORT-Senzomix','GESU6453586','12M',1750.00,NULL,'FULL',NULL),(118,NULL,'2024-05-03','15','PORT-Senzomix','APHU7357233','12M',1750.00,NULL,'FULL',NULL),(119,NULL,'2024-05-03','6','PORT-Senzomix','MNBU3072625','12M',1750.00,NULL,'FULL',NULL),(120,NULL,'2024-05-03','6','PORT-Senzomix','SEKU5690290','12M',1750.00,NULL,'FULL',NULL),(121,NULL,'2024-05-03','6','PORT-Senzomix','MNBU3327665','12M',1750.00,NULL,'FULL',NULL),(122,NULL,'2024-05-03','6','PORT-Senzomix','BSIU8080231','12M',1750.00,NULL,'FULL',NULL),(123,NULL,'2024-05-03','6','PORT-Senzomix','MNBU0477131','12M',1750.00,NULL,'FULL',NULL),(124,NULL,'2024-05-03','6','PORT-Senzomix','MNBU0189393','12M',1750.00,NULL,'FULL',NULL),(125,NULL,'2024-05-05','3','Port-Client','PCIU8976621','12M',2450.00,NULL,'FULL',NULL),(126,NULL,'2024-05-09','3','Port-Client','EGSU9067212','12M',2450.00,NULL,'FULL',NULL),(127,NULL,'2024-05-11','3','Port-Parrow','BEAU6212405','12m',2450.00,NULL,'Full',NULL),(128,NULL,'2024-05-11','17','Port-SATL','CSNU6032113','12M',2450.00,NULL,'FULL',NULL),(129,21,'2024-05-13','6','PORT-AECI FOOD BELLVILE','MSCU3626144','6M',3500.00,NULL,'FULL',NULL),(130,21,'2024-05-13','6','PORT-AECI FOOD BELLVILE','MSDU3010300','6M',3500.00,NULL,'FULL',NULL),(131,21,'2024-05-13','17','PORT-AECI FOOD BELLVILE','MEDU3012324','6M',3500.00,NULL,'FULL',NULL),(132,21,'2024-05-13','17','PORT-AECI FOOD BELLVILE','MSCU3606425','6M',3500.00,NULL,'FULL',NULL),(133,NULL,'2024-05-16','3','Port-Parrow','OOCU6840534','12M',2450.00,NULL,'FULL',NULL),(134,NULL,'2024-05-16','6','Port-Parrow','TRHU4090320','12M',2450.00,NULL,'FULL',NULL),(135,NULL,'2024-05-17','17','Port-Parrow','ZCSU7653917','12M',2450.00,NULL,'FULL',NULL),(136,NULL,'2024-05-19','3','Port-Parrow','OOCU7340317','12M',2450.00,NULL,'FULL',NULL),(137,NULL,'2024-05-22','6','PORT-AECI FOOD BELLVILE','MSDU9803507','6M',3500.00,NULL,'FULL',NULL),(138,NULL,'2024-05-22','17','PORT-AECI FOOD BELLVILE','TRIU8010179','6M',3500.00,NULL,'FULL',NULL),(139,NULL,'2024-05-22','17','PORT-AECI FOOD BELLVILE','CRLU1237430','6M',3500.00,NULL,'FULL',NULL),(140,NULL,'2024-05-22','17','PORT-AECI FOOD BELLVILE','SZLU9116993','6M',3500.00,NULL,'FULL',NULL),(141,NULL,'2024-05-23','3','Belcon-Port','MRKU2294192','12M',2450.00,NULL,'FULL',NULL),(142,29,'2024-05-29','17','FPT-Senzomix','ARCGAB3CPT002','12M',1710.00,NULL,'FULL',NULL),(143,29,'2024-05-29','17','FPT-Senzomix','ARCGAB3CPT001','12M',2250.00,NULL,'FULL',NULL),(144,NULL,'2024-03-28','6','PORT - CLIENT','FCIU4455230','12M',2700.00,NULL,'EMPTY',NULL);
+/*!40000 ALTER TABLE `trip_dupl` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trip_names`
+--
+
+DROP TABLE IF EXISTS `trip_names`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trip_names` (
+  `trip_names_id` int NOT NULL AUTO_INCREMENT,
+  `trip_name` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_names_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`trip_names_id`),
+  UNIQUE KEY `trip_name_UNIQUE` (`trip_name`)
+) ENGINE=MyISAM AUTO_INCREMENT=166 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trip_names`
+--
+
+LOCK TABLES `trip_names` WRITE;
+/*!40000 ALTER TABLE `trip_names` DISABLE KEYS */;
+INSERT INTO `trip_names` VALUES (1,'11 THOR CIRCLE - PORT','2024-06-25 12:18:31'),(2,'ALLENTOWN - PORT','2024-06-25 12:18:31'),(3,'BELCON - KILLARNEY','2024-06-25 12:18:31'),(4,'BELCON - PORT','2024-06-25 12:18:31'),(5,'BELVILLE - PORT','2024-06-25 12:18:31'),(6,'BOLSTER','2024-06-25 12:18:31'),(7,'CISCO - FPT','2024-06-25 12:18:31'),(8,'CLIENT - PORT','2024-06-25 12:18:31'),(9,'COMBI - KILLARNEY','2024-06-25 12:18:31'),(10,'COMBI - AECI','2024-06-25 12:18:31'),(11,'COMBI - AECI FOOD','2024-06-25 12:18:31'),(12,'COMBI - BELCON','2024-06-25 12:18:31'),(13,'COMBI - MAITLAND','2024-06-25 12:18:31'),(14,'COMBI - MSC','2024-06-25 12:18:31'),(15,'COMBI - PORT','2024-06-25 12:18:31'),(16,'COMBI - SENZOMIX','2024-06-25 12:18:31'),(17,'CROSSHAUL DCP - PORT','2024-06-25 12:18:31'),(18,'CTCT - KILLARNEY','2024-06-25 12:18:31'),(19,'CTCT - MAITLAND','2024-06-25 12:18:31'),(20,'CTMPT - KILLARNEY','2024-06-25 12:18:31'),(21,'DCP - COMBI','2024-06-25 12:18:31'),(22,'DCP - PORT','2024-06-25 12:18:31'),(23,'FPT - AECI FOOD','2024-06-25 12:18:31'),(24,'FPT - ATLANTIS','2024-06-25 12:18:31'),(25,'FPT - BELCON','2024-06-25 12:18:31'),(26,'FPT - MAITLAND','2024-06-25 12:18:31'),(27,'FPT - MILTR','2024-06-25 12:18:31'),(28,'FPT - MSC','2024-06-25 12:18:31'),(29,'FPT - SENZOMIX','2024-06-25 12:18:31'),(30,'FPT - UCD','2024-06-25 12:18:31'),(31,'FPT - YARD','2024-06-25 12:18:31'),(32,'GOODWOOD - PORT','2024-06-25 12:18:31'),(33,'GRINDROD','2024-06-25 12:18:31'),(34,'HELENA - BELCON','2024-06-25 12:18:31'),(35,'HILLEBRAND - PORT','2024-06-25 12:18:31'),(36,'I.C SOLUTION - PORT','2024-06-25 12:18:31'),(37,'ICR - OTTER - PORT','2024-06-25 12:18:31'),(38,'JFM - CLIENT','2024-06-25 12:18:31'),(39,'JFM - PORT','2024-06-25 12:18:31'),(40,'KILLARNEY - CFC - KILLARNEY','2024-06-25 12:18:31'),(41,'KILLARNEY - CTCT','2024-06-25 12:18:31'),(42,'KILLARNEY - FPT','2024-06-25 12:18:31'),(43,'KILLARNEY - PORT','2024-06-25 12:18:31'),(44,'MAERSK - PORT','2024-06-25 12:18:31'),(45,'MAITLAND - COMBI','2024-06-25 12:18:31'),(46,'MAITLAND - FPT','2024-06-25 12:18:31'),(47,'MAITLAND - MSC','2024-06-25 12:18:31'),(48,'MAITLAND - PORT','2024-06-25 12:18:31'),(49,'MILTRANS - PORT','2024-06-25 12:18:31'),(50,'MONTAGUE GARDENS - MSC','2024-06-25 12:18:31'),(51,'MSC - PORT','2024-06-25 12:18:31'),(52,'OSTRICH - ATLANTIS','2024-06-25 12:18:31'),(53,'OSTRICH FARM - ATLANTIS','2024-06-25 12:18:31'),(54,'PAARDENEILAND - 45 MANHATTAN','2024-06-25 12:18:31'),(55,'PAARDENEILAND - COMBI','2024-06-25 12:18:31'),(56,'PAARDENEILAND - FPT','2024-06-25 12:18:31'),(57,'PAARDENEILAND - PORT','2024-06-25 12:18:31'),(58,'PARROW - PORT','2024-06-25 12:18:31'),(59,'POARDENEILAND - PORT','2024-06-25 12:18:31'),(60,'PORT - AECI FOOD BELLVILE','2024-06-25 12:18:31'),(61,'PORT - ATLANTIS','2024-06-25 12:18:31'),(62,'PORT - CHEMPAC','2024-06-25 12:18:31'),(63,'PORT - CLIENT','2024-06-25 12:18:31'),(64,'PORT - DCP','2024-06-25 12:18:31'),(65,'PORT - EPPING','2024-06-25 12:18:31'),(66,'PORT - FPT','2024-06-25 12:18:31'),(67,'PORT - JFM','2024-06-25 12:18:31'),(68,'PORT - KILLARNEY','2024-06-25 12:18:31'),(98,'SACD - CLIENT','2024-06-26 08:48:07'),(70,'PORT - MAITLAND','2024-06-25 12:18:31'),(99,'FPT - KRAAIFONTEIN','2024-06-26 09:11:27'),(72,'PORT - MILNERTON','2024-06-25 12:18:31'),(73,'PORT - MILTRANS','2024-06-25 12:18:31'),(74,'PORT - MSC','2024-06-25 12:18:31'),(75,'PORT - OSTRICH FARM','2024-06-25 12:18:31'),(76,'PORT - PAARDENEILAND','2024-06-25 12:18:31'),(77,'PORT - PARROW','2024-06-25 12:18:31'),(78,'PORT - RIEBEECK WEST','2024-06-25 12:18:31'),(79,'PORT - SATL','2024-06-25 12:18:31'),(80,'PORT - SENZOMIX','2024-06-25 12:18:31'),(81,'PORT - SILVER SOLUTIONS','2024-06-25 12:18:31'),(82,'PORT - STOBEL','2024-06-25 12:18:31'),(83,'PORT - STOBEL PARROW','2024-06-25 12:18:31'),(84,'PORT - UCD','2024-06-25 12:18:31'),(85,'RIEBEECK WEST','2024-06-25 12:18:31'),(86,'SACD - FPT','2024-06-25 12:18:31'),(87,'SAFT - FPT','2024-06-25 12:18:31'),(88,'SAFT - PORT','2024-06-25 12:18:31'),(89,'SATL - FPT','2024-06-25 12:18:31'),(90,'SATL - MAITLAND','2024-06-25 12:18:31'),(91,'SATL - PORT','2024-06-25 12:18:31'),(92,'SILVER SOLUTION - FPT','2024-06-25 12:18:31'),(93,'ST HELENA - BELCON','2024-06-25 12:18:31'),(94,'STELLENBOSCH - FPT','2024-06-25 12:18:31'),(95,'AECI BEVERAGE','2024-06-26 05:13:49'),(96,'KROMCO - PORT','2024-06-26 07:02:55'),(97,'PORT - SHEERLIN','2024-06-26 07:04:59'),(100,'MILTRANS - ICR','2024-06-29 10:52:35'),(101,'MILTRANS - DCP','2024-06-30 15:33:51'),(102,'FPT - NEETHLINGSHOT','2024-07-01 06:47:15'),(103,'MSC - FPT','2024-07-01 12:08:12'),(104,'PORT-SACD','2024-07-25 20:47:01'),(105,'PORT - SACD','2024-07-29 07:55:13'),(106,'SACD - PORT','2024-07-29 07:57:17'),(107,'CTCT - MSC','2024-07-30 09:16:33'),(108,'PORT - ZIBO','2024-07-31 12:18:39'),(109,'FPT - FISANTEKRAAL','2024-07-31 12:25:41'),(110,'MSC - SAFL','2024-08-01 03:55:35'),(111,'SENZOMIX - CLIENT','2024-08-02 10:28:26'),(112,'PORT - FISANTEKRAAL','2024-10-01 04:15:54'),(113,'CFC - PORT','2024-10-01 04:18:43'),(114,'MAITLAND - CTMPT','2024-10-01 09:01:27'),(115,'ATLANTIS-MONTAGUE GARDENS','2024-10-31 09:58:20'),(116,'ATLANTIS - MONTEGO GARDENS','2024-10-31 09:58:54'),(117,'SHEAKERNARE - PORT','2024-10-31 10:10:30'),(118,'SATL - SNEAKER LAB','2024-10-31 10:12:45'),(119,'KILLARNEY - KALAHARI','2024-10-31 10:33:28'),(120,'MSC - ATLANTIS','2024-10-31 11:13:47'),(121,'SALT - HILLBRAND','2024-10-31 11:22:43'),(122,'SATL - GLO PAARDEN EILAND','2024-10-31 11:26:02'),(123,'BELCON - GLO PAARDEN EILAND','2024-10-31 11:34:03'),(124,'GLO PAARDEN EIRLAND - ICR','2024-10-31 11:43:44'),(125,'GLO PAARDEN EILAND - FPT','2024-11-01 11:16:28'),(126,'KILLARNEY - ONE RESOLUTION','2024-11-04 08:38:10'),(127,'COMBI - PAROW','2024-11-10 11:12:14'),(128,'GRINROD','2024-11-10 11:14:21'),(129,'GLO - PORT','2024-11-10 11:39:08'),(130,'PORT - MONTAGUE','2024-11-28 10:50:33'),(131,'MONTAGUE - AIRPORT SLOBEL','2024-11-28 10:55:09'),(132,'MONTAGUE - AKCLA','2024-11-28 10:57:01'),(133,'PORT - ALMEX ALUMINIUM BLACK','2024-11-28 12:29:16'),(134,'FPT - PORT','2024-12-01 04:44:28'),(135,'SILVER SOLUTION - KUILSRIVER','2024-12-01 05:02:07'),(136,'MSC BELCOM - BOLSTER','2024-12-01 05:04:12'),(137,'CTCT - ROCKLANDS TRADING','2024-12-03 13:45:16'),(138,'BOLSTER - PORT','2024-12-29 06:33:30'),(139,'PAARL VALLEY - PORT','2024-12-29 07:14:06'),(140,'PORT - BOLSTER','2024-12-29 08:10:14'),(141,'PORT - 6 Gorlay Rd, Ottery','2024-12-29 08:24:47'),(142,'COMBI - PAARDENEIRLAND','2024-12-29 08:29:59'),(143,'EPPING - ICR - SILVER SOLUTION','2024-12-29 08:31:21'),(144,'MAITLAND - RICHMOND - PORT','2025-01-01 10:08:22'),(145,'PORT -DSV AIRPORT','2025-01-02 08:28:03'),(146,'COMBI - DCP','2025-01-02 08:30:41'),(147,'EPPING - SATL','2025-01-29 05:48:06'),(148,'PORT -NW LOGISTICS','2025-01-29 05:59:27'),(149,'PORT - TWO OCEAN KVIISE','2025-02-01 02:23:28'),(150,'FPT - CLIENT','2025-02-01 04:19:12'),(151,'PORT - CULENNBORG','2025-02-02 02:27:32'),(152,'BOLSTER - MONTAGUE','2025-02-02 02:39:40'),(153,'COMBI - BOLSTER','2025-02-02 02:42:23'),(154,'PORT - BELLVILLE','2025-02-02 02:57:48'),(155,'RICHMONA CFC - BOLSTER','2025-02-02 03:04:07'),(156,'SILVERSOLUTION - PORT','2025-02-02 03:49:59'),(157,'SALT - COMBI','2025-02-02 04:06:12'),(158,'BOLSTER - COMBI','2025-02-02 04:12:31'),(159,'PORT - GRINDROD','2025-02-02 04:21:50'),(160,'SATL - CLIENT','2025-02-03 13:55:03'),(161,'SADC - SATL','2025-02-04 09:51:17'),(162,'PORT - TWO OCEANS COMMERCIAL COLD STORE','2025-02-05 01:12:36'),(163,'SATI - COLO FRESH - PORT','2025-02-05 01:18:41'),(164,'SATI - BEFRESH - PORT','2025-02-05 01:44:43'),(165,'MONTAGUE GARDENS - SATL PAARDEN EILAND','2025-02-05 03:24:50');
+/*!40000 ALTER TABLE `trip_names` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trip_rates`
+--
+
+DROP TABLE IF EXISTS `trip_rates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trip_rates` (
+  `trip_rat_id` int NOT NULL AUTO_INCREMENT,
+  `trip_rat_client` int DEFAULT NULL,
+  `trip_rat_name` varchar(145) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `trip_rat_type` int DEFAULT NULL,
+  `trip_rat_size` int DEFAULT NULL,
+  `trip_rat_amount` double DEFAULT NULL,
+  `trip_rat_driver` double DEFAULT NULL,
+  `date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`trip_rat_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trip_rates`
+--
+
+LOCK TABLES `trip_rates` WRITE;
+/*!40000 ALTER TABLE `trip_rates` DISABLE KEYS */;
+/*!40000 ALTER TABLE `trip_rates` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trip_size`
+--
+
+DROP TABLE IF EXISTS `trip_size`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trip_size` (
+  `trip_size_id` int NOT NULL AUTO_INCREMENT,
+  `trip_size_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`trip_size_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trip_size`
+--
+
+LOCK TABLES `trip_size` WRITE;
+/*!40000 ALTER TABLE `trip_size` DISABLE KEYS */;
+INSERT INTO `trip_size` VALUES (1,'6M'),(2,'12M'),(3,'Other');
+/*!40000 ALTER TABLE `trip_size` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trip_type`
+--
+
+DROP TABLE IF EXISTS `trip_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trip_type` (
+  `trip_type_id` int NOT NULL AUTO_INCREMENT,
+  `trip_type_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`trip_type_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trip_type`
+--
+
+LOCK TABLES `trip_type` WRITE;
+/*!40000 ALTER TABLE `trip_type` DISABLE KEYS */;
+INSERT INTO `trip_type` VALUES (1,'Full'),(2,'Empty');
+/*!40000 ALTER TABLE `trip_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trips`
+--
+
+DROP TABLE IF EXISTS `trips`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trips` (
+  `trip_id` int NOT NULL AUTO_INCREMENT,
+  `invoiced` int DEFAULT '0',
+  `trip_client` int DEFAULT NULL,
+  `client` int DEFAULT NULL,
+  `trip_date` date DEFAULT NULL,
+  `trip_truck` int DEFAULT NULL,
+  `trip_name` varchar(45) DEFAULT NULL,
+  `trip_container` varchar(45) DEFAULT NULL,
+  `trip_size` int DEFAULT NULL,
+  `trip_amount` double DEFAULT NULL,
+  `trip_driver_rate` double DEFAULT NULL,
+  `trip_type` int DEFAULT NULL,
+  `trip_driver` int DEFAULT NULL,
+  `trip_confirmed` int DEFAULT '0',
+  `trip_create_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`trip_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1689 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='TRIP	TRUCK REG	CONTAINER N0	SIZE	AMOUNT	RIVER RAT	TYPE	DRIVER';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trips`
+--
+
+LOCK TABLES `trips` WRITE;
+/*!40000 ALTER TABLE `trips` DISABLE KEYS */;
+/*!40000 ALTER TABLE `trips` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trips_paid`
+--
+
+DROP TABLE IF EXISTS `trips_paid`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trips_paid` (
+  `tri_id` int NOT NULL AUTO_INCREMENT,
+  `tri_client` int DEFAULT NULL,
+  `tri_date` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tri_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tri_truck` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tri_container` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tri_size` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tri_amount` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tri_type` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tri_create_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`tri_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=518 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='TRIP	TRUCK REG	CONTAINER N0	SIZE	AMOUNT	TYPE';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trips_paid`
+--
+
+LOCK TABLES `trips_paid` WRITE;
+/*!40000 ALTER TABLE `trips_paid` DISABLE KEYS */;
+INSERT INTO `trips_paid` VALUES (1,10,'2023-12-11','FPT-BELCON','3','MNBU0298985','12M','1850','EMPTY','2024-02-02 10:10:21'),(2,10,'2023-12-01','FPT-MAITLAND','2','MNBU4351265','12M','750','EMPTY','2024-02-02 10:10:21'),(3,10,'2023-12-01','FPT-MAITLAND','2','MNBU0183590','12M','750','EMPTY','2024-02-02 10:10:21'),(4,10,'2023-12-07','BELCON-KILLARNEY','2','MMAU1416574','12M','1700','EMPTY','2024-02-02 10:10:21'),(5,10,'2023-12-11','BELCON-PORT','1','MRSU3375028','12M','1850','EMPTY','2024-02-02 10:10:21'),(6,10,'2023-12-11','FPT-BELCON','2','MNBU3060711','12M','1850','EMPTY','2024-02-02 10:10:21'),(7,10,'2023-12-11','FPT-BELCON','2','CNIU2230505','12M','1850','EMPTY','2024-02-02 10:10:21'),(8,10,'2023-12-11','BELCON-PORT','2','TRHU4858790','12M','1850','EMPTY','2024-02-02 10:10:21'),(9,10,'2023-12-11','COMBI-BELCON','2','MNBU3570470','12M','1850','EMPTY','2024-02-02 10:10:21'),(10,10,'2023-12-12','FPT-BELCON','3','SUDU8148837','12M','1850','EMPTY','2024-02-02 10:10:21'),(11,10,'2023-12-12','FPT-BELCON','3','MNBU4046467','12M','1850','EMPTY','2024-02-02 10:10:21'),(12,10,'2023-12-12','FPT-BELCON','3','MNBU1036953','12M','1850','EMPTY','2024-02-02 10:10:21'),(13,10,'2023-12-12','FPT-BELCON','3','MNBU0020320','12M','1850','EMPTY','2024-02-02 10:10:21'),(14,10,'2023-12-12','FPT-BELCON','3','MNBU0179409','12M','1850','EMPTY','2024-02-02 10:10:21'),(15,10,'2023-12-12','FPT-BELCON','3','MNBU0067097','12M','1850','EMPTY','2024-02-02 10:10:21'),(16,10,'2023-12-12','BELCON-KILLARNEY','3','MNBU0616638','12M','1700','EMPTY','2024-02-02 10:10:21'),(17,10,'2023-12-12','FPT-BELCON\nFPT-BELCON','3','MNBU3162586','12M','1850','EMPTY','2024-02-02 10:10:21'),(18,10,'2023-12-12','','3','MNBU3361438','12M','1850','EMPTY','2024-02-02 10:10:21'),(19,10,'2023-12-12','FPT-BELCON','1','MNBU3548178','12M','1850','EMPTY','2024-02-02 10:10:21'),(20,10,'2023-12-12','FPT-BELCON','1','MNBU0074199','12M','1850','EMPTY','2024-02-02 10:10:21'),(21,10,'2023-12-12','FPT-BELCON','1','MNBU9017899','12M','1850','EMPTY','2024-02-02 10:10:21'),(22,10,'2023-12-12','PORT-MAITLAND','2','MNBU0013547','12M','750','EMPTY','2024-02-02 10:10:21'),(23,10,'2023-12-12','PORT-MAITLAND','2','SUDU8020954','12M','750','EMPTY','2024-02-02 10:10:21'),(24,10,'2023-12-12','FPT-BELCON','2','MNBU3834037','12M','1850','EMPTY','2024-02-02 10:10:21'),(25,10,'2023-12-12','MAITLAND-PORT','2','MSDU2915260','6M','1100','FULL','2024-02-02 10:10:21'),(26,10,'2023-12-12','MAITLAND-PORT','2','MEDU5617620','6M','1100','FULL','2024-02-02 10:10:21'),(27,10,'2023-12-12','PORT-P/EILAND','2','HLBU9228640','12M','950','FULL','2024-02-02 10:10:22'),(28,10,'2023-12-13','P/EILAND-PORT','2','HASU1052828','6M','950','FULL','2024-02-02 10:10:22'),(29,10,'2023-12-13','P/EILAND-COMBI','2','HASU1036215','6M','950','FULL','2024-02-02 10:10:22'),(30,10,'2023-12-13','COMBI-KILLARNEY','2','SUDU8214754','12M','1550','EMPTY','2024-02-02 10:10:22'),(31,10,'2023-12-13','P/EILAND-COMBI','2','MRKU6567248','6M','950','FULL','2024-02-02 10:10:22'),(32,10,'2023-12-14','P/EILAND-COMBI','2','MRKU6759404','6M','950','FULL','2024-02-02 10:10:22'),(33,10,'2023-12-14','P/EILAND-COMBI','2','SUDU7835973','6M','950','FULL','2024-02-02 10:10:22'),(34,10,'2023-12-14','P/EILAND-COMBI','2','TTNU1117263','6M','950','FULL','2024-02-02 10:10:22'),(35,10,'2023-12-15','MAITLAND-PORT','2','MSMU1620110','6M','1100','FULL','2024-02-02 10:10:22'),(36,10,'2023-12-15','MAITLAND-PORT','2','TGHU1858856','6M','1100','FULL','2024-02-02 10:10:22'),(37,10,'2023-12-16','COMBI-KILLARNEY','2','SUDU6251002','12M','1550','EMPTY','2024-02-02 10:10:22'),(38,10,'2023-12-16','COMBI-KILLARNEY','2','MNBU3294303','12M','1550','EMPTY','2024-02-02 10:10:22'),(39,10,'2023-12-17','COMBI-KILLARNEY','3','MNBU0218402','12M','1550','EMPTY','2024-02-02 10:10:22'),(40,10,'2023-12-17','COMBI-KILLARNEY','2','MNBU3109278','12M','1550','EMPTY','2024-02-02 10:10:22'),(41,10,'2023-12-18','BELCON-KILLARNEY','3','MNBU3181879','12M','1700','EMPTY','2024-02-02 10:10:22'),(42,10,'2023-12-18','P/EILAND-PORT','2','TLLU2286939','6M','950','FULL','2024-02-02 10:10:22'),(43,10,'2023-12-18','P/EILAND-PORT','2','MRKU7597680','6M','950','FULL','2024-02-02 10:10:22'),(44,10,'2023-12-18','P/EILAND-PORT','2','MRKU7176839','6M','950','FULL','2024-02-02 10:10:22'),(45,10,'2023-12-19','P/EILAND-PORT','2','TLLU2474833','6M','950','FULL','2024-02-02 10:10:22'),(46,10,'2023-12-20','FPT-BELCON','3','MWCU5227965','12M','1850','EMPTY','2024-02-02 10:10:22'),(47,10,'2023-12-20','P/EILAND-PORT','2','TEMU9754183','12M','950','EMPTY','2024-02-02 10:10:22'),(48,10,'2023-12-20','FPT-BELCON','2','MNBU3619482','12M','1850','EMPTY','2024-02-02 10:10:22'),(49,10,'2023-12-21','FPT-BELCON','3','MNBU0080340','12M','1850','EMPTY','2024-02-02 10:10:22'),(50,10,'2023-12-21','FPT-BELCON','3','SUDU5194654','12M','1850','EMPTY','2024-02-02 10:10:22'),(51,10,'2023-12-21','FPT-BELCON','3','SUDU8002631','12M','1850','EMPTY','2024-02-02 10:10:22'),(52,10,'2023-12-21','FPT-BELCON','1','MNBU0084638','12M','1850','EMPTY','2024-02-02 10:10:22'),(53,10,'2023-12-21','FPT-BELCON','1','MNBU0349470','12M','1850','EMPTY','2024-02-02 10:10:22'),(54,10,'2023-12-21','FPT-BELCON','2','MNBU0030014','12M','1850','EMPTY','2024-02-02 10:10:22'),(55,10,'2023-12-21','FPT-BELCON','2','MNBU3472771','12M','1850','EMPTY','2024-02-02 10:10:22'),(56,10,'2023-12-21','FPT-BELCON','2','SZLU5006088','12M','1850','EMPTY','2024-02-02 10:10:22'),(57,10,'2023-12-21','FPT-BELCON','2','MNBU0395223','12M','1850','EMPTY','2024-02-02 10:10:22'),(58,10,'2023-12-21','FPT-BELCON','2','MNBU4017469','12M','1850','EMPTY','2024-02-02 10:10:22'),(65,10,'2023-12-23','MAITLAND-FPT','2','FBIU0485390','6M','1100','FULL','2024-02-02 10:10:22'),(66,10,'2023-12-23','MAITLAND-FPT','2','MSDU1725389','6M','1100','FULL','2024-02-02 10:10:22'),(67,10,'2023-12-24','MAITLAND-FPT','2','MSDU2303541','6M','1100','FULL','2024-02-02 10:10:22'),(68,10,'2023-12-24','MAITLAND-FPT','2','MSDU2221736','6M','1100','FULL','2024-02-02 10:10:22'),(69,10,'2023-12-24','COMBI-MAITLAND','2','TLLU1193132','12M','750','EMPTY','2024-02-02 10:10:22'),(70,10,'2023-12-27','PORT-KILLARNEY','2','MNBU0124622','12M','1550','EMPTY','2024-02-02 10:10:22'),(71,10,'2023-12-27','PORT-KILLARNEY','2','MNBU9062455','12M','1550','EMPTY','2024-02-02 10:10:22'),(72,10,'2023-12-27','PORT-KILLARNEY','2','SUDU8227047','12M','1550','EMPTY','2024-02-02 10:10:22'),(73,10,'2023-12-28','PORT-MAITLAND','2','MNBU0640260','12M','750','EMPTY','2024-02-02 10:10:22'),(74,10,'2023-12-28','PORT-MAITLAND','2','MNBU3506193','12M','750','EMPTY','2024-02-02 10:10:22'),(75,10,'2023-12-28','PORT-KILLARNEY','2','MNBU3441343','12M','1550','EMPTY','2024-02-02 10:10:22'),(76,10,'2023-12-28','PORT-KILLARNEY','2','MNBU3538396','12M','1550','EMPTY','2024-02-02 10:10:22'),(77,10,'2023-12-29','PORT-KILLARNEY','2','MNBU4020544','12M','1550','EMPTY','2024-02-02 10:10:22'),(78,10,'2023-12-29','PORT-KILLARNEY','2','MNBU3124082','12M','1550','EMPTY','2024-02-02 10:10:22'),(79,10,'2023-12-29','PORT-KILLARNEY','2','SUDU8213260','12M','1550','EMPTY','2024-02-02 10:10:22'),(80,10,'2023-12-29','COMBI-KILLARNEY','2','MNBU0480705','12M','1550','EMPTY','2024-02-02 10:10:22'),(81,10,'2023-12-29','COMBI-KILLARNEY','2','MNBU0551840','12M','1550','EMPTY','2024-02-02 10:10:22'),(82,10,'2023-12-29','COMBI-KILLARNEY','2','SUDU8073018','12M','1550','EMPTY','2024-02-02 10:10:22'),(83,10,'2023-12-29','COMBI-KILLARNEY','2','MNBU3721067','12M','1550','EMPTY','2024-02-02 10:10:22'),(84,10,'2023-12-29','COMBI-KILLARNEY','2','MWCU5243729','12M','1550','EMPTY','2024-02-02 10:10:22'),(85,10,'1/31/2024','PORT-MAITLAND','3','MNBU3110221','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(86,10,'1/31/2024','PORT-MAITLAND','3','MNBU0572801','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(87,10,'1/31/2024','PORT-MAITLAND','3','SUDU6103875','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(88,10,'1/31/2024','P/EILAND-FPT','1','MRSU6209674','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(89,10,'1/31/2024','P/EILAND-FPT','1','SUDU6649336','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(90,10,'1/31/2024','KILLARNEY-FPT','1','MRKU0536764','12M',' 1,580.00 ','EMPTY','2024-03-01 08:37:10'),(91,10,'1/31/2024','P/EILAND-FPT','1','TCKU6889874','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(92,10,'1/31/2024','SATL-MAITLAND','1','TRLU9195024','6M',' 325.00 ','EMPTY','2024-03-01 08:37:10'),(93,10,'1/31/2024','SATL-MAITLAND','1','MRSU0212433','6M',' 325.00 ','EMPTY','2024-03-01 08:37:10'),(94,10,'1/31/2024','P/EILAND-COMBI','2','SUDU7771694','6M',' 950.00 ','FULL','2024-03-01 08:37:10'),(95,10,'1/31/2024','SATL-FPT','2','CIPU5032081','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(96,10,'1/31/2024','SATL-FPT','2','SEKU4621611','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(97,10,'1/31/2024','P/EILAND-FPT','2','MSKU1447405','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(98,10,'1/31/2024','SATL-FPT','2','PONU7618001','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(99,10,'1/31/2024','SATL-FPT','2','TLLU8128400','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(100,10,'1/31/2024','SATL-FPT','2','TLLU4892684','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(101,10,'1/31/2024','SATL-FPT','2','MRSU5289192','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(102,10,'1/31/2024','COMBI-MAITLAND','2','MNBU3595230','12M',' 755.00 ','EMPTY','2024-03-01 08:37:10'),(103,10,'1/31/2024','PORT-KILLARNEY','2','MNBU4166755','12M',' 1,580.00 ','EMPTY','2024-03-01 08:37:10'),(104,10,'1/31/2024','PORT-KILLARNEY','2','MNBU0177073','12M',' 1,580.00 ','EMPTY','2024-03-01 08:37:10'),(105,10,'1/31/2024','P/EILAND-COMBI','2','MRSU0105409','6M',' 950.00 ','FULL','2024-03-01 08:37:10'),(106,10,'1/31/2024','P/EILAND-COMBI','2','TEMU5474142','6M',' 950.00 ','FULL','2024-03-01 08:37:10'),(107,10,'1/31/2024','MAITLAND-PORT','2','CAIU2744472','6M',' 775.00 ','FULL','2024-03-01 08:37:10'),(108,10,'1/31/2024','MAITLAND-PORT','2','CRSU1522520','6M',' 775.00 ','FULL','2024-03-01 08:37:10'),(109,10,'1/31/2024','SATL-MAITLAND','2','MRKU9264780','6M',' 325.00 ','EMPTY','2024-03-01 08:37:10'),(110,10,'1/31/2024','SATL-MAITLAND','2','MSKU5926860','6M',' 325.00 ','EMPTY','2024-03-01 08:37:10'),(111,10,'1/31/2024','P/EILAND-COMBI','2','MRKU8672875','6M',' 950.00 ','FULL','2024-03-01 08:37:10'),(112,10,'1/31/2024','P/EILAND-PORT','2','MRKU9505105','6M',' 950.00 ','FULL','2024-03-01 08:37:10'),(113,10,'1/31/2024','MAITLAND-PORT','2','TCLU2814452','6M',' 775.00 ','FULL','2024-03-01 08:37:10'),(114,10,'1/31/2024','MAITLAND-PORT','2','HLBU2290639','6M',' 775.00 ','FULL','2024-03-01 08:37:10'),(115,10,'1/31/2024','P/EILAND-PORT','2','MRKU8183046','6M',' 1,400.00 ','FULL','2024-03-01 08:37:10'),(116,10,'1/31/2024','MAITLAND-PORT','2','GLDU9924080','6M',' 1,100.00 ','FULL/EMPTY','2024-03-01 08:37:10'),(117,10,'1/31/2024','P/EILAND-PORT','2','MSKU3926393','6M',' 950.00 ','FULL','2024-03-01 08:37:10'),(118,10,'2024-01-31','PORT-MSC','3','CRSU6118804','12M','900','EMPTY','2024-03-05 07:17:33'),(119,10,'2024-01-31','PORT-MSC','3','TRIU8183425','12M','900','EMPTY','2024-03-05 07:17:33'),(120,10,'2024-01-31','PORT-MSC','3','MSDU901638','12M','900','EMPTY','2024-03-05 07:17:33'),(121,10,'2024-01-31','PORT-MSC','3','MSDU9016380','12M','900','EMPTY','2024-03-05 07:17:33'),(122,10,'2024-01-31','PORT-MSC','3','TRIU8915418','12M','900','EMPTY','2024-03-05 07:17:33'),(123,10,'2024-01-31','FPT-UCD','3','CXRU162380','12M','1300','EMPTY','2024-03-05 07:17:33'),(124,10,'2024-01-31','FPT-UCD','3','TTNU8956412','12M','1300','EMPTY','2024-03-05 07:17:33'),(125,10,'2024-01-31','PORT-MILTRAN','3','HLBU6009709','12M','1800','EMPTY','2024-03-05 07:17:33'),(126,10,'2024-01-31','PORT-MSC','3','MEDU6706342','6M','450','EMPTY','2024-03-05 07:17:33'),(127,10,'2024-01-31','PORT-MSC','3','MEDU2925065','6M','450','EMPTY','2024-03-05 07:17:33'),(128,10,'2024-01-31','PORT-MSC','3','SEGU9666065','12M','900','EMPTY','2024-03-05 07:17:33'),(129,10,'2024-01-31','PORT-MSC','3','MSCU7389821','12M','900','EMPTY','2024-03-05 07:17:33'),(130,10,'2024-01-31','PORT-MSC','3','TTNU8721892','12M','900','EMPTY','2024-03-05 07:17:33'),(131,10,'2024-01-31','FPT-MSC','2','SZLU9466158','12M','900','EMPTY','2024-03-05 07:17:33'),(132,10,'2024-01-31','COMBI-MSC','2','BMOU9005746','12M','900','EMPTY','2024-03-05 07:17:33'),(133,10,'2024-01-31','COMBI-MSC','2','TRIU8390736','12M','900','EMPTY','2024-03-05 07:17:33'),(134,10,'2024-01-31','COMBI-MSC','2','SZLU9323049','12M','900','EMPTY','2024-03-05 07:17:33'),(135,10,'2024-01-31','COMBI-MSC','2','CRLU1315739','12M','900','EMPTY','2024-03-05 07:17:33'),(136,10,'2024-01-31','PORT-MAITLAN','2','HLBU9019059','12M','900','EMPTY','2024-03-05 07:17:33'),(137,10,'2024-01-31','PORT-MSC','2','HLBU6009226','12M','900','EMPTY','2024-03-05 07:17:33'),(138,10,'2024-01-31','PORT-MSC','2','TCLU2178849','12M','900','EMPTY','2024-03-05 07:17:33'),(139,10,'2024-01-31','PORT-MSC','2','MEDU2543632','12M','900','EMPTY','2024-03-05 07:17:33'),(140,10,'2024-01-31','PORT-UCD','2','HLBU6003383','12M','1300','EMPTY','2024-03-05 07:17:34'),(141,10,'2024-01-31','PORT-MAITLAN','2','HLBU6005072','12M','900','EMPTY','2024-03-05 07:17:34'),(142,10,'2024-01-31','PORT-MAITLAN','2','HLBU9538753','12M','900','EMPTY','2024-03-05 07:17:34'),(143,10,'2024-01-31','PORT-MAITLAN','2','HLBU9867574','12M','900','EMPTY','2024-03-05 07:17:34'),(144,10,'2024-01-31','PORT-MAITLAN','2','TEMU9040062','12M','900','EMPTY','2024-03-05 07:17:34'),(145,10,'2024-01-31','PORT-MAITLAN','2','HLBU9035960','12M','900','EMPTY','2024-03-05 07:17:34'),(146,10,'2024-01-31','MSC-PORT','2','MSMU817334','12M','900','EMPTY','2024-03-05 07:17:34'),(147,10,'2024-01-31','MSC-PORT','2','MSMU584443','12M','900','EMPTY','2024-03-05 07:17:34'),(148,10,'2024-01-31','MSC-PORT','2','MEDU7358663','12M','900','EMPTY','2024-03-05 07:17:34'),(149,10,'2024-01-31','MSC-PORT','2','TGBU9329728','12M','900','EMPTY','2024-03-05 07:17:34'),(150,10,'2024-01-31','MSC-PORT','2','CAIU7368110','12M','900','EMPTY','2024-03-05 07:17:34'),(151,10,'2024-01-31','MSC-PORT','2','CXDU2062548','12M','900','EMPTY','2024-03-05 07:17:34'),(152,10,'2024-01-31','MSC-PORT','2','MEDU7966920','12M','900','EMPTY','2024-03-05 07:17:34'),(153,10,'2024-02-28','PORT-MSC','3','TEMU9508045','12M ','900','EMPTY','2024-04-08 10:19:12'),(154,10,'2024-02-28','PORT-MSC','3','MEDU9122682','12M ','900','EMPTY','2024-04-08 10:19:12'),(155,10,'2024-02-28','PORT-MSC','3','FBIU5139980','12M ','900','EMPTY','2024-04-08 10:19:12'),(156,10,'2024-02-28','PORT-MSC','3','BMOU9291486','12M ','900','EMPTY','2024-04-08 10:19:12'),(157,10,'2024-02-28','PORT-MSC','3','SZLU9325592','12M ','900','EMPTY','2024-04-08 10:19:12'),(158,10,'2024-02-28','PORT-MSC','3','MSDU9820320','12M ','900','EMPTY','2024-04-08 10:19:12'),(159,10,'2024-02-28','PORT-MSC','3','TRIU8628995','12M ','900','EMPTY','2024-04-08 10:19:12'),(160,10,'2024-02-28','PORT-MSC','3','MSCU7308603','12M ','900','EMPTY','2024-04-08 10:19:12'),(161,10,'2024-02-28','PORT-MSC','3','SEGU9160591','12M ','900','EMPTY','2024-04-08 10:19:12'),(162,10,'2024-02-28','PORT-MSC','3','SEGU9666168','12M ','900','EMPTY','2024-04-08 10:19:12'),(163,10,'2024-02-28','PORT-MSC','3','FFAU1905300','12M ','900','EMPTY','2024-04-08 10:19:12'),(164,10,'2024-02-28','FPT-MSC','3','CXRU1403916','12M ','900','EMPTY','2024-04-08 10:19:12'),(165,10,'2024-02-28','FPT-MSC','3','CHIU9020998','12M ','900','EMPTY','2024-04-08 10:19:12'),(166,10,'2024-02-28','FPT-MSC','3','MEDU9776662','12M ','900','EMPTY','2024-04-08 10:19:12'),(167,10,'2024-02-28','FPT-MSC','3','CXRU1534454','12M ','900','EMPTY','2024-04-08 10:19:12'),(168,10,'2024-02-28','FPT-MSC','3','MSCU7302328','12M ','900','EMPTY','2024-04-08 10:19:12'),(169,10,'2024-02-28','PORT-MSC','3','CRXU6918814','12M ','900','EMPTY','2024-04-08 10:19:12'),(170,10,'2024-02-28','PORT-MSC','3','MSCU7325576','12M ','900','EMPTY','2024-04-08 10:19:12'),(171,10,'2024-02-28','FPT TO MSC','3','OTPU6379377','12M','900','EMPTY','2024-04-08 10:19:12'),(172,10,'2024-02-28','FPT TO MSC','3','SZLU2567737','12M','900','EMPTY','2024-04-08 10:19:12'),(173,10,'2024-02-28','FPT TO MSC','3','CRSU6026312','12M','900','EMPTY','2024-04-08 10:19:12'),(174,10,'2024-02-28','FPT TO MSC','3','FSCU5804016','12M','900','EMPTY','2024-04-08 10:19:12'),(175,10,'2024-02-28','FPT TO MSC','3','SEGU9664041','12M','900','EMPTY','2024-04-08 10:19:12'),(176,10,'2024-02-28','FPT TO MSC','3','TTNU8312385','12M','900','EMPTY','2024-04-08 10:19:12'),(177,10,'2024-02-28','PORT TO MSC','3','SEGU9443040','12M','900','EMPTY','2024-04-08 10:19:12'),(178,10,'2024-02-28','PORT TO MSC','3','TTNU8216571','12M','900','EMPTY','2024-04-08 10:19:12'),(179,10,'2024-02-28','PORT TO MSC','3','TTNU8213145','12M','900','EMPTY','2024-04-08 10:19:12'),(180,10,'2024-02-28','PORT TO MSC','3','CRXU6945743','12M','900','EMPTY','2024-04-08 10:19:12'),(181,10,'2024-02-28','MSC-PORT','3','CAAU2128896','6M','450','EMPTY','2024-04-08 10:19:12'),(182,10,'2024-02-28','MSC-PORT','3','FSCU3336507','6M','450','EMPTY','2024-04-08 10:19:12'),(183,10,'2024-02-28','MSC-PORT','3','FBIU0193973','6M','450','EMPTY','2024-04-08 10:19:12'),(184,10,'2024-02-28','MSC-PORT','3','CXDU1952758','6M','450','EMPTY','2024-04-08 10:19:12'),(185,10,'2024-02-28','MSC-PORT','3','MEDU6200328','6M','450','EMPTY','2024-04-08 10:19:12'),(186,10,'2024-02-28','MSC-PORT','3','MEDU6676989','6M','450','EMPTY','2024-04-08 10:19:12'),(187,10,'2024-02-28','MSC-PORT','3','CARU3815807','6M','450','EMPTY','2024-04-08 10:19:12'),(188,10,'2024-02-28','MSC-PORT','3','FCIU4320851','6M','450','EMPTY','2024-04-08 10:19:12'),(189,10,'2024-02-28','MSC-PORT','3','MEDU6266710','6M','450','EMPTY','2024-04-08 10:19:12'),(190,10,'2024-02-28','MSC-PORT','3','TCLU2910570','6M','450','EMPTY','2024-04-08 10:19:12'),(191,10,'2024-02-28','FPT-MSC ','3','MEDU9047737','12M','900','EMPTY','2024-04-08 10:19:12'),(192,10,'2024-02-28','FPT-MSC ','3','MEDU9801050','12M','900','EMPTY','2024-04-08 10:19:12'),(193,10,'2024-02-28','FPT-MSC ','3','TEMU9396367','12M','900','EMPTY','2024-04-08 10:19:12'),(194,10,'2024-02-28','FPT-MSC ','3','SZLU6028477','12M','900','EMPTY','2024-04-08 10:19:12'),(195,10,'2024-02-28','FPT-MSC ','3','MEDU9739695','12M','900','EMPTY','2024-04-08 10:19:12'),(196,10,'2024-02-28','FPT-MSC ','3','CXRU1206795','12M','900','EMPTY','2024-04-08 10:19:12'),(197,10,'2024-02-28','BELCON-PORT','3','MRSU3018695','12M','1850','EMPTY','2024-04-08 10:19:12'),(198,10,'2024-02-28','BELCON-PORT','3','MSKU9403131','12M','1850','EMPTY','2024-04-08 10:19:12'),(199,10,'2024-02-28','COMBI-KILLARNEY','3','MNBU0209777','12M','1580','EMPTY','2024-04-08 10:19:12'),(200,10,'2024-02-28','COMBI-KILLARNEY','3','MNBU3496860','12M','1580','EMPTY','2024-04-08 10:19:12'),(201,10,'2024-02-28','COMBI-KILLARNEY','3','MNBU0001063','12M','1580','EMPTY','2024-04-08 10:19:12'),(202,10,'2024-02-28','COMBI-KILLARNEY','3','MNBU4286220','12M','1580','EMPTY','2024-04-08 10:19:12'),(203,10,'2024-02-28','COMBI-KILLARNEY','3','MNBU4096508','12M','1580','EMPTY','2024-04-08 10:19:12'),(204,10,'2024-02-28','COMBI-KILLARNEY','3','MNBU3818247','12M','1580','EMPTY','2024-04-08 10:19:12'),(205,10,'2024-02-28','COMBI-KILLARNEY','3','MNBU3228940','12M','1580','EMPTY','2024-04-08 10:19:12'),(206,10,'2024-02-28','FPT-MSC','1','MSCU7410087','12M ','900','EMPTY','2024-04-08 10:19:12'),(207,10,'2024-02-28','FPT-MSC','1','TRIU8260542','12M ','900','EMPTY','2024-04-08 10:19:12'),(208,10,'2024-02-28','FPT TO MSC','1','MEDU9782243','12M','900','EMPTY','2024-04-08 10:19:12'),(209,10,'2024-02-28','FPT TO MSC','1','SZLU9374771','12M','900','EMPTY','2024-04-08 10:19:12'),(210,10,'2024-02-28','FPT TO MILTR','1','TTNU8460778','12M','1900','EMPTY','2024-04-08 10:19:12'),(211,10,'2024-02-28','FPT-MSC ','1','CRLU1379841 ','12M ','900','EMPTY','2024-04-08 10:19:12'),(212,10,'2024-02-28','FPT-MSC ','1','TRIU8569038 ','12M ','900','EMPTY','2024-04-08 10:19:12'),(213,10,'2024-02-28','FPT-MSC ','1','GTIU8001028 ','12M ','900','EMPTY','2024-04-08 10:19:12'),(214,10,'2024-02-28','FPT-MSC ','1','SEGU9166183 ','12M ','900','EMPTY','2024-04-08 10:19:12'),(215,10,'2024-02-28','FPT-MSC ','1','MSCU7457757 ','12M ','900','EMPTY','2024-04-08 10:19:12'),(216,10,'2024-02-28','FPT-MSC ','1','GESU9469138 ','12M ','900','EMPTY','2024-04-08 10:19:12'),(217,10,'2024-02-28','FPT-MSC ','1','CRSU6063152 ','12M ','900','EMPTY','2024-04-08 10:19:12'),(218,10,'2024-02-28','PORT-MSC','2','MEDU9697820','12M ','900','EMPTY','2024-04-08 10:19:12'),(219,10,'2024-02-28','PORT-MSC','2','TTNU8355807','12M ','900','EMPTY','2024-04-08 10:19:12'),(220,10,'2024-02-28','PORT-MSC','2','TTNU8726528','12M ','900','EMPTY','2024-04-08 10:19:12'),(221,10,'2024-02-28','PORT-MSC','2','TRIU8173432','12M ','900','EMPTY','2024-04-08 10:19:12'),(222,10,'2024-02-28','PORT-MSC','2','MSMU7237198','12M ','900','EMPTY','2024-04-08 10:19:12'),(223,10,'2024-02-28','PORT-MSC','2','OTPU6515658','12M ','900','EMPTY','2024-04-08 10:19:12'),(224,10,'2024-02-28','FPT TO MILTR','2','OTPU6133491','12M','1900','EMPTY','2024-04-08 10:19:12'),(225,10,'2024-02-28','MSC-PORT','2','MSMU1857490','6M','450','EMPTY','2024-04-08 10:19:12'),(226,10,'2024-02-28','MSC-PORT','2','MEDU3887925','6M','450','EMPTY','2024-04-08 10:19:12'),(227,10,'2024-02-28','MSC-PORT','2','MEDU6349060','6M','450','EMPTY','2024-04-08 10:19:12'),(228,10,'2024-02-28','MSC-PORT','2','MSDU1873133','6M','450','EMPTY','2024-04-08 10:19:12'),(229,10,'2024-02-28','MSC-PORT','2','MSCU6878880','6M','450','EMPTY','2024-04-08 10:19:12'),(230,10,'2024-02-28','MSC-PORT','2','CXDU2101069','6M','450','EMPTY','2024-04-08 10:19:12'),(231,10,'2024-02-28','FPT-MSC ','2','MEDU9805647','12M','900','EMPTY','2024-04-08 10:19:12'),(232,10,'2024-02-28','PORT-MSC','2','CXRU1567669','12M','900','EMPTY','2024-04-08 10:19:12'),(233,10,'2024-02-28','PORT-MSC','2','CHIU9020597','12M','900','EMPTY','2024-04-08 10:19:12'),(234,10,'2024-02-28','P/EILAND-PORT','2','TCLU2505089','6M','950','FULL','2024-04-08 10:19:12'),(235,10,'2024-02-28','P/EILAND-PORT','2','MRKU9975990','6M','950','FULL','2024-04-08 10:19:12'),(236,10,'2024-02-28','P/EILAND-PORT','2','MSKU3501892','6M','950','FULL','2024-04-08 10:19:12'),(237,10,'2024-02-28','P/EILAND-PORT','2','MRKU9585923','6M','950','FULL','2024-04-08 10:19:12'),(238,10,'2024-02-28','P/EILAND-PORT','2','MRSU0240604','6M','950','FULL','2024-04-08 10:19:12'),(239,10,'2024-02-28','MAITLAND-PORT','2','TGBU3066671','6M','1100','FULL','2024-04-08 10:19:12'),(240,10,'2024-02-28','MAITLAND-PORT','2','MSDU2167825','6M','1100','FULL','2024-04-08 10:19:12'),(241,10,'2024-02-28','MAITLAND-PORT','2','MSMU1750644','6M','1100','FULL','2024-04-08 10:19:12'),(242,10,'2024-02-28','MAITLAND-PORT','2','FCIU6474650','6M','1100','FULL','2024-04-08 10:19:12'),(243,10,'2024-02-28','MAITLAND-PORT','2','LYGU3110940','6M','1100','FULL','2024-04-08 10:19:12'),(244,10,'2024-02-28','MAITLAND-PORT','2','TGHU1728549','6M','1100','FULL','2024-04-08 10:19:12'),(245,10,'2024-02-28','MAITLAND-PORT','2','IPXU2158696','6M','770','FULL','2024-04-08 10:19:12'),(246,10,'2024-02-28','P/EILAND-PORT','2','MSKU7098110','6M','950','FULL','2024-04-08 10:19:12'),(247,10,'2024-02-28','P/EILAND-PORT','2','MRKU8569152','6M','950','FULL','2024-04-08 10:19:12'),(248,10,'2024-02-28','P/EILAND-PORT','2','HASU1242448','6M','950','FULL','2024-04-08 10:19:12'),(249,10,'2024-02-28','P/EILAND-PORT','2','MSKU5074043','6M','950','FULL','2024-04-08 10:19:12'),(250,10,'2024-02-28','P/EILAND-PORT','2','MSKU7307231','6M','950','FULL','2024-04-08 10:19:12'),(251,10,'2024-02-28','MAITLAND-COMBI','2','CAIU3461522','6M','770','FULL','2024-04-08 10:19:12'),(252,10,'2024-02-28','MAITLAND-COMBI','2','MRKU7895278','6M','770','FULL','2024-04-08 10:19:12'),(253,10,'2024-02-28','MAITLAND-COMBI','2','TEMU5252274','6M','770','FULL','2024-04-08 10:19:12'),(254,10,'2024-02-28','MAITLAND-COMBI','2','SUDU7599693','6M','770','FULL','2024-04-08 10:19:12'),(255,10,'2024-02-28','MAITLAND-COMBI','2','CMAU0310530','6M','770','FULL','2024-04-08 10:19:12'),(256,10,'2024-02-28','MAITLAND-COMBI','2','CAIU2473046','6M','770','FULL','2024-04-08 10:19:12'),(257,10,'2024-02-28','MAITLAND-COMBI','2','MRKU9780982','6M','770','FULL','2024-04-08 10:19:12'),(258,10,'2024-02-28','MAITLAND-COMBI','2','MSKU3800281','6M','770','FULL','2024-04-08 10:19:12'),(259,10,'2024-02-28','MAITLAND-COMBI','2','MSKU5495438','6M','770','FULL','2024-04-08 10:19:12'),(260,10,'2024-02-28','MAITLAND-COMBI','2','PONU2086101','6M','770','FULL','2024-04-08 10:19:12'),(261,10,'2024-02-28','MAITLAND-COMBI','2','CMAU0272467','6M','770','FULL','2024-04-08 10:19:12'),(262,10,'2024-02-28','KILLARNEY-CFC-KILLARNEY','2','MNBU4073014','12M','1800','FULL','2024-04-08 10:19:12'),(263,10,'2024-02-28','P/EILAND-PORT','2','MSKU3957368','6M','950','FULL','2024-04-08 10:19:12'),(264,10,'2024-02-28','P/EILAND-PORT','2','SUDU1858760','6M','950','FULL','2024-04-08 10:19:12'),(265,10,'2024-02-28','P/EILAND-PORT','2','HASU1054374','6M','950','FULL','2024-04-08 10:19:12'),(266,10,'2024-02-28','P/EILAND-PORT','2','MRKU7187957','6M','950','FULL','2024-04-08 10:19:12'),(267,10,'2024-02-28','P/EILAND-PORT','2','TCKU2753806','6M','950','FULL','2024-04-08 10:19:12'),(268,10,'2024-02-28','P/EILAND-PORT','2','MRKU9280842','6M','950','FULL','2024-04-08 10:19:12'),(269,10,'2024-02-28','P/EILAND-PORT','2','MSKU7236400','6M','950','FULL','2024-04-08 10:19:12'),(270,10,'2024-02-28','P/EILAND-PORT','2','HASU1285244','6M','950','FULL','2024-04-08 10:19:12'),(271,10,'2024-02-28','KILLARNEY-PORT','2','MMAU1264070','12M','1800','FULL','2024-04-08 10:19:12'),(272,10,'2024-02-28','COMBI-KILLARNEY','2','MNBU9104925','12M','1580','EMPTY','2024-04-08 10:19:12'),(273,10,'2024-02-28','COMBI-KILLARNEY','2','MNBU3398062','12M','1580','EMPTY','2024-04-08 10:19:12'),(274,10,NULL,'JFM-PORT','10','SUDU8760204','12M','1650','EMPTY','2024-04-30 07:49:46'),(275,10,NULL,'JFM-PORT','10','MRKU2409990','12M','1650','EMPTY','2024-04-30 07:49:46'),(276,10,NULL,'JFM-PORT','3','TCKU7752206','12M','1650','EMPTY','2024-04-30 07:49:46'),(277,10,NULL,'JFM-PORT','3','TGHU9894823','12M','1650','EMPTY','2024-04-30 07:49:46'),(278,10,NULL,'JFM-PORT','3','BEAU5101351','12M','1650','EMPTY','2024-04-30 07:49:46'),(279,10,NULL,'JFM-PORT','3','MRKU3350156','12M','1650','EMPTY','2024-04-30 07:49:46'),(280,10,NULL,'JFM-PORT','3','MRSU5791934','12M','1650','EMPTY','2024-04-30 07:49:46'),(281,10,NULL,'JFM-PORT','3','TCKU7077812','12M','1650','EMPTY','2024-04-30 07:49:46'),(282,10,NULL,'JFM-PORT','3','HASU4911146','12M','1650','EMPTY','2024-04-30 07:49:46'),(283,10,NULL,'JFM-PORT','12','TRHU4579564','12M','1650','EMPTY','2024-04-30 07:49:46'),(284,10,NULL,'JFM-PORT','12','TCKU7283979','12M','1650','EMPTY','2024-04-30 07:49:46'),(285,10,NULL,'JFM-PORT','12','GCXU5714301','12M','1650','EMPTY','2024-04-30 07:49:46'),(286,10,NULL,'JFM-PORT','2','MRKU3122011','12M','1650','EMPTY','2024-04-30 07:49:46'),(287,10,NULL,'JFM-PORT','5','HASU4720670\n','12M','1650','EMPTY','2024-04-30 07:49:46'),(288,10,NULL,'JFM-PORT','5','MSKU9367409','12M','1650','EMPTY','2024-04-30 07:49:46'),(289,10,NULL,'JFM-PORT','5','CIPU5090684\n','12M','1650','EMPTY','2024-04-30 07:49:46'),(290,10,NULL,'JFM-PORT','5','MRSU6381596','12M','1650','EMPTY','2024-04-30 07:49:46'),(291,10,NULL,'JFM-PORT','5','MRKU2919783','12M','1650','EMPTY','2024-04-30 07:49:46'),(292,10,NULL,'JFM-PORT','5','MSKU0937877','12M','1650','EMPTY','2024-04-30 07:49:46'),(293,10,NULL,'JFM-PORT','5','MRKU6198330','12M','1650','EMPTY','2024-04-30 07:49:46'),(294,10,NULL,'JFM-PORT','5','TCKU6036790','12M','1650','EMPTY','2024-04-30 07:49:46'),(295,10,NULL,'JFM-PORT','5','MSKU1429720','12M','1650','EMPTY','2024-04-30 07:49:46'),(296,10,NULL,'JFM-PORT','5','TCKU7704403','12M','1650','EMPTY','2024-04-30 07:49:46'),(297,10,NULL,'JFM-PORT','5','HASU4703029','12M','1650','EMPTY','2024-04-30 07:49:46'),(298,10,NULL,'JFM-PORT','5','TLLU5970204','12M','1650','EMPTY','2024-04-30 07:49:46'),(299,10,NULL,'JFM-PORT','4','MRKU5399073','12M','1650','EMPTY','2024-04-30 07:49:46'),(300,10,NULL,'JFM-PORT','4','MRKU3986805','12M','1650','EMPTY','2024-04-30 07:49:46'),(301,10,NULL,'JFM-PORT','4','MRKU3063201','12M','1650','EMPTY','2024-04-30 07:49:46'),(302,10,NULL,'JFM-PORT','4','MRSU6319157','12M','1650','EMPTY','2024-04-30 07:49:47'),(303,10,NULL,'JFM-PORT','4','MSKU1147239','12M','1650','EMPTY','2024-04-30 07:49:47'),(304,10,NULL,'JFM-PORT','9','MRKU3325030','12M','1650','EMPTY','2024-04-30 07:49:47'),(305,10,NULL,'JFM-PORT','3','TRHU4589599','12M','1650','EMPTY','2024-05-07 07:14:44'),(306,10,NULL,'JFM-PORT','3','MRSU4238858','12M','1650','EMPTY','2024-05-07 07:14:45'),(307,10,NULL,'JFM-PORT','3','MRSU4292340','12M','1650','EMPTY','2024-05-07 07:14:45'),(308,10,NULL,'JFM-PORT','2','MRKU3232699','12M','1650','EMPTY','2024-05-07 07:14:45'),(309,10,NULL,'JFM-PORT','2','MRSU5315120','12M','1650','EMPTY','2024-05-07 07:14:45'),(310,10,NULL,'JFM-PORT','2','SUDU8531276','12M','1650','EMPTY','2024-05-07 07:14:45'),(311,10,NULL,'JFM-PORT','2','SUDU8604840','12M','1650','EMPTY','2024-05-07 07:14:45'),(312,10,'2024-03-05','PORT-UCD','3','CRXU1179719','12M','1300','EMPTY','2024-05-07 07:27:03'),(313,10,'2024-03-12','PORT-UCD','3','ONEU9142091','12M','1300','EMPTY','2024-05-07 07:27:03'),(314,10,'2024-03-12','PORT-UCD','3','TTNU8520223','12M','1300','EMPTY','2024-05-07 07:27:03'),(315,10,'2024-03-10','PORT-MSC','3','CRSU6133537','12M','900','EMPTY','2024-05-07 07:27:03'),(316,10,'2024-03-10','PORT-MSC','3','TRIU8886541','12M','900','EMPTY','2024-05-07 07:27:03'),(317,10,'2024-03-09','PORT-MSC','3','TEMU9312221','12M','900','EMPTY','2024-05-07 07:27:03'),(318,10,'2024-03-09','PORT-MSC','3','TEMU9389408','12M','900','EMPTY','2024-05-07 07:27:03'),(319,10,'2024-03-09','PORT-MSC','2','TRIU8853419','12M','900','EMPTY','2024-05-07 07:27:03'),(320,10,'2024-03-09','PORT-MSC','2','MEDU9854739','12M','900','EMPTY','2024-05-07 07:27:03'),(321,10,'2024-03-09','PORT-MSC','2','SZLU9046160','12M','900','EMPTY','2024-05-07 07:27:03'),(322,10,'2024-03-10','PORT-MSC','2','TRIU8871876','12M','900','EMPTY','2024-05-07 07:27:03'),(323,10,'2024-03-24','MAITLAND-PORT','3','CAAU5300740','12M','750','EMPTY','2024-05-07 07:35:58'),(324,10,'2024-03-20','SATL-PORT','3','HASU4098740','12M','750','EMPTY','2024-05-07 07:35:58'),(325,10,'2024-03-24','PORT-MAITLAND','3','MCAU6003974','12M','750','EMPTY','2024-05-07 07:35:58'),(326,10,'2024-03-23','PORT-MAITLAND','3','MCAU6043350','12M','750','EMPTY','2024-05-07 07:35:58'),(327,10,'2024-03-30','COMBI-KILLARNEY','3','MCAU6070606','12M','1580','EMPTY','2024-05-07 07:35:58'),(328,10,'2024-03-11','MAITLAND-PORT','3','MIEU0021434','12M','750','EMPTY','2024-05-07 07:35:58'),(329,10,'2024-03-13','PORT-KILLARNEY','3','MMAU1119560','12M','1580','EMPTY','2024-05-07 07:35:58'),(330,10,'2024-03-24','PORT-MAITLAND','3','MMAU1282876','12M','750','EMPTY','2024-05-07 07:35:58'),(331,10,'2024-03-13','PORT-KILLARNEY','3','MMAU1433191','12M','1580','EMPTY','2024-05-07 07:35:58'),(332,10,'2024-03-09','COMBI-MAITLAND','3','MNBU0244736','12M','750','EMPTY','2024-05-07 07:35:58'),(333,10,'2024-03-31','COMBI-KILLARNEY','3','MNBU3021612','12M','1580','EMPTY','2024-05-07 07:35:58'),(334,10,'2024-03-04','COMBI-MAITLAND','3','MNBU3134990','12M','750','EMPTY','2024-05-07 07:35:58'),(335,10,'2024-03-31','COMBI-KILLARNEY','3','MNBU3196143','12M','1580','EMPTY','2024-05-07 07:35:58'),(336,10,'2024-03-03','COMBI-KILLARNEY','3','MNBU3809332','12M','1580','EMPTY','2024-05-07 07:35:58'),(337,10,'2024-03-03','COMBI-KILLARNEY','3','MNBU3995073','12M','1580','EMPTY','2024-05-07 07:35:58'),(338,10,'2024-03-09','COMBI-MAITLAND','3','MNBU4351814','12M','750','EMPTY','2024-05-07 07:35:58'),(339,10,'2024-03-10','COMBI-MAITLAND','3','MNBU9029020','12M','750','EMPTY','2024-05-07 07:35:58'),(340,10,'2024-03-11','MAITLAND-PORT','3','MRSU5719354','12M','750','EMPTY','2024-05-07 07:35:58'),(341,10,'2024-03-20','SATL-PORT','3','MSKU1478392','12M','750','EMPTY','2024-05-07 07:35:58'),(342,10,'2024-03-10','COMBI-MAITLAND','3','SUDU6109678','12M','750','EMPTY','2024-05-07 07:35:58'),(343,10,'2024-03-05','COMBI-MAITLAND','3','SUDU6290523','12M','750','EMPTY','2024-05-07 07:35:58'),(344,10,'2024-03-09','COMBI-MAITLAND','3','SUDU8093729','12M','750','EMPTY','2024-05-07 07:35:58'),(345,10,'2024-03-23','MAITLAND-PORT','3','TRHU8308200','12M','750','EMPTY','2024-05-07 07:35:58'),(346,10,'2024-03-13','PORT-KILLARNEY','2','MCAU6060763','12M','1580','EMPTY','2024-05-07 07:35:58'),(347,10,'2024-03-13','PORT-KILLARNEY','2','MCAU6062447','12M','1580','EMPTY','2024-05-07 07:35:58'),(348,10,'2024-03-10','MAITLAND-PORT','2','MEDU1025480','6M','1100','FULL','2024-05-07 07:35:58'),(349,10,'2024-03-10','MAITLAND-PORT','2','MEDU6224504','6M','1100','FULL','2024-05-07 07:35:58'),(350,10,'2024-03-23','PORT-MAITLAND','2','MMAU1406405','12M','750','EMPTY','2024-05-07 07:35:58'),(351,10,'2024-02-28','KILLARNEY-PORT','2','MNBU3887016','12M','1800','FULL','2024-05-07 07:35:58'),(352,10,'2024-03-03','P/EILAND-PORT','2','MNBU3938670','6M','950','FULL','2024-05-07 07:35:58'),(353,10,'2024-03-31','COMBI-KILLARNEY','2','MNBU4257916','12M','1580','EMPTY','2024-05-07 07:35:58'),(354,10,'2024-03-23','MAITLAND-PORT','2','MRKU5143883','12M','750','EMPTY','2024-05-07 07:35:58'),(355,10,'2024-03-03','P/EILAND-PORT','2','MRKU7142320','6M','950','FULL','2024-05-07 07:35:58'),(356,10,'2024-03-03','P/EILAND-PORT','2','MRKU7234149','6M','950','FULL','2024-05-07 07:35:58'),(357,10,'2024-03-10','MAITLAND-PORT','2','MRSU3764164','12M','750','EMPTY','2024-05-07 07:35:58'),(358,10,'2024-03-11','MAITLAND-PORT','2','MSKU0874613','12M','750','EMPTY','2024-05-07 07:35:58'),(359,10,'2024-03-17','P/EILAND-PORT','2','MSKU7467440','6M','950','FULL','2024-05-07 07:35:58'),(360,10,'2024-03-20','SATL-PORT','2','MSKU9602787','12M','750','EMPTY','2024-05-07 07:35:58'),(361,10,'2024-03-31','COMBI-KILLARNEY','2','MWCU6982560','12M','1580','EMPTY','2024-05-07 07:35:58'),(362,10,'2024-03-24','PORT-MAITLAND','2','SUDU6048058','12M','750','EMPTY','2024-05-07 07:35:58'),(363,10,'2024-03-02','P/EILAND-PORT','2','SUDU7742546','6M','950','FULL','2024-05-07 07:35:58'),(364,10,'2024-03-11','MAITLAND-PORT','2','SUDU8730998','12M','750','EMPTY','2024-05-07 07:35:58'),(365,10,'2024-03-12','P/EILAND-PORT','2','TCKU2715806','12M','950','FULL','2024-05-07 07:35:58'),(366,10,'2024-03-12','P/EILAND-PORT','2','TGHU1591918','12M','950','FULL','2024-05-07 07:35:58'),(367,10,'2024-03-11','MAITLAND-PORT','2','TRLU8046788','12M','750','EMPTY','2024-05-07 07:35:58'),(368,21,'2024-04-17','PORT-OSTRICH FARM','2','BMOU5607133','12M','1600','FULL','2024-05-10 06:43:45'),(369,21,'2024-04-17','PORT-OSTRICH FARM','2','CMAI8733760','12M','1600','FULL','2024-05-10 06:43:45'),(370,21,'2024-04-15','PORT-OSTRICH FARM','2','TRHU6397471','12M','1600','FULL','2024-05-10 06:43:45'),(371,21,'2024-04-15','PORT-OSTRICH FARM','2','CMAU9386692','12M','1600','FULL','2024-05-10 06:55:01'),(372,21,'2024-04-20','PORT-OSTRICH FARM','2','TGNU6224849','12M','1600','FULL','2024-05-10 07:00:53'),(373,21,'2024-03-24','PORT-KILLARNEY','3','MMAU1348377','12M','0','EMPTY','2024-05-10 07:02:15'),(374,NULL,'2020-04-15','P/EILAND-PORT','5','MRSU4883466','12M','755.00','EMPTY','2024-06-07 08:20:14'),(375,NULL,'2020-04-19','P/EILAND-PORT','2','CLHU3789363','6M','950.00','FULL','2024-06-07 08:20:14'),(376,NULL,'2020-04-19','P/EILAND-PORT','2','GLDU5610882','6M','950.00','FULL','2024-06-07 08:20:14'),(377,NULL,'2020-04-19','P/EILAND-PORT','2','HLBU3018570','6M','950.00','FULL','2024-06-07 08:20:14'),(378,NULL,'2020-04-19','P/EILAND-PORT','2','HLXU1411780','6M','950.00','FULL','2024-06-07 08:20:14'),(379,NULL,'2020-04-19','P/EILAND-PORT','2','UACU3395452','6M','950.00','FULL','2024-06-07 08:20:14'),(380,NULL,'2020-04-19','P/EILAND-PORT','6','CAIU2687921','6M','950.00','FULL','2024-06-07 08:20:14'),(381,NULL,'2020-04-19','P/EILAND-PORT','6','SEGU3565910','6M','950.00','FULL','2024-06-07 08:20:14'),(382,NULL,'2020-04-19','P/EILAND-PORT','6','TGBU2220761','6M','950.00','FULL','2024-06-07 08:20:14'),(383,NULL,'2020-04-19','P/EILAND-PORT','6','UACU3757823','6M','950.00','FULL','2024-06-07 08:20:14'),(384,NULL,'2020-04-19','P/EILAND-PORT','6','UACU3830225','6M','950.00','FULL','2024-06-07 08:20:14'),(385,NULL,'2020-04-20','P/EILAND-PORT','2','CAIU3218277','6M','950.00','FULL','2024-06-07 08:20:14'),(386,NULL,'2020-04-20','P/EILAND-PORT','2','FANU1371086','6M','950.00','FULL','2024-06-07 08:20:14'),(387,NULL,'2024-03-04','Port-Stobel','6','ALRU3577438','6m','2500.00','Full','2024-06-07 08:20:14'),(388,NULL,'2024-04-12','P/EILAND-PORT','2','MSKU4067672','6M','950.00','FULL','2024-06-07 08:20:14'),(389,NULL,'2024-04-12','P/EILAND-PORT','2','MSKU5623903','6M','950.00','FULL','2024-06-07 08:20:14'),(390,NULL,'2024-04-12','P/EILAND-PORT','2','TGHU1410840','6M','950.00','FULL','2024-06-07 08:20:14'),(391,NULL,'2024-04-13','P/EILAND-PORT','5','BEAU5026638','12M','755.00','EMPTY','2024-06-07 08:20:14'),(392,NULL,'2024-04-13','P/EILAND-PORT','5','MRKU0140665','12M','755.00','EMPTY','2024-06-07 08:20:14'),(393,NULL,'2024-04-13','P/EILAND-PORT','5','MRKU2040541','12M','755.00','EMPTY','2024-06-07 08:20:14'),(394,NULL,'2024-04-13','P/EILAND-PORT','5','MRKU2987453','12M','755.00','EMPTY','2024-06-07 08:20:14'),(395,NULL,'2024-04-13','P/EILAND-PORT','5','MRSU4406191','12M','755.00','EMPTY','2024-06-07 08:20:14'),(396,NULL,'2024-04-13','P/EILAND-PORT','5','PONU1690056','12M','755.00','EMPTY','2024-06-07 08:20:14'),(397,NULL,'2024-04-15','SATL-PORT','3','MRKU3228528','12M','755.00','EMPTY','2024-06-07 08:20:14'),(398,NULL,'2024-04-15','SATL-PORT','3','MRKU3500678','12M','755.00','EMPTY','2024-06-07 08:20:14'),(399,NULL,'2024-04-15','SATL-PORT','3','MSKU9543658','12M','755.00','EMPTY','2024-06-07 08:20:14'),(400,NULL,'2024-04-15','BELCON-PORT','3','SUDU4869964','12M','1850.00','EMPTY','2024-06-07 08:20:14'),(401,NULL,'2024-04-15','SATL-PORT','3','TRHU4809970','12M','755.00','EMPTY','2024-06-07 08:20:14'),(402,NULL,'2024-04-15','Port-Silver solutions','5','KKFU7829202','12m ','2500.00','Full','2024-06-07 08:20:14'),(403,NULL,'2024-04-15','SATL-PORT','5','HASU4542578','12M','755.00','EMPTY','2024-06-07 08:20:14'),(404,NULL,'2024-04-15','SATL-PORT','5','MRKU4709683','12M','755.00','EMPTY','2024-06-07 08:20:14'),(405,NULL,'2024-04-15','BELCON-PORT','5','SUDU4864263','12M','1850.00','EMPTY','2024-06-07 08:20:14'),(406,NULL,'2024-04-15','SATL-PORT','5','SUDU5946833','12M','755.00','EMPTY','2024-06-07 08:20:14'),(407,NULL,'2024-04-16','CTMPT-KILLARNEY','3','MCAU6023076','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(408,NULL,'2024-04-16','CTMPT-KILLARNEY','3','MCAU6053928','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(409,NULL,'2024-04-16','CTMPT-KILLARNEY','3','MMAU1348654','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(410,NULL,'2024-04-16','CTMPT-KILLARNEY','3','MNBU3129232','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(411,NULL,'2024-04-16','MSC/P.E-Port','5','MSDU2920517','6m','1600.00','Full','2024-06-07 08:20:14'),(412,NULL,'2024-04-16','CTMPT-KILLARNEY','4','MCAU6041418','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(413,NULL,'2024-04-16','CTMPT-KILLARNEY','4','MWCU6982451','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(414,NULL,'2024-04-16','CTMPT-KILLARNEY','6','MNBU4362980','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(415,NULL,'2024-04-16','CTMPT-KILLARNEY','6','SUDU6198757','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(416,NULL,'2024-04-17','COMBI-MAITLAND','3','MCAU6010850','12M','755.00','EMPTY','2024-06-07 08:20:14'),(417,NULL,'2024-04-17','COMBI-MAITLAND','3','MCAU6049980','12M','755.00','EMPTY','2024-06-07 08:20:14'),(418,NULL,'2024-04-17','COMBI-MAITLAND','3','SUDU5295808','12M','755.00','EMPTY','2024-06-07 08:20:14'),(419,NULL,'2024-04-17','COMBI-MAITLAND','3','SUDU6288465','12M','755.00','EMPTY','2024-06-07 08:20:14'),(420,NULL,'2024-04-17','I.C Solution-Port','5','TCLU6846530','6m','2200.00','Full','2024-06-07 08:20:14'),(421,NULL,'2024-04-18','BELCON-PORT','3','MAEU4135450','12M','1850.00','EMPTY','2024-06-07 08:20:14'),(422,NULL,'2024-04-18','BELCON-PORT','5','MAEU4177075','12M','1850.00','EMPTY','2024-06-07 08:20:14'),(423,NULL,'2024-04-21','COMBI-KILLARNEY','3','MNBU3936430','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(424,NULL,'2024-04-21','COMBI-KILLARNEY','3','MNBU9155373','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(425,NULL,'2024-04-21','COMBI-KILLARNEY','3','SUDU6246834','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(426,NULL,'2024-04-21','COMBI-KILLARNEY','5','MCAU6012024','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(427,NULL,'2024-04-21','COMBI-KILLARNEY','5','MNBU3424731','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(428,NULL,'2024-04-21','COMBI-KILLARNEY','5','TEMU9753612','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(429,NULL,'2024-04-21','COMBI-MAITLAND','5','TLLU1217790','12M','755.00','EMPTY','2024-06-07 08:20:14'),(430,NULL,'2024-04-21','COMBI-MAITLAND','6','MNBU0106681','12M','755.00','EMPTY','2024-06-07 08:20:14'),(431,NULL,'2024-04-21','COMBI-MAITLAND','6','MNBU0303757','12M','755.00','EMPTY','2024-06-07 08:20:14'),(432,NULL,'2024-04-21','COMBI-MAITLAND','6','MWCU5217041','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(433,NULL,'2024-04-22','COMBI-MAITLAND','3','MNBU4034804','12M','755.00','EMPTY','2024-06-07 08:20:14'),(434,NULL,'2024-04-22','COMBI-MAITLAND','3','MSWU1011156','12M','755.00','EMPTY','2024-06-07 08:20:14'),(435,NULL,'2024-04-22','COMBI-MAITLAND','2','MMAU1075349','12M','755.00','EMPTY','2024-06-07 08:20:14'),(436,NULL,'2024-04-22','COMBI-MAITLAND','2','MWCU6850537','12M','755.00','EMPTY','2024-06-07 08:20:14'),(437,NULL,'2024-04-22','COMBI-MAITLAND','5','MNBU4218756','12M','755.00','EMPTY','2024-06-07 08:20:14'),(438,NULL,'2024-04-22','COMBI-MAITLAND','5','MNBU4312989','12M','755.00','EMPTY','2024-06-07 08:20:14'),(439,NULL,'2024-04-22','MAITLAND-COMBI','6','MSDU1567719','6M','1100.00','FULL','2024-06-07 08:20:14'),(440,NULL,'2024-04-24','P/EILAND-COMBI','2','MRKU7802589','6M','950.00','FULL','2024-06-07 08:20:14'),(441,NULL,'2024-04-24','PORT-MAITLAND','2','MSNU2053329','6M','1100.00','FULL','2024-06-07 08:20:14'),(442,NULL,'2024-04-24','CTCT-KILLARNEY','5','MMAU1409580','6M','1580.00','EMPTY','2024-06-07 08:20:14'),(443,NULL,'2024-04-25','PORT-MAITLAND','2','MSNU2052507','6M','1100.00','FULL','2024-06-07 08:20:14'),(444,NULL,'2024-04-27','PORT-KILLARNEY','3','MCAU6011917','12m','1580.00','EMPTY','2024-06-07 08:20:14'),(445,NULL,'2024-04-27','CTMPT-KILLARNEY','3','MMAU1057290','12m','1580.00','EMPTY','2024-06-07 08:20:14'),(446,NULL,'2024-04-27','CTMPT-KILLARNEY','3','MMAU1266725','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(447,NULL,'2024-04-27','CTCT-KILLARNEY','3','MMAU1307357','12m','1580.00','EMPTY','2024-06-07 08:20:14'),(448,NULL,'2024-04-27','CTMPT-KILLARNEY','3','MNBU3180091','12m','1580.00','EMPTY','2024-06-07 08:20:14'),(449,NULL,'2024-04-27','CTMPT-KILLARNEY','3','MNBU9008726','12m','1580.00','EMPTY','2024-06-07 08:20:14'),(450,NULL,'2024-04-27','P.EILAND-PORT','2','BMOU2835042','6M','950.00','FULL','2024-06-07 08:20:14'),(451,NULL,'2024-04-27','P.EILAND-PORT','2','CAAU2322160','6M','950.00','FULL','2024-06-07 08:20:14'),(452,NULL,'2024-04-27','P.EILAND-PORT','2','CAIU6506390','6M','950.00','FULL','2024-06-07 08:20:14'),(453,NULL,'2024-04-27','P.EILAND-PORT','2','FANU1330678','6M','950.00','FULL','2024-06-07 08:20:14'),(454,NULL,'2024-04-27','P.EILAND-PORT','2','HLXU3543620','6M','950.00','FULL','2024-06-07 08:20:14'),(455,NULL,'2024-04-27','CTMPT-KILLARNEY','5','MCAU6025356','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(456,NULL,'2024-04-27','CTCT-KILLARNEY','5','MMAU1324694','12M','1580.00','EMPTY','2024-06-07 08:20:14'),(457,NULL,'2024-04-27','COMBI-KILLARNEY','5','MNBU9034978','12m','1580.00','EMPTY','2024-06-07 08:20:14'),(458,NULL,'2024-04-27','P.EILAND-PORT','6','APZU3711362','6m','950.00','FULL','2024-06-07 08:20:14'),(459,NULL,'2024-04-27','P.EILAND-PORT','6','HLBU1049885','6m','950.00','FULL','2024-06-07 08:20:14'),(460,NULL,'2024-04-27','CTCT-KILLARNEY','6','MMAU1393458','12m','1580.00','EMPTY','2024-06-07 08:20:14'),(461,NULL,'2024-04-27','CTCT-KILLARNEY','6','MMAU1427748','12m','1580.00','EMPTY','2024-06-07 08:20:14'),(462,NULL,'2024-04-27','CTMPT-KILLARNEY','6','MNBU4039405','12m','1580.00','EMPTY','2024-06-07 08:20:14'),(463,NULL,'2024-04-27','CTMPT-KILLARNEY','6','MNBU9098421','12m','1580.00','EMPTY','2024-06-07 08:20:14'),(464,NULL,'2024-04-27','P.EILAND-COMBI','6','MRKU7026931','6m','950.00','FULL','2024-06-07 08:20:14'),(465,NULL,'2024-04-27','MAITLAND-PORT','6','MSDU2644810','6m','1100.00','FULL','2024-06-07 08:20:14'),(466,NULL,'2024-04-27','PORT-MAITLAND','6','MSNU2052699','6m','1100.00','FULL','2024-06-07 08:20:14'),(467,NULL,'2024-04-27','P.EILAND-COMBI','6','SUDU1360398','6m','950.00','FULL','2024-06-07 08:20:14'),(468,NULL,'2024-04-27','P.EILAND-COMBI','6','SUDU7982320','6m','950.00','FULL','2024-06-07 08:20:14'),(469,NULL,'2024-04-27','P.EILAND-PORT','6','TGHU0456338','6m','950.00','FULL','2024-06-07 08:20:14'),(470,NULL,'2024-04-29','P.EILAND-PORT','6','DFSU3137536','6m','950.00','FULL','2024-06-07 08:20:14'),(471,NULL,'2024-04-29','P.EILAND-PORT','6','FANU1338581','6m','950.00','FULL','2024-06-07 08:20:14'),(472,NULL,'2024-04-29','P.EILAND-PORT','6','HLXU1337929','6m','950.00','FULL','2024-06-07 08:20:14'),(473,NULL,'2024-04-29','P.EILAND-PORT','6','TCKU1432247','6m','950.00','FULL','2024-06-07 08:20:14'),(474,NULL,'2024-04-29','P.EILAND-PORT','6','TEMU1959016','6m','950.00','FULL','2024-06-07 08:20:14'),(475,NULL,'2024-04-29','MAITLAND-PORT','6','TRHU2253178','6m','1100.00','FULL','2024-06-07 08:20:14'),(476,NULL,'2024-05-01','Combi-Senzomix','14','MNBU4174679','12M','1750.00','FULL','2024-06-07 08:20:14'),(477,NULL,'2024-05-01','Combi-Senzomix','16','SUDU8214918','12M','1750.00','FULL','2024-06-07 08:20:14'),(478,NULL,'2024-05-01','Combi-Senzomix','16','MNBU3343964','12M','1750.00','FULL','2024-06-07 08:20:14'),(479,NULL,'2024-05-01','Combi-Senzomix','15','MNBU4271874','12M','1750.00','FULL','2024-06-07 08:20:14'),(480,NULL,'2024-05-01','Combi-Senzomix','15','MNBU0153554','12M','1750.00','FULL','2024-06-07 08:20:14'),(481,NULL,'2024-05-01','Combi-Senzomix','3','MNBU0636070','12M','1750.00','FULL','2024-06-07 08:20:14'),(482,NULL,'2024-05-01','Combi-Senzomix','3','MNBU355412','12M','1750.00','FULL','2024-06-07 08:20:14'),(483,NULL,'2024-05-01','Combi-Senzomix','2','SUDU6180017','12M','1750.00','FULL','2024-06-07 08:20:14'),(484,NULL,'2024-05-01','Combi-Senzomix','2','MNBU4288440','12M','1750.00','FULL','2024-06-07 08:20:14'),(485,NULL,'2024-05-01','PORT-Senzomix','6','MNBU3856519','12M','1750.00','FULL','2024-06-07 08:20:14'),(486,NULL,'2024-05-01','PORT-Senzomix','6','MNBU0404496','12M','1750.00','FULL','2024-06-07 08:20:14'),(487,NULL,'2024-05-01','PORT-Senzomix','6','MNBU3619219','12M','1750.00','FULL','2024-06-07 08:20:14'),(488,NULL,'2024-05-02','Port-Client','3','SUDU8521956','12M','2450.00','FULL','2024-06-07 08:20:14'),(489,NULL,'2024-05-03','PORT-Senzomix','14','MNBU0592475','12M','1750.00','FULL','2024-06-07 08:20:14'),(490,NULL,'2024-05-03','PORT-Senzomix','14','GESU6453586','12M','1750.00','FULL','2024-06-07 08:20:14'),(491,NULL,'2024-05-03','PORT-Senzomix','15','APHU7357233','12M','1750.00','FULL','2024-06-07 08:20:14'),(492,NULL,'2024-05-03','PORT-Senzomix','6','MNBU3072625','12M','1750.00','FULL','2024-06-07 08:20:14'),(493,NULL,'2024-05-03','PORT-Senzomix','6','SEKU5690290','12M','1750.00','FULL','2024-06-07 08:20:14'),(494,NULL,'2024-05-03','PORT-Senzomix','6','MNBU3327665','12M','1750.00','FULL','2024-06-07 08:20:14'),(495,NULL,'2024-05-03','PORT-Senzomix','6','BSIU8080231','12M','1750.00','FULL','2024-06-07 08:20:14'),(496,NULL,'2024-05-03','PORT-Senzomix','6','MNBU0477131','12M','1750.00','FULL','2024-06-07 08:20:14'),(497,NULL,'2024-05-03','PORT-Senzomix','6','MNBU0189393','12M','1750.00','FULL','2024-06-07 08:20:14'),(498,NULL,'2024-05-05','Port-Client','3','PCIU8976621','12M','2450.00','FULL','2024-06-07 08:20:14'),(499,NULL,'2024-05-09','Port-Client','3','EGSU9067212','12M','2450.00','FULL','2024-06-07 08:20:14'),(500,NULL,'2024-05-11','Port-Parrow','3','BEAU6212405','12m','2450.00','Full','2024-06-07 08:20:14'),(501,NULL,'2024-05-11','Port-SATL','17','CSNU6032113','12M','2450.00','FULL','2024-06-07 08:20:14'),(502,21,'2024-05-13','PORT-AECI FOOD BELLVILE','6','MSCU3626144','6M','3500.00','FULL','2024-06-07 08:20:14'),(503,21,'2024-05-13','PORT-AECI FOOD BELLVILE','6','MSDU3010300','6M','3500.00','FULL','2024-06-07 08:20:14'),(504,21,'2024-05-13','PORT-AECI FOOD BELLVILE','17','MEDU3012324','6M','3500.00','FULL','2024-06-07 08:20:14'),(505,21,'2024-05-13','PORT-AECI FOOD BELLVILE','17','MSCU3606425','6M','3500.00','FULL','2024-06-07 08:20:14'),(506,NULL,'2024-05-16','Port-Parrow','3','OOCU6840534','12M','2450.00','FULL','2024-06-07 08:20:14'),(507,NULL,'2024-05-16','Port-Parrow','6','TRHU4090320','12M','2450.00','FULL','2024-06-07 08:20:14'),(508,NULL,'2024-05-17','Port-Parrow','17','ZCSU7653917','12M','2450.00','FULL','2024-06-07 08:20:14'),(509,NULL,'2024-05-19','Port-Parrow','3','OOCU7340317','12M','2450.00','FULL','2024-06-07 08:20:14'),(510,NULL,'2024-05-22','PORT-AECI FOOD BELLVILE','6','MSDU9803507','6M','3500.00','FULL','2024-06-07 08:20:14'),(511,NULL,'2024-05-22','PORT-AECI FOOD BELLVILE','17','TRIU8010179','6M','3500.00','FULL','2024-06-07 08:20:14'),(512,NULL,'2024-05-22','PORT-AECI FOOD BELLVILE','17','CRLU1237430','6M','3500.00','FULL','2024-06-07 08:20:14'),(513,NULL,'2024-05-22','PORT-AECI FOOD BELLVILE','17','SZLU9116993','6M','3500.00','FULL','2024-06-07 08:20:14'),(514,NULL,'2024-05-23','Belcon-Port','3','MRKU2294192','12M','2450.00','FULL','2024-06-07 08:20:14'),(515,29,'2024-05-29','FPT-Senzomix','17','ARCGAB3CPT002','12M','1710.00','FULL','2024-06-07 08:20:14'),(516,29,'2024-05-29','FPT-Senzomix','17','ARCGAB3CPT001','12M','2250.00','FULL','2024-06-07 08:20:14'),(517,NULL,'2024-03-28','PORT - CLIENT','6','FCIU4455230','12M','2700.00','EMPTY','2024-06-07 08:20:14');
+/*!40000 ALTER TABLE `trips_paid` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `truck`
+--
+
+DROP TABLE IF EXISTS `truck`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `truck` (
+  `truck_id` int NOT NULL AUTO_INCREMENT,
+  `truck_owner` int DEFAULT NULL,
+  `truck_vin` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_desc` varchar(245) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_reg` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_model` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_value` double DEFAULT NULL,
+  `truck_Engine_number` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_Series_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `truck_update` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`truck_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `truck`
+--
+
+LOCK TABLES `truck` WRITE;
+/*!40000 ALTER TABLE `truck` DISABLE KEYS */;
+INSERT INTO `truck` VALUES (1,2,NULL,NULL,'KW42XK-GP','Hino',NULL,NULL,NULL,'2024-01-10 10:05:17','2024-04-08 09:28:31'),(2,2,'w1N1671192A85082','Heavy load veh (GVM>3 5 0 oKg equip to draw) Self-propel-Led.  Gross Vehicle Mass 18000','KZ68BT-GP','MERCEDES - BEN',NULL,'45793700065990','AXOR','2024-01-10 10:05:17','2024-04-08 09:28:31'),(3,2,'AHHGDL.fLK00010546','Heavy load veh (GVM>3 5 0 oKg equip to draw) Self-propel-Led.  Gross Vehicle Mass 13000','JM23HD-GP','Hino',NULL,'J08CF21444','F- SERIES','2024-01-10 10:05:17','2024-04-08 09:28:31'),(4,1,NULL,NULL,'LH61CSGP',NULL,NULL,NULL,NULL,'2024-04-08 09:28:31','2024-04-08 09:28:31'),(5,1,NULL,NULL,'LH37ZLGP',NULL,NULL,NULL,NULL,'2024-04-08 09:28:31','2024-04-08 09:28:31'),(6,1,NULL,NULL,'LM47JHGP',NULL,NULL,NULL,NULL,'2024-04-08 09:28:31','2024-04-08 09:28:31'),(7,5,NULL,NULL,'CAA143106',NULL,NULL,NULL,NULL,'2024-04-08 09:28:31','2024-06-03 09:31:24'),(8,4,NULL,NULL,'KJ16XTGP',NULL,NULL,NULL,NULL,'2024-04-08 09:28:31','2024-06-03 10:19:20'),(9,4,NULL,NULL,'WXV949GP',NULL,NULL,NULL,NULL,'2024-04-08 09:28:31','2024-06-03 10:19:20'),(10,4,NULL,NULL,'FK69RHGP',NULL,NULL,NULL,NULL,'2024-04-08 09:28:31','2024-06-03 10:19:20'),(11,4,NULL,NULL,'LJ27PSGP',NULL,NULL,NULL,NULL,'2024-04-08 11:25:57','2024-06-03 10:19:20'),(12,4,NULL,NULL,'KNR251NW',NULL,NULL,NULL,NULL,'2024-04-17 06:28:08','2024-06-03 10:19:20'),(13,6,NULL,NULL,'JR72MVGP',NULL,NULL,NULL,NULL,'2024-05-23 11:05:11','2024-06-10 12:14:17'),(14,3,NULL,NULL,'CAA520958',NULL,NULL,NULL,NULL,'2024-05-23 11:09:26','2024-06-03 10:19:20'),(15,3,NULL,NULL,'CAA561325',NULL,NULL,NULL,NULL,'2024-05-23 11:11:58','2024-06-03 10:19:20'),(16,3,NULL,NULL,'CAA425938',NULL,NULL,NULL,NULL,'2024-05-23 11:17:08','2024-06-03 10:19:20'),(17,1,NULL,NULL,'LS83BYGP',NULL,NULL,NULL,NULL,'2024-06-06 14:18:48','2024-06-06 14:18:48'),(18,10,NULL,NULL,'CAA349364',NULL,NULL,NULL,NULL,'2024-06-10 10:04:27','2024-06-10 10:04:27'),(19,NULL,NULL,NULL,'CAA288',NULL,NULL,NULL,NULL,'2024-07-01 12:10:41','2024-07-01 12:10:41'),(20,NULL,NULL,NULL,'CAA608079',NULL,NULL,NULL,NULL,'2024-12-31 14:50:43','2024-12-31 14:50:43'),(21,1,NULL,NULL,'MB92SXGP',NULL,NULL,NULL,NULL,'2024-12-31 15:06:24','2024-12-31 15:06:24'),(22,6,'ADXKL3TX1MABO7436','DAEWOO','MCO8RKGP','MAXINUS KL3TX',560000,'80233490','CLX043X','2025-02-01 03:31:53','2025-02-01 03:31:53'),(23,1,'.','0','MC19XRGP','V',4,'0','S','2025-02-02 03:41:43','2025-02-02 03:41:43');
+/*!40000 ALTER TABLE `truck` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `truck_client`
+--
+
+DROP TABLE IF EXISTS `truck_client`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `truck_client` (
+  `truck_client_id` int NOT NULL AUTO_INCREMENT,
+  `truck_client` int DEFAULT NULL,
+  `truck_client_rate` double DEFAULT NULL,
+  `truck_client_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `truck_client_update` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`truck_client_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `truck_client`
+--
+
+LOCK TABLES `truck_client` WRITE;
+/*!40000 ALTER TABLE `truck_client` DISABLE KEYS */;
+INSERT INTO `truck_client` VALUES (1,10,10,'2024-04-08 11:31:23',NULL),(2,20,0,'2024-04-08 11:31:23',NULL),(3,21,5,'2024-04-08 11:31:23',NULL),(4,22,5,'2024-04-11 09:52:02',NULL),(5,29,5,'2024-05-23 10:41:28',NULL),(6,31,5,'2024-06-05 10:56:23',NULL),(7,27,5,'2024-06-10 07:10:57',NULL),(8,32,5,'2024-06-19 07:20:09',NULL),(9,33,5,'2024-06-30 07:11:11',NULL);
+/*!40000 ALTER TABLE `truck_client` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `truck_owners`
+--
+
+DROP TABLE IF EXISTS `truck_owners`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `truck_owners` (
+  `truck_owner_id` int NOT NULL AUTO_INCREMENT,
+  `truck_owner_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_owner_reg` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_owner_address` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_owner_contact` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_owner_phone` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_owner_vat` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `truck_owner_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`truck_owner_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `truck_owners`
+--
+
+LOCK TABLES `truck_owners` WRITE;
+/*!40000 ALTER TABLE `truck_owners` DISABLE KEYS */;
+INSERT INTO `truck_owners` VALUES (1,'EUCLID Tarwireyi  Trucks',NULL,NULL,'Tich','+27 72 550 9978',NULL,'2024-04-08 09:08:56'),(2,'Ramthel',NULL,NULL,'Percy','+27 78 968 3459',NULL,'2024-04-08 09:08:56'),(3,'CyberEye Consulting','2020/566486/07','35 Kensington Close, Parklands Western Cape','Brian','0768034338','4570315764','2024-04-08 11:26:54'),(4,'Musk T Pty Ltd','2018/232393/07','117 Summit View	 Blue Hills	 Midrand','K Musekiwa','0789966479','4630287185','2024-04-08 11:26:54'),(5,'Rosy',NULL,NULL,NULL,NULL,NULL,'2024-06-03 09:31:12'),(6,'DigitalPaper Pty Ltd',NULL,'7556 Halfway House Midrand 1685',NULL,NULL,'4440283291','2024-06-10 12:13:40');
+/*!40000 ALTER TABLE `truck_owners` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `user_id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `emp_id` int NOT NULL,
+  `access_level` int NOT NULL,
+  PRIMARY KEY (`user_id`),
+  KEY `access_level` (`access_level`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'admin','12345@',7,1);
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vehicle`
+--
+
+DROP TABLE IF EXISTS `vehicle`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `vehicle` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `vehicle_company` int DEFAULT NULL,
+  `registering_authority` int NOT NULL,
+  `vehicle_registration_number` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `licence_number` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `vin` varchar(17) COLLATE utf8mb4_general_ci NOT NULL,
+  `engine_number` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `make` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `model` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `vehicle_category` int NOT NULL,
+  `driven` varchar(215) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `vehicle_description` text COLLATE utf8mb4_general_ci,
+  `tare` decimal(10,2) NOT NULL,
+  `date_of_liability` date NOT NULL,
+  `vehicle_status` int NOT NULL,
+  `date_liable_for_registration` date NOT NULL,
+  `last_three_license_numbers` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `title_holder_id_type` int NOT NULL,
+  `title_holder_id_number` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `title_holder_country` int NOT NULL,
+  `title_holder_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `owner_id_type` int NOT NULL,
+  `owner_id_number` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `owner_country` int NOT NULL,
+  `owner_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `owner_control_number` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `owner_issue_number` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `owner_issue_date` date DEFAULT NULL,
+  `owner_registering_authority` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `vin` (`vin`)
+) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vehicle`
+--
+
+LOCK TABLES `vehicle` WRITE;
+/*!40000 ALTER TABLE `vehicle` DISABLE KEYS */;
+INSERT INTO `vehicle` VALUES (1,1,1,'MFL399W',NULL,'ADNK090000A000301','KA20116866X','NISSAN','HARDBODY',1,'Self-propelled','Pick-up / Bakkie : Light load vehicle ( GvM 3500K9 or less)',1377.00,'2009-09-11',2,'2015-05-14','FGZ883MP YTC145GP',3,'404615YMG0001',1,'CHAITEZVI PERCY',3,'404615YMG0001',1,'CHAITEZVI PERCY','4046047ZHZ4X','1','2015-05-14',1,NULL,'2024-05-28 09:12:36'),(2,1,1,'XZP380W',NULL,'ADNALGD22ZR103131','KA20141162X','NISSAN','NP300 HARDBODY',1,'Self-propelled','Pick-up / Bakkie : Light load vehicle ( GVM 3500KG or less)',1371.00,'2017-10-11',2,'2022-08-10','HC11WDGP',1,'FL30480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'FL30480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048LLXNB','1','2022-08-18',1,NULL,'2024-05-28 09:12:36'),(3,1,1,'DYB6985',NULL,'AHHFG1JPP00012900','J08CTW13398','HINO','SUPER F',2,'Self-propelled','Elevating Unit/Flat Deck/Platform Deck :  Heavy load veh (GVM>3500Kg equip to draw)',6420.00,'2005-05-04',2,'2021-04-28','JCL834NW BL70KWGP ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048GKSCR','1','2021-04-28',1,NULL,'2024-05-28 09:12:36'),(4,1,1,'GWT963S',NULL,'MAT45002067R09111','B591802050H62416319','TATA','TATA LPT1518',2,'Self-propelled','Heavy load veh (GVM>3500Kg equip to draw)',7700.00,'2006-10-13',2,'2022-12-06','JLS264MP NN11178',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048MS320','1','2022-12-06',1,NULL,'2024-05-28 09:12:36'),(5,1,1,'WML504W',NULL,'KMFGA17BRFC28984','D4D8FJ597569','HYUNDAI','HD72',2,'Self-propelled','Heavy load veh(GVM>3500K9, not to draw)',3500.00,'2016-05-04',2,'2020-06-29','FG46KYGP',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048CWWX9','1','2020-06-29',1,NULL,'2024-05-28 09:12:36'),(6,1,1,'HMM576S',NULL,'ABV1008SN6N6B1220','0','VENTER','SUPER',3,'Self-propelled','Light load vehicle (GVM 3500K9 or less)',180.00,'2006-08-04',2,'2020-06-29','HCM079NW TWX618GP',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048CWX0D','1','2020-06-29',1,NULL,'2024-05-28 09:12:36'),(7,1,1,'BCF6175',NULL,'ABV1009SNVN7B0219','0','VENTER','SUPER',3,'Self-propelled','Light load vehicle (GVM 3500 kg or less)',170.00,'1999-04-08',2,'2020-06-29','HYM725GP',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048CWX2P','1','2020-06-29',1,NULL,'2024-05-28 14:10:08'),(8,1,1,'GWF226S','KW42XKGP','AHHFG1JPP00015165','J08CTW14341','HINO','SUPER F',2,'0','Heavy load veh(GVM>3500Kg equip to draw)',4860.00,'2006-06-27',2,'2022-11-07','FMC291FS FHV583EC  N',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048MGT9W','1','2022-07-11',1,NULL,'2024-08-19 09:39:53'),(9,1,1,'GXY907W',NULL,'AHHGD1JLK00010546','J08CF21444','HINO','F-SERIERS',2,'Self-propelled','Heavy loadveh(GVM>3500Kg equip to draw)',4360.00,'2002-09-12',2,'2023-05-03','JM23HDGP CA342617 CY',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048P1J3B','1','2023-05-03',1,NULL,'2024-05-28 09:12:36'),(10,1,1,'FLZ423S','KZ68BTGP','WDB9440326L015899','45793700065990','MERCEDES - BENZ','AXOR',2,'0','Heavy load veh(GVM>3500Kg equip to draw)',6460.00,'2006-05-23',2,'2023-02-14','JFX780MP DFW566L HLH',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048ND80M','1','2023-02-14',1,NULL,'2024-06-05 09:06:08'),(11,1,1,'XLN599W',NULL,'KMFGA17BRHC309265','D4DBGJ630534','HYUNDAI','HD72',2,'Self-propelled','Heavy  load veh GVM>3500K9 equip to draw) Dropside',3320.00,'2017-02-06',2,'2020-02-04','FS31SFGP',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048C643J','1','2020-02-04',1,NULL,'2024-05-30 09:16:39'),(12,1,1,'MBC608A','CW07BNGP','LM5M0532','0','KARET','0',3,'0','Light load vehicle (GVM 3500kg or less) ',160.00,'1993-01-01',2,'2019-11-13','CW07BNGP FKN974FS DZ',1,'404615YMG0001',1,'CHAITEZVI PERCY',1,'404615YMG0001',1,'CHAITEZVI PERCY','40450488K456','1','2019-11-13',1,NULL,'2024-08-19 13:23:14'),(13,1,1,'YTX373W',NULL,'ADNUSN1D5U0142416','K7MF710UJ82409','NISSAN','NP 200',1,'Self-propelled','Light load vehicle (GVM 3500Kg or less) Pick up',1055.00,'2018-07-20',2,'2020-02-04','HN27YRGP',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048C6485','1','2020-02-04',1,NULL,'2024-05-30 09:16:39'),(14,1,1,'DGM935K',NULL,'AAVZZZ6SAU003915','CLP008832','VOLKSWAGEN','VW 241-POLO VIVO',1,'Self-propelled','Light passenger mv(less than 12 persons) Sedan (closed top)',1014.00,'2010-06-29',2,'2020-10-20','HP65CHGP CFY533L ZKK',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048DZ0X1','1','2020-10-20',1,NULL,'2024-05-30 09:16:39'),(15,1,1,'HFJ777L',NULL,'MHKE8F300K001012','2NRF697580','TOYOTA','RUSH',1,'Self-propelled','Light passenger mv(less than 12 persons) Station wagon)',1290.00,'2018-09-25',2,'2020-11-20','HR19DPGP',3,'404615ZT80000',1,'PATIENCE T MUCHINGA',3,'404615ZT80000',1,'PATIENCE T MUCHINGA','4046048F983D','1','2020-11-20',1,NULL,'2024-05-30 09:16:39'),(16,1,1,'BDG034X',NULL,'ADNCPG22ZR124730','YD25862640T','NISSAN','NP300 HARDBODY',1,'0','Light load vehicle(GVM 3500kg or less)',1725.00,'2019-10-29',2,'2024-05-14','BH49GRZN KWY862NW ND',3,'404615YMG0001',1,'CHAITEZVI PERCY',3,'404615YMG0001',1,'CHAITEZVI PERCY','4046048TNBCF','1','2024-05-14',1,NULL,'2024-05-30 09:15:54'),(17,1,1,'CWT705L',NULL,'AHTYZ59G008006889','1KD7641189','TOYOTA','FORTUNER',1,'Self-propelled','Light passenger mv(less than 12 persons) Station wagon',1885.00,'2008-09-29',2,'2020-01-31','CZ13RBGP DXR25MP',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048C646W','1','2020-02-04',1,NULL,'2024-05-28 14:10:08'),(18,1,1,'HJY216K',NULL,'WAUZZZF41JA190993','CVN084685','AUDI','AU 481-A4',1,'0','Light passenger mv(less than 12 persons) Sedan (closed top)',1340.00,'2018-07-26',2,'2021-10-21','HN19JLGP',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ',1,'F130480060015',1,'GUTAKURA TRADINGS PTY LTD ','4046048J4048','1','2021-10-26',1,NULL,'2024-05-28 14:35:45'),(19,1,1,'DTW454A','LH37YKGP','TPA921001085550',' ','HOME-BUILT','-',3,'0','HEAVY LOAD VEH(GVM>3500KG equip to draw)',7100.00,'2024-07-31',2,'2025-07-31','-',1,'404615YMG0001',1,'GUTAKURA TRADINGS PTY LTD ',1,'404615YMG0001',1,'GUTAKURA TRADINGS PTY LTD ','4046048VHWTW','1','2025-07-31',1,NULL,'2024-08-19 13:31:01');
+/*!40000 ALTER TABLE `vehicle` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vehicle_category`
+--
+
+DROP TABLE IF EXISTS `vehicle_category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `vehicle_category` (
+  `vehicle_category_id` int NOT NULL AUTO_INCREMENT,
+  `vehicle_category_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`vehicle_category_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vehicle_category`
+--
+
+LOCK TABLES `vehicle_category` WRITE;
+/*!40000 ALTER TABLE `vehicle_category` DISABLE KEYS */;
+INSERT INTO `vehicle_category` VALUES (1,'Car'),(2,'Truck'),(3,'Trailer');
+/*!40000 ALTER TABLE `vehicle_category` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vehicle_expenses`
+--
+
+DROP TABLE IF EXISTS `vehicle_expenses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `vehicle_expenses` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `vehicle` int NOT NULL,
+  `exp_date` date NOT NULL,
+  `company_id` int NOT NULL,
+  `receipt` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `amount` double NOT NULL,
+  `provider` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `purpose` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `method` int NOT NULL,
+  `account` int NOT NULL,
+  `paid_by` int NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vehicle_expenses`
+--
+
+LOCK TABLES `vehicle_expenses` WRITE;
+/*!40000 ALTER TABLE `vehicle_expenses` DISABLE KEYS */;
+/*!40000 ALTER TABLE `vehicle_expenses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vehicle_licence`
+--
+
+DROP TABLE IF EXISTS `vehicle_licence`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `vehicle_licence` (
+  `vl_id` int NOT NULL AUTO_INCREMENT,
+  `vl_vehicle` int DEFAULT NULL,
+  `vl_br_number` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `vl_date_expire` date DEFAULT NULL,
+  `vl_date` date DEFAULT NULL,
+  `vl_amount` double DEFAULT NULL,
+  `vl_created` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`vl_id`),
+  UNIQUE KEY `vl_br_number_UNIQUE` (`vl_br_number`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vehicle_licence`
+--
+
+LOCK TABLES `vehicle_licence` WRITE;
+/*!40000 ALTER TABLE `vehicle_licence` DISABLE KEYS */;
+INSERT INTO `vehicle_licence` VALUES (1,8,'KW42XKGP','2025-07-31','0000-00-00',4212,'2024-08-19 12:44:46'),(2,12,'CW07BNGP','2025-04-30','0000-00-00',718,'2024-08-19 13:22:44'),(3,19,'4046048VHWTW','2025-07-31','0000-00-00',12012,'2024-08-19 13:32:30'),(4,15,'4046048WL2YW','2025-10-31','2024-11-21',756,'2024-11-27 06:28:41');
+/*!40000 ALTER TABLE `vehicle_licence` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vehicle_repair`
+--
+
+DROP TABLE IF EXISTS `vehicle_repair`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `vehicle_repair` (
+  `veh_repair_id` int NOT NULL AUTO_INCREMENT,
+  `veh_id` int DEFAULT NULL,
+  `veh_repair_date` date DEFAULT NULL,
+  `veh_repair_millage` double DEFAULT NULL,
+  `veh_repair_service` longtext,
+  `veh_repair_by` varchar(145) DEFAULT NULL,
+  `veh_repair_cost` double DEFAULT NULL,
+  `veh_repair_notes` mediumtext,
+  `veh_repair_created` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`veh_repair_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vehicle_repair`
+--
+
+LOCK TABLES `vehicle_repair` WRITE;
+/*!40000 ALTER TABLE `vehicle_repair` DISABLE KEYS */;
+/*!40000 ALTER TABLE `vehicle_repair` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vehicle_service`
+--
+
+DROP TABLE IF EXISTS `vehicle_service`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `vehicle_service` (
+  `veh_serv_id` int NOT NULL AUTO_INCREMENT,
+  `veh_id` int NOT NULL,
+  `veh_serv_date` date DEFAULT NULL,
+  `veh_serv_millage` double NOT NULL,
+  `veh_serv_service` longtext NOT NULL,
+  `veh_serv_by` varchar(145) DEFAULT NULL,
+  `veh_serv_cost` double NOT NULL,
+  `veh_serv_notes` mediumtext,
+  `veh_serv_created` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`veh_serv_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vehicle_service`
+--
+
+LOCK TABLES `vehicle_service` WRITE;
+/*!40000 ALTER TABLE `vehicle_service` DISABLE KEYS */;
+/*!40000 ALTER TABLE `vehicle_service` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vehicle_status`
+--
+
+DROP TABLE IF EXISTS `vehicle_status`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `vehicle_status` (
+  `vehicle_status_id` int NOT NULL AUTO_INCREMENT,
+  `vehicle_status_name` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`vehicle_status_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vehicle_status`
+--
+
+LOCK TABLES `vehicle_status` WRITE;
+/*!40000 ALTER TABLE `vehicle_status` DISABLE KEYS */;
+INSERT INTO `vehicle_status` VALUES (1,'New'),(2,'Used');
+/*!40000 ALTER TABLE `vehicle_status` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `work_log`
+--
+
+DROP TABLE IF EXISTS `work_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `work_log` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `empl_id` int NOT NULL,
+  `site` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `date` date NOT NULL,
+  `time_in` time NOT NULL,
+  `time_out` time NOT NULL,
+  `total_hours` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `work_log`
+--
+
+LOCK TABLES `work_log` WRITE;
+/*!40000 ALTER TABLE `work_log` DISABLE KEYS */;
+/*!40000 ALTER TABLE `work_log` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping events for database 'gutakura_app1'
+--
+
+--
+-- Dumping routines for database 'gutakura_app1'
+--
+/*!50003 DROP PROCEDURE IF EXISTS `AddVehicle` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddVehicle`(
+  IN registering_authority INT,
+  IN licence_number varchar(50),
+  IN vehicle_registration_number VARCHAR(255),
+  IN vin VARCHAR(17),
+  IN engine_number VARCHAR(255),
+  IN make VARCHAR(255),
+  IN model VARCHAR(255),
+  IN vehicle_category INT,
+  IN driven INT,
+  IN vehicle_description TEXT,
+  IN tare DECIMAL(10,2),
+  IN date_of_liability DATE,
+  IN vehicle_status INT,
+  IN date_liable_for_registration DATE,
+  IN last_three_license_numbers VARCHAR(20),
+  IN title_holder_id_type INT,
+  IN title_holder_id_number VARCHAR(255),
+  IN title_holder_country INT,
+  IN title_holder_name VARCHAR(255),
+  IN owner_id_type INT,
+  IN owner_id_number VARCHAR(255),
+  IN owner_country INT,
+  IN owner_name VARCHAR(255),
+  IN owner_control_number VARCHAR(255),
+  IN owner_issue_number VARCHAR(255),
+  IN owner_issue_date DATE,
+  IN owner_registering_authority INT,
+  IN vehicle_company INT
+)
+BEGIN
+  INSERT INTO vehicle (
+    registering_authority,
+    licence_number,
+    vehicle_registration_number,
+    vin,
+    engine_number,
+    make,
+    model,
+    vehicle_category,
+    driven,
+    vehicle_description,
+    tare,
+    date_of_liability,
+    vehicle_status,
+    date_liable_for_registration,
+    last_three_license_numbers,
+    title_holder_id_type,
+    title_holder_id_number,
+    title_holder_country,
+    title_holder_name,
+    owner_id_type,
+    owner_id_number,
+    owner_country,
+    owner_name,
+    owner_control_number,
+    owner_issue_number,
+    owner_issue_date,
+    owner_registering_authority,
+    vehicle_company
+  )
+  VALUES (
+    registering_authority,
+    licence_number,
+    vehicle_registration_number,
+    vin,
+    engine_number,
+    make,
+    model,
+    vehicle_category,
+    driven,
+    vehicle_description,
+    tare,
+    date_of_liability,
+    vehicle_status,
+    date_liable_for_registration,
+    last_three_license_numbers,
+    title_holder_id_type,
+    title_holder_id_number,
+    title_holder_country,
+    title_holder_name,
+    owner_id_type,
+    owner_id_number,
+    owner_country,
+    owner_name,
+    owner_control_number,
+    owner_issue_number,
+    owner_issue_date,
+    owner_registering_authority,
+    vehicle_company
+  );
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `EditVehicle` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `EditVehicle`(
+    IN p_vehicle_id INT,
+    IN p_registering_authority VARCHAR(255),
+  IN p_licence_number varchar(50),
+    IN p_vehicle_registration_number VARCHAR(255),
+    IN p_vin VARCHAR(17),
+    IN p_engine_number VARCHAR(255),
+    IN p_make VARCHAR(255),
+    IN p_model VARCHAR(255),
+    IN p_vehicle_category VARCHAR(255),
+    IN p_driven_distance INT,
+    IN p_vehicle_description TEXT,
+    IN p_tare INT,
+    IN p_date_of_liability DATE,
+    IN p_vehicle_status VARCHAR(255),
+    IN p_date_liable_for_registration DATE,
+    IN p_last_three_license_numbers VARCHAR(255),
+    IN p_title_holder_id_type VARCHAR(255),
+    IN p_title_holder_id_number VARCHAR(255),
+    IN p_title_holder_country VARCHAR(255),
+    IN p_title_holder_name VARCHAR(255),
+    IN p_owner_id_type VARCHAR(255),
+    IN p_owner_id_number VARCHAR(255),
+    IN p_owner_country VARCHAR(255),
+    IN p_owner_name VARCHAR(255),
+    IN p_owner_control_number VARCHAR(255),
+    IN p_owner_issue_number VARCHAR(255),
+    IN p_owner_issue_date DATE,
+    IN p_owner_registering_authority VARCHAR(255),
+    IN p_vehicle_company VARCHAR(255)
+)
+BEGIN
+    UPDATE vehicle
+    SET 
+        registering_authority = p_registering_authority,
+        licence_number = p_licence_number,
+        vehicle_registration_number = p_vehicle_registration_number,
+        vin = p_vin,
+        engine_number = p_engine_number,
+        make = p_make,
+        model = p_model,
+        vehicle_category = p_vehicle_category,
+        driven = p_driven_distance,
+        vehicle_description = p_vehicle_description,
+        tare = p_tare,
+        date_of_liability = p_date_of_liability,
+        vehicle_status = p_vehicle_status,
+        date_liable_for_registration = p_date_liable_for_registration,
+        last_three_license_numbers = p_last_three_license_numbers,
+        title_holder_id_type = p_title_holder_id_type,
+        title_holder_id_number = p_title_holder_id_number,
+        title_holder_country = p_title_holder_country,
+        title_holder_name = p_title_holder_name,
+        owner_id_type = p_owner_id_type,
+        owner_id_number = p_owner_id_number,
+        owner_country = p_owner_country,
+        owner_name = p_owner_name,
+        owner_control_number = p_owner_control_number,
+        owner_issue_number = p_owner_issue_number,
+        owner_issue_date = p_owner_issue_date,
+        owner_registering_authority = p_owner_registering_authority,
+        vehicle_company = p_vehicle_company
+    WHERE id = p_vehicle_id;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `insert_asset_grp` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_asset_grp`(IN `as_id` INT, IN `guta` INT, IN `ram` INT, IN `png` INT)
+BEGIN
+
+    DECLARE guta_id INT;
+
+    DECLARE ram_id INT;
+
+    DECLARE png_id INT;
+
+    DECLARE guta_va INT;
+
+    DECLARE ram_va INT;
+
+    DECLARE png_va INT;
+
+    
+
+    
+
+    -- Check if the value already exists in the table
+
+    SELECT COUNT(*) INTO guta_id FROM guta.asset WHERE asset_id = as_id ; 
+
+    IF guta_id = 0 THEN
+
+        -- Value does not exist, insert a new row
+
+        INSERT INTO guta.asset(ownership, asset_id) VALUES(guta, as_id) ; 
+
+    ELSE
+
+        -- Value exists, check if the existing value is different
+
+        SELECT ownership INTO guta_va FROM guta.asset WHERE asset_id = as_id ; 
+
+        IF guta_va <> guta THEN
+
+            -- Values are different, update the existing row
+
+            UPDATE guta.asset SET ownership = guta WHERE asset_id = as_id ;
+
+        END IF ;
+
+    END IF ;
+
+    
+
+    SELECT COUNT(*) INTO ram_id FROM ram.asset WHERE asset_id = as_id ; 
+
+    IF ram_id = 0 THEN
+
+        -- Value does not exist, insert a new row
+
+        INSERT INTO ram.asset(ownership, asset_id) VALUES(ram, as_id) ;
+
+    ELSE 
+
+        -- Value exists, check if the existing value is different
+
+        SELECT ownership INTO ram_va FROM ram.asset WHERE asset_id = as_id ; 
+
+        IF ram_va <> ram THEN
+
+            -- Values are different, update the existing row
+
+            UPDATE ram.asset SET ownership = ram WHERE asset_id = as_id ;
+
+        END IF ;
+
+    END IF ;
+
+    
+
+    SELECT COUNT(*) INTO png_id FROM png.asset WHERE asset_id = as_id ; 
+
+    IF png_id = 0 THEN
+
+        -- Value does not exist, insert a new row
+
+        INSERT INTO png.asset(ownership, asset_id) VALUES(png, as_id) ; 
+
+    ELSE
+
+        -- Value exists, check if the existing value is different
+
+        SELECT ownership INTO png_va FROM png.asset WHERE asset_id = as_id ; 
+
+        IF png_va <> png THEN
+
+            -- Values are different, update the existing row
+
+            UPDATE  png.asset SET ownership = png WHERE asset_id = as_id ;
+
+        END IF ;
+
+    END IF ;
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `insert_asset_guta` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_asset_guta`(IN `as_id` INT, `guta` INT, `ram` INT, `png` INT)
+BEGIN
+
+    DECLARE guta_id INT;
+
+    DECLARE ram_id INT;
+
+    DECLARE png_id INT;
+
+    DECLARE guta_va INT;
+
+    DECLARE ram_va INT;
+
+    DECLARE png_va INT;
+
+        -- Check if the value already exists in the table
+
+    SELECT COUNT(*) INTO guta_id FROM guta.asset WHERE asset_id = as_id ; IF guta_id = 0 THEN
+
+    -- Value does not exist, insert a new row
+
+INSERT INTO guta.asset(ownership) VALUES(guta) ; ELSE
+
+-- Value exists, check if the existing value is different
+
+SELECT ownership INTO guta_va FROM guta.asset WHERE asset_id = as_id ; IF guta_va <> guta 
+
+THEN
+
+    -- Values are different, update the existing row
+
+UPDATE guta.asset SET ownership = guta WHERE asset_id = as_id ;
+
+END IF ;
+
+END IF ;
+
+SELECT COUNT(*) INTO ram_id FROM ram.asset WHERE asset_id = as_id ; IF ram_id = 0 
+
+THEN
+
+    -- Value does not exist, insert a new row
+
+INSERT INTO ram.asset(ownership) VALUES(ram) ; 
+
+ELSE
+
+-- Value exists, check if the existing value is different
+
+SELECT ownership INTO ram_va FROM ram.asset WHERE asset_id = as_id ; IF ram_va <> ram 
+
+THEN
+
+    -- Values are different, update the existing row
+
+UPDATE ram.asset SET ownership = ram WHERE asset_id = as_id ;
+
+END IF ;
+
+END IF ;
+
+SELECT COUNT(*) INTO png_id FROM png.asset WHERE asset_id = as_id ; IF png_id = 0 THEN
+
+    -- Value does not exist, insert a new row
+
+INSERT INTO png.asset(ownership)
+
+VALUES(png) ; ELSE
+
+-- Value exists, check if the existing value is different
+
+SELECT ownership INTO png_va FROM png.asset WHERE asset_id = as_id ; IF png_va <> png THEN
+
+    -- Values are different, update the existing row
+
+UPDATE  png.asset SET ownership = png WHERE asset_id = as_id ;
+
+END IF ;
+
+END IF ;
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `insert_sub_contract_expense` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_sub_contract_expense`(
+  IN comp_id INT,
+  IN exp_date DATE,
+  IN exp_amount DECIMAL(10,2),
+  IN provider VARCHAR(255),
+  IN invoice_id INT,
+  IN paid_by INT,
+  IN payment_method INT,
+  IN rating INT,
+  IN exp_status INT
+)
+BEGIN
+INSERT INTO sub_contract_expenses (
+    sub_co_company_id,
+    sub_co_date,
+    sub_co_amount,
+    sub_co_provider,
+    sub_co_invoice_id,
+    sub_co_paid_by,
+    sub_co_payment_method,
+    sub_co_rating,
+    sub_co_status
+  )
+  VALUES (comp_id, exp_date, exp_amount, provider, invoice_id, paid_by, payment_method, rating, exp_status);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `insert_vehicle_licence` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_vehicle_licence`(
+  IN vehicle_id INT,
+  IN br_number VARCHAR(45),
+  IN exp_date DATE,
+  IN date DATE,
+  IN amount DOUBLE
+)
+BEGIN
+
+  INSERT INTO vehicle_licence (vl_vehicle, vl_br_number, vl_date_expire, vl_date, vl_amount)
+  VALUES (vehicle_id, br_number, exp_date, date, amount);
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-04-24 12:34:43
