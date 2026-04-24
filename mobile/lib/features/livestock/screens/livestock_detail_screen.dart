@@ -45,6 +45,11 @@ class LivestockDetailScreen extends ConsumerWidget {
             tooltip: 'Add Event',
             onPressed: () => _addEvent(context, ref),
           ),
+          IconButton(
+            icon: const Icon(Icons.auto_graph_rounded),
+            tooltip: 'Advanced',
+            onPressed: () => _openAdvanced(context, ref),
+          ),
         ],
       ),
       body: detail.when(
@@ -197,6 +202,661 @@ class LivestockDetailScreen extends ConsumerWidget {
             notes: notesCtrl.text,
           );
       ref.invalidate(_weightRecordsProvider(id));
+    }
+  }
+
+  Future<void> _openAdvanced(BuildContext context, WidgetRef ref) async {
+    final farmId = ref.read(authProvider).user?.farmId;
+    if (farmId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No farm_id on this user session')),
+      );
+      return;
+    }
+
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      builder: (_) => const _AdvancedActionsSheet(),
+    );
+    if (action == null) return;
+
+    switch (action) {
+      case 'analytics':
+        await showDialog<void>(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('Lifecycle analytics'),
+            content: FutureBuilder(
+              future: ref
+                  .read(livestockServiceProvider)
+                  .getLifecycleAnalytics(farmId: farmId, livestockId: id),
+              builder: (_, snap) {
+                if (!snap.hasData) {
+                  if (snap.hasError) return Text(snap.error.toString());
+                  return const SizedBox(
+                    height: 80,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                final a = snap.data!;
+                return SingleChildScrollView(
+                  child: Text(
+                    'Feed: ${a.feedCount} logs · ${a.feedCostTotal.toStringAsFixed(2)}\n'
+                    'Health: ${a.healthCount} records · ${a.healthCostTotal.toStringAsFixed(2)}\n'
+                    'Vaccinations: ${a.vaccinationCount} · ${a.vaccinationCostTotal.toStringAsFixed(2)}\n'
+                    'Production metrics: ${a.production.length}\n'
+                    'Trace events: ${a.traceability.length}',
+                  ),
+                );
+              },
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
+          ),
+        );
+        break;
+      case 'breeding_plan':
+        await showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => _AddBreedingPlanSheet(farmId: farmId, damId: id),
+        );
+        break;
+      case 'pedigree':
+        await showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => _SavePedigreeSheet(farmId: farmId, livestockId: id),
+        );
+        break;
+      case 'genetics':
+        await showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => _AddGeneticTraitSheet(farmId: farmId, livestockId: id),
+        );
+        break;
+      case 'feed_log':
+        await showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => _AddFeedLogSheet(farmId: farmId, livestockId: id),
+        );
+        break;
+      case 'trace':
+        await showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => _AddTraceEventSheet(farmId: farmId, livestockId: id),
+        );
+        break;
+    }
+  }
+}
+
+class _AdvancedActionsSheet extends StatelessWidget {
+  const _AdvancedActionsSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 8),
+          const ListTile(
+            title: Text('Advanced livestock'),
+            subtitle: Text('Breeding, genetics, traceability, analytics'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.auto_graph_rounded),
+            title: const Text('Lifecycle analytics'),
+            onTap: () => Navigator.pop(context, 'analytics'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.favorite_rounded),
+            title: const Text('Breeding plan'),
+            onTap: () => Navigator.pop(context, 'breeding_plan'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.account_tree_rounded),
+            title: const Text('Pedigree'),
+            onTap: () => Navigator.pop(context, 'pedigree'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.science_rounded),
+            title: const Text('Genetic trait'),
+            onTap: () => Navigator.pop(context, 'genetics'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.restaurant_rounded),
+            title: const Text('Feed log'),
+            onTap: () => Navigator.pop(context, 'feed_log'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.location_on_rounded),
+            title: const Text('Trace event'),
+            onTap: () => Navigator.pop(context, 'trace'),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddBreedingPlanSheet extends ConsumerStatefulWidget {
+  const _AddBreedingPlanSheet({required this.farmId, required this.damId});
+  final int farmId;
+  final int damId;
+
+  @override
+  ConsumerState<_AddBreedingPlanSheet> createState() => _AddBreedingPlanSheetState();
+}
+
+class _AddBreedingPlanSheetState extends ConsumerState<_AddBreedingPlanSheet> {
+  final _sireId = TextEditingController();
+  DateTime _planned = DateTime.now();
+  DateTime? _expectedBirth;
+  String _method = 'natural';
+  bool _busy = false;
+
+  @override
+  void dispose() {
+    _sireId.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Breeding plan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _sireId,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: 'Sire ID (optional)'),
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            value: _method,
+            items: const [
+              DropdownMenuItem(value: 'natural', child: Text('Natural')),
+              DropdownMenuItem(value: 'ai', child: Text('AI')),
+              DropdownMenuItem(value: 'embryo_transfer', child: Text('Embryo transfer')),
+            ],
+            onChanged: (v) => setState(() => _method = v ?? 'natural'),
+            decoration: const InputDecoration(labelText: 'Method'),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton(
+            onPressed: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: _planned,
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+              );
+              if (picked == null) return;
+              setState(() => _planned = picked);
+            },
+            child: Text('Planned: ${_planned.toIso8601String().split('T').first}'),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton(
+            onPressed: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: _expectedBirth ?? DateTime.now().add(const Duration(days: 280)),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+              );
+              if (picked == null) return;
+              setState(() => _expectedBirth = picked);
+            },
+            child: Text('Expected birth: ${_expectedBirth?.toIso8601String().split('T').first ?? '-'}'),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _busy ? null : _save,
+              child: Text(_busy ? 'Saving...' : 'Save'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _save() async {
+    setState(() => _busy = true);
+    try {
+      final sireId = int.tryParse(_sireId.text.trim());
+      await ref.read(livestockServiceProvider).createBreedingPlan(
+            farmId: widget.farmId,
+            damId: widget.damId,
+            sireId: sireId != null && sireId > 0 ? sireId : null,
+            plannedBreedingDate: _planned,
+            method: _method,
+            expectedBirthDate: _expectedBirth,
+          );
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+}
+
+class _SavePedigreeSheet extends ConsumerStatefulWidget {
+  const _SavePedigreeSheet({required this.farmId, required this.livestockId});
+  final int farmId;
+  final int livestockId;
+
+  @override
+  ConsumerState<_SavePedigreeSheet> createState() => _SavePedigreeSheetState();
+}
+
+class _SavePedigreeSheetState extends ConsumerState<_SavePedigreeSheet> {
+  final _sireId = TextEditingController();
+  final _damId = TextEditingController();
+  final _herdbook = TextEditingController();
+  final _line = TextEditingController();
+  bool _busy = false;
+
+  @override
+  void dispose() {
+    _sireId.dispose();
+    _damId.dispose();
+    _herdbook.dispose();
+    _line.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Save pedigree', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _sireId,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: 'Sire ID (optional)'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _damId,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: 'Dam ID (optional)'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _herdbook,
+            decoration: const InputDecoration(labelText: 'Herdbook ID (optional)'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _line,
+            decoration: const InputDecoration(labelText: 'Genetic line (optional)'),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _busy ? null : _save,
+              child: Text(_busy ? 'Saving...' : 'Save'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _save() async {
+    setState(() => _busy = true);
+    try {
+      final sireId = int.tryParse(_sireId.text.trim());
+      final damId = int.tryParse(_damId.text.trim());
+      await ref.read(livestockServiceProvider).savePedigree(
+            farmId: widget.farmId,
+            livestockId: widget.livestockId,
+            sireId: sireId != null && sireId > 0 ? sireId : null,
+            damId: damId != null && damId > 0 ? damId : null,
+            herdbookId: _herdbook.text.trim(),
+            geneticLine: _line.text.trim(),
+          );
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+}
+
+class _AddGeneticTraitSheet extends ConsumerStatefulWidget {
+  const _AddGeneticTraitSheet({required this.farmId, required this.livestockId});
+  final int farmId;
+  final int livestockId;
+
+  @override
+  ConsumerState<_AddGeneticTraitSheet> createState() => _AddGeneticTraitSheetState();
+}
+
+class _AddGeneticTraitSheetState extends ConsumerState<_AddGeneticTraitSheet> {
+  final _name = TextEditingController();
+  final _value = TextEditingController();
+  DateTime? _measuredOn;
+  bool _busy = false;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _value.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Add genetic trait', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _name,
+            decoration: const InputDecoration(labelText: 'Trait name'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _value,
+            decoration: const InputDecoration(labelText: 'Trait value'),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton(
+            onPressed: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: _measuredOn ?? DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+              );
+              if (picked == null) return;
+              setState(() => _measuredOn = picked);
+            },
+            child: Text('Measured: ${_measuredOn?.toIso8601String().split('T').first ?? '-'}'),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _busy ? null : _save,
+              child: Text(_busy ? 'Saving...' : 'Save'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _save() async {
+    if (_name.text.trim().isEmpty || _value.text.trim().isEmpty) return;
+    setState(() => _busy = true);
+    try {
+      await ref.read(livestockServiceProvider).addGeneticTrait(
+            farmId: widget.farmId,
+            livestockId: widget.livestockId,
+            traitName: _name.text.trim(),
+            traitValue: _value.text.trim(),
+            measuredOn: _measuredOn,
+          );
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+}
+
+class _AddFeedLogSheet extends ConsumerStatefulWidget {
+  const _AddFeedLogSheet({required this.farmId, required this.livestockId});
+  final int farmId;
+  final int livestockId;
+
+  @override
+  ConsumerState<_AddFeedLogSheet> createState() => _AddFeedLogSheetState();
+}
+
+class _AddFeedLogSheetState extends ConsumerState<_AddFeedLogSheet> {
+  final _item = TextEditingController();
+  final _qty = TextEditingController(text: '0');
+  final _unit = TextEditingController(text: 'kg');
+  final _cost = TextEditingController(text: '0');
+  bool _postToFinance = false;
+  bool _busy = false;
+
+  @override
+  void dispose() {
+    _item.dispose();
+    _qty.dispose();
+    _unit.dispose();
+    _cost.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Feed log', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _item,
+            decoration: const InputDecoration(labelText: 'Feed item'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _qty,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(labelText: 'Quantity'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _unit,
+            decoration: const InputDecoration(labelText: 'Unit'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _cost,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(labelText: 'Cost total'),
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: _postToFinance,
+            title: const Text('Post expense to finance'),
+            onChanged: (v) => setState(() => _postToFinance = v),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _busy ? null : _save,
+              child: Text(_busy ? 'Saving...' : 'Save'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _save() async {
+    if (_item.text.trim().isEmpty) return;
+    setState(() => _busy = true);
+    try {
+      await ref.read(livestockServiceProvider).createFeedLog(
+            farmId: widget.farmId,
+            livestockId: widget.livestockId,
+            feedItem: _item.text.trim(),
+            feedQty: double.tryParse(_qty.text.trim()) ?? 0,
+            unit: _unit.text.trim().isEmpty ? 'kg' : _unit.text.trim(),
+            costTotal: double.tryParse(_cost.text.trim()) ?? 0,
+            postToFinance: _postToFinance,
+          );
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+}
+
+class _AddTraceEventSheet extends ConsumerStatefulWidget {
+  const _AddTraceEventSheet({required this.farmId, required this.livestockId});
+  final int farmId;
+  final int livestockId;
+
+  @override
+  ConsumerState<_AddTraceEventSheet> createState() => _AddTraceEventSheetState();
+}
+
+class _AddTraceEventSheetState extends ConsumerState<_AddTraceEventSheet> {
+  final _type = TextEditingController(text: 'move');
+  final _location = TextEditingController();
+  final _notes = TextEditingController();
+  bool _busy = false;
+
+  @override
+  void dispose() {
+    _type.dispose();
+    _location.dispose();
+    _notes.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Trace event', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _type,
+            decoration: const InputDecoration(labelText: 'Event type'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _location,
+            decoration: const InputDecoration(labelText: 'Location'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _notes,
+            decoration: const InputDecoration(labelText: 'Notes'),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _busy ? null : _save,
+              child: Text(_busy ? 'Saving...' : 'Save'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _save() async {
+    if (_type.text.trim().isEmpty) return;
+    setState(() => _busy = true);
+    try {
+      await ref.read(livestockServiceProvider).createTraceEvent(
+            farmId: widget.farmId,
+            livestockId: widget.livestockId,
+            eventType: _type.text.trim(),
+            location: _location.text.trim(),
+            notes: _notes.text.trim(),
+          );
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
     }
   }
 }

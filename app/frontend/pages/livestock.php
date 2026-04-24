@@ -1,6 +1,6 @@
 <?php
 if (empty($_SESSION['user'])) {
-    header('Location: ../public/index.php?page=login');
+    header('Location: index.php?page=login');
     exit;
 }
 
@@ -96,6 +96,12 @@ require __DIR__ . '/../components/header.php';
         <button type="button" onclick="document.getElementById('reproModal').classList.remove('hidden')" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Record Reproduction</button>
         <button type="button" onclick="document.getElementById('productionModal').classList.remove('hidden')" class="bg-emerald-600 text-white px-3 py-2 rounded-md text-sm hover:bg-emerald-700">Add Production Log</button>
         <button type="button" onclick="document.getElementById('vaccinationModal').classList.remove('hidden')" class="bg-amber-600 text-white px-3 py-2 rounded-md text-sm hover:bg-amber-700">Schedule Vaccination</button>
+        <button type="button" onclick="document.getElementById('feedLogModal').classList.remove('hidden')" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Feed Log</button>
+        <button type="button" onclick="document.getElementById('traceEventModal').classList.remove('hidden')" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Trace Event</button>
+        <button type="button" onclick="document.getElementById('breedingPlanModal').classList.remove('hidden')" class="bg-purple-600 text-white px-3 py-2 rounded-md text-sm hover:bg-purple-700">Breeding Plan</button>
+        <button type="button" onclick="document.getElementById('pedigreeModal').classList.remove('hidden')" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Pedigree</button>
+        <button type="button" onclick="document.getElementById('geneticsModal').classList.remove('hidden')" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Genetics</button>
+        <button type="button" onclick="document.getElementById('lifecycleModal').classList.remove('hidden')" class="bg-blue-600 text-white px-3 py-2 rounded-md text-sm hover:bg-blue-700">Lifecycle Analytics</button>
     </div>
 
     <!-- Tabs -->
@@ -211,6 +217,84 @@ require __DIR__ . '/../components/header.php';
                 <?php endif; ?>
             </tbody>
         </table>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div class="px-6 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Alerts</h3>
+                <button type="button" onclick="loadAdvancedPlatform()" class="text-sm text-primary-600 hover:text-primary-700">Refresh</button>
+            </div>
+            <div class="p-6">
+                <div id="alertsBox" class="text-sm text-gray-600 dark:text-gray-300">Loading...</div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div class="px-6 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Breeding Plans</h3>
+                <button type="button" onclick="document.getElementById('breedingPlanModal').classList.remove('hidden')" class="text-sm text-primary-600 hover:text-primary-700">Add</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700/50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Dam</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Sire</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Planned</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breedingPlansBody" class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                        <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div class="px-6 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Feed Logs</h3>
+                <button type="button" onclick="document.getElementById('feedLogModal').classList.remove('hidden')" class="text-sm text-primary-600 hover:text-primary-700">Add</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700/50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Animal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Item</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Qty</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feedLogsBody" class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                        <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div class="px-6 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Trace Events</h3>
+                <button type="button" onclick="document.getElementById('traceEventModal').classList.remove('hidden')" class="text-sm text-primary-600 hover:text-primary-700">Add</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700/50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Animal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody id="traceEventsBody" class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                        <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -397,6 +481,249 @@ require __DIR__ . '/../components/header.php';
                 <button type="submit" class="px-4 py-2 rounded-md bg-amber-600 text-white text-sm hover:bg-amber-700">Save</button>
             </div>
         </form>
+    </div>
+</div>
+
+<div id="feedLogModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Feed Log</h3>
+        <form id="feedLogForm">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Livestock ID</label>
+                    <input type="number" name="livestock_id" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Log Date</label>
+                    <input type="date" name="log_date" value="<?php echo date('Y-m-d'); ?>" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Feed Item</label>
+                    <input type="text" name="feed_item" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Qty</label>
+                    <input type="number" step="0.001" name="feed_qty" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Unit</label>
+                    <input type="text" name="unit" value="kg" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Cost Total</label>
+                    <input type="number" step="0.01" name="cost_total" value="0" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <input type="checkbox" name="post_to_finance" value="1" class="rounded border-gray-300 dark:border-gray-600">
+                    Post expense to finance
+                </label>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Finance Category</label>
+                <input type="text" name="finance_category" value="Livestock Feed" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Notes</label>
+                <input type="text" name="notes" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('feedLogModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Cancel</button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-primary-600 text-white text-sm hover:bg-primary-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="traceEventModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Trace Event</h3>
+        <form id="traceEventForm">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Livestock ID</label>
+                    <input type="number" name="livestock_id" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Event Type</label>
+                    <input type="text" name="event_type" value="move" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Event Date</label>
+                    <input type="datetime-local" name="event_date" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Location</label>
+                    <input type="text" name="location" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Notes</label>
+                <input type="text" name="notes" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('traceEventModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Cancel</button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-primary-600 text-white text-sm hover:bg-primary-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="breedingPlanModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Breeding Plan</h3>
+        <form id="breedingPlanForm">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Dam ID</label>
+                    <input type="number" name="dam_id" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Sire ID</label>
+                    <input type="number" name="sire_id" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Planned Breeding Date</label>
+                    <input type="date" name="planned_breeding_date" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Method</label>
+                    <select name="method" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="natural">Natural</option>
+                        <option value="ai">AI</option>
+                        <option value="embryo_transfer">Embryo Transfer</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Expected Birth Date</label>
+                    <input type="date" name="expected_birth_date" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Status</label>
+                    <select name="status" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="planned">Planned</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Notes</label>
+                <input type="text" name="notes" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('breedingPlanModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Cancel</button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-purple-600 text-white text-sm hover:bg-purple-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="pedigreeModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Pedigree</h3>
+        <form id="pedigreeForm">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Livestock ID</label>
+                    <input type="number" name="livestock_id" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Herdbook ID</label>
+                    <input type="text" name="herdbook_id" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Sire ID</label>
+                    <input type="number" name="sire_id" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Dam ID</label>
+                    <input type="number" name="dam_id" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Genetic Line</label>
+                <input type="text" name="genetic_line" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Notes</label>
+                <input type="text" name="notes" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('pedigreeModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Cancel</button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-primary-600 text-white text-sm hover:bg-primary-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="geneticsModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Genetic Trait</h3>
+        <form id="geneticsForm">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Livestock ID</label>
+                    <input type="number" name="livestock_id" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Measured On</label>
+                    <input type="date" name="measured_on" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Trait Name</label>
+                    <input type="text" name="trait_name" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Trait Value</label>
+                    <input type="text" name="trait_value" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Notes</label>
+                <input type="text" name="notes" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('geneticsModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Cancel</button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-primary-600 text-white text-sm hover:bg-primary-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="lifecycleModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Lifecycle Analytics</h3>
+        <form id="lifecycleForm">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-700 dark:text-gray-300">Livestock ID (optional)</label>
+                    <input type="number" name="livestock_id" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700">Run</button>
+                </div>
+            </div>
+        </form>
+        <pre id="lifecycleOutput" class="mt-3 p-3 text-xs bg-gray-50 dark:bg-gray-900/40 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto max-h-64"></pre>
+        <div class="flex justify-end gap-3 mt-4">
+            <button type="button" onclick="document.getElementById('lifecycleModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Close</button>
+        </div>
     </div>
 </div>
 
@@ -896,7 +1223,7 @@ async function postData(url, data) {
             } catch (parseError) {}
             showLivestockNotice(message, 'error');
             if (res.status === 401 || res.status === 403) {
-                window.location.href = '../public/index.php?page=login';
+                window.location.href = 'index.php?page=login';
             }
         }
     } catch (err) {
@@ -904,6 +1231,88 @@ async function postData(url, data) {
         showLivestockNotice('Error occurred while saving data.', 'error');
     }
 }
+
+async function loadAdvancedPlatform() {
+    const alertsBox = document.getElementById('alertsBox');
+    const breedingPlansBody = document.getElementById('breedingPlansBody');
+    const feedLogsBody = document.getElementById('feedLogsBody');
+    const traceEventsBody = document.getElementById('traceEventsBody');
+
+    if (alertsBox) alertsBox.textContent = 'Loading...';
+    if (breedingPlansBody) breedingPlansBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">Loading...</td></tr>';
+    if (feedLogsBody) feedLogsBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">Loading...</td></tr>';
+    if (traceEventsBody) traceEventsBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">Loading...</td></tr>';
+
+    try {
+        const [alerts, breedingPlans, feedLogs, traceEvents] = await Promise.all([
+            window.AppApi.get('/api/livestock-platform/alerts', { showError: false }),
+            window.AppApi.get('/api/livestock-platform/breeding-plans', { showError: false }),
+            window.AppApi.get('/api/livestock-platform/feed-logs', { showError: false }),
+            window.AppApi.get('/api/livestock-platform/trace', { showError: false }),
+        ]);
+
+        if (alertsBox) {
+            const due = Array.isArray(alerts?.due_vaccines) ? alerts.due_vaccines.length : 0;
+            const overdue = Array.isArray(alerts?.overdue_vaccines) ? alerts.overdue_vaccines.length : 0;
+            const followups = Array.isArray(alerts?.health_followups) ? alerts.health_followups.length : 0;
+            const preg = Array.isArray(alerts?.pregnancy_checks_due) ? alerts.pregnancy_checks_due.length : 0;
+            const births = Array.isArray(alerts?.births_due) ? alerts.births_due.length : 0;
+            alertsBox.textContent = `Due vaccines: ${due} · Overdue: ${overdue} · Followups: ${followups} · Pregnancy checks: ${preg} · Births due: ${births}`;
+        }
+
+        if (breedingPlansBody) {
+            const items = Array.isArray(breedingPlans) ? breedingPlans.slice(0, 10) : [];
+            breedingPlansBody.innerHTML = items.length
+                ? items.map(p => `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">#${p.dam_id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${p.sire_id ? '#' + p.sire_id : '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${p.planned_breeding_date || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${p.status || '-'}</td>
+                    </tr>
+                `).join('')
+                : '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No breeding plans.</td></tr>';
+        }
+
+        if (feedLogsBody) {
+            const items = Array.isArray(feedLogs) ? feedLogs.slice(0, 10) : [];
+            feedLogsBody.innerHTML = items.length
+                ? items.map(l => `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">#${l.livestock_id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${l.feed_item || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${l.feed_qty || 0} ${l.unit || ''}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${Number(l.cost_total || 0).toFixed(2)}</td>
+                    </tr>
+                `).join('')
+                : '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No feed logs.</td></tr>';
+        }
+
+        if (traceEventsBody) {
+            const items = Array.isArray(traceEvents) ? traceEvents.slice(0, 10) : [];
+            traceEventsBody.innerHTML = items.length
+                ? items.map(t => `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">#${t.livestock_id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${t.event_type || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${t.event_date || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${t.location || '-'}</td>
+                    </tr>
+                `).join('')
+                : '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No trace events.</td></tr>';
+        }
+    } catch (e) {
+        console.error('Failed to load advanced platform', e);
+        if (alertsBox) alertsBox.textContent = 'Failed to load alerts.';
+        if (breedingPlansBody) breedingPlansBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">Failed to load.</td></tr>';
+        if (feedLogsBody) feedLogsBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">Failed to load.</td></tr>';
+        if (traceEventsBody) traceEventsBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">Failed to load.</td></tr>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadAdvancedPlatform();
+});
 
 document.getElementById('addBatchForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -996,6 +1405,86 @@ document.getElementById('vaccinationForm').addEventListener('submit', async (e) 
         livestock_id: Number(raw.livestock_id || 0)
     };
     postData('/api/livestock-platform/vaccinations', payload);
+});
+
+document.getElementById('feedLogForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = Object.fromEntries(new FormData(e.target));
+    const payload = {
+        ...raw,
+        livestock_id: Number(raw.livestock_id || 0),
+        feed_qty: Number(raw.feed_qty || 0),
+        cost_total: Number(raw.cost_total || 0),
+        post_to_finance: raw.post_to_finance ? 1 : 0,
+    };
+    postData('/api/livestock-platform/feed-logs', payload);
+});
+
+document.getElementById('traceEventForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = Object.fromEntries(new FormData(e.target));
+    let eventDate = String(raw.event_date || '');
+    if (eventDate.includes('T')) {
+        eventDate = eventDate.replace('T', ' ');
+        if (eventDate.length === 16) eventDate += ':00';
+    }
+    const payload = {
+        ...raw,
+        livestock_id: Number(raw.livestock_id || 0),
+        event_date: eventDate,
+    };
+    postData('/api/livestock-platform/trace', payload);
+});
+
+document.getElementById('breedingPlanForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = Object.fromEntries(new FormData(e.target));
+    const sire = raw.sire_id ? Number(raw.sire_id) : null;
+    const payload = {
+        ...raw,
+        dam_id: Number(raw.dam_id || 0),
+        sire_id: sire && sire > 0 ? sire : null,
+    };
+    postData('/api/livestock-platform/breeding-plans', payload);
+});
+
+document.getElementById('pedigreeForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = Object.fromEntries(new FormData(e.target));
+    const payload = {
+        ...raw,
+        livestock_id: Number(raw.livestock_id || 0),
+        sire_id: raw.sire_id ? Number(raw.sire_id) : null,
+        dam_id: raw.dam_id ? Number(raw.dam_id) : null,
+    };
+    postData('/api/livestock-platform/pedigree', payload);
+});
+
+document.getElementById('geneticsForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = Object.fromEntries(new FormData(e.target));
+    const payload = {
+        ...raw,
+        livestock_id: Number(raw.livestock_id || 0),
+    };
+    postData('/api/livestock-platform/genetics', payload);
+});
+
+document.getElementById('lifecycleForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = Object.fromEntries(new FormData(e.target));
+    const out = document.getElementById('lifecycleOutput');
+    if (out) out.textContent = 'Loading...';
+    try {
+        let url = '/api/livestock-platform/lifecycle-analytics';
+        if (raw.livestock_id) {
+            url += `?livestock_id=${encodeURIComponent(String(Number(raw.livestock_id)))}`
+        }
+        const data = await window.AppApi.get(url, { showError: false });
+        if (out) out.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+        if (out) out.textContent = err?.message || 'Failed to load analytics';
+    }
 });
 </script>
 

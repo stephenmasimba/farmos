@@ -328,6 +328,19 @@ class AccessControlService
             )'
         );
 
+        try {
+            $this->db->execute('ALTER TABLE roles ADD COLUMN description VARCHAR(255) NULL');
+        } catch (\Throwable $e) {
+        }
+        try {
+            $this->db->execute('ALTER TABLE roles ADD COLUMN is_system TINYINT(1) NOT NULL DEFAULT 1');
+        } catch (\Throwable $e) {
+        }
+        try {
+            $this->db->execute('ALTER TABLE roles ADD COLUMN created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP');
+        } catch (\Throwable $e) {
+        }
+
         $this->db->execute(
             'CREATE TABLE IF NOT EXISTS role_permissions (
                 id INT AUTO_INCREMENT PRIMARY KEY,

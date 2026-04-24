@@ -5,7 +5,7 @@ namespace FarmOS\Controllers;
 use FarmOS\{
     Request, Response, Database, Logger, Validation, RateLimiter
 };
-use FarmOS\Models\Livestock;
+use FarmOS\Models\{Livestock, FinancialRecord};
 
 /**
  * LivestockController - Manages farm animal records
@@ -576,6 +576,187 @@ class LivestockController
         } catch (\Exception $e) {
             Logger::error('Failed to retrieve livestock cost analysis', ['error' => $e->getMessage()]);
             return Response::error('Failed to retrieve livestock cost analysis', 'LIVESTOCK_COST_ANALYSIS_ERROR', 500);
+        }
+    }
+
+    public function traceability(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $query = $this->request->getQuery();
+            $farmId = (int) ($query['farm_id'] ?? 0);
+            $livestockId = isset($query['livestock_id']) ? (int) $query['livestock_id'] : 0;
+            if ($farmId <= 0) {
+                return Response::validationError(['farm_id' => 'Farm ID is required']);
+            }
+
+            $conds = 'WHERE l.farm_id = ?';
+            $params = [$farmId];
+            if ($livestockId > 0) {
+                $conds .= ' AND l.id = ?';
+                $params[] = $livestockId;
+            }
+
+            $animal = null;
+            if ($livestockId > 0) {
+                $existing = $this->db->queryOne('SELECT * FROM ' . Livestock::table() . ' WHERE id = ? AND farm_id = ? LIMIT 1', [$livestockId, $farmId]);
+                if (!$existing) {
+                    return Response::notFound('Livestock not found');
+                }
+                $animal = $existing;
+            }
+
+            $this->ensureAnimalEventsTable();
+            $eventRows = $this->db->query(
+                'SELECT ae.id, ae.livestock_id, ae.event_type, ae.description, ae.date, ae.cost
+                 FROM animal_events ae
+                 INNER JOIN ' . Livestock::table() . ' l ON l.id = ae.livestock_id
+                 ' . ($livestockId > 0 ? 'WHERE ae.livestock_id = ? AND l.farm_id = ?' : 'WHERE l.farm_id = ?') . '
+                 ORDER BY ae.date DESC, ae.id DESC',
+                $livestockId > 0 ? [$livestockId, $farmId] : [$farmId]
+            );
+
+            $breedingRows = $this->db->query(
+                'SELECT b.id, b.dam_batch_id, b.sire_batch_id, b.breeding_date, b.expected_birth_date, b.notes,
+                        d.name AS dam_name, s.name AS sire_name
+                 FROM livestock_breeding_records b
+                 LEFT JOIN ' . Livestock::table() . ' d ON d.id = b.dam_batch_id
+                 LEFT JOIN ' . Livestock::table() . ' s ON s.id = b.sire_batch_id
+                 WHERE b.farm_id = ?' . ($livestockId > 0 ? ' AND (b.dam_batch_id = ? OR b.sire_batch_id = ?)' : '') . '
+                 ORDER BY b.breeding_date DESC, b.id DESC',
+                $livestockId > 0 ? [$farmId, $livestockId, $livestockId] : [$farmId]
+            );
+
+            return Response::success([
+                'animal' => $animal,
+                'events' => $eventRows,
+                'breeding_history' => $breedingRows,
+            ]);
+        } catch (\Exception $e) {
+            Logger::error('Failed to retrieve livestock traceability', ['error' => $e->getMessage()]);
+            return Response::error('Failed to retrieve livestock traceability', 'LIVESTOCK_TRACEABILITY_ERROR', 500);
+        }
+    }
+
+    public function pedigree(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $query = $this->request->getQuery();
+            $farmId = (int) ($query['farm_id'] ?? 0);
+            $animalId = isset($query['animal_id']) ? (int) $query['animal_id'] : 0;
+            if ($farmId <= 0) {
+                return Response::validationError(['farm_id' => 'Farm ID is required']);
+            }
+
+            $where = 'WHERE b.farm_id = ?';
+            $params = [$farmId];
+            if ($animalId > 0) {
+                $where .= ' AND (b.dam_batch_id = ? OR b.sire_batch_id = ?)';
+                $params[] = $animalId;
+                $params[] = $animalId;
+            }
+
+            $rows = $this->db->query(
+                'SELECT b.id, b.dam_batch_id, b.sire_batch_id, b.breeding_date, b.expected_birth_date, b.notes,
+                        d.name AS dam_name, s.name AS sire_name
+                 FROM livestock_breeding_records b
+                 LEFT JOIN ' . Livestock::table() . ' d ON d.id = b.dam_batch_id
+                 LEFT JOIN ' . Livestock::table() . ' s ON s.id = b.sire_batch_id
+                 ' . $where . '
+                 ORDER BY b.breeding_date DESC, b.id DESC',
+                $params
+            );
+
+            return Response::success([
+                'animal_id' => $animalId,
+                'records' => $rows,
+            ]);
+        } catch (\Exception $e) {
+            Logger::error('Failed to retrieve livestock pedigree', ['error' => $e->getMessage()]);
+            return Response::error('Failed to retrieve livestock pedigree', 'LIVESTOCK_PEDIGREE_ERROR', 500);
+        }
+    }
+
+    public function costAllocation(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+
+            $query = $this->request->getQuery();
+            $farmId = (int) ($query['farm_id'] ?? 0);
+            if ($farmId <= 0) {
+                return Response::validationError(['farm_id' => 'Farm ID is required']);
+            }
+
+            $startDate = Validation::sanitizeString((string) ($query['start_date'] ?? date('Y-m-d', strtotime('-30 days'))));
+            $endDate = Validation::sanitizeString((string) ($query['end_date'] ?? date('Y-m-d')));
+            if (!Validation::validateDate($startDate, 'Y-m-d')) {
+                return Response::validationError(['start_date' => 'Invalid start date']);
+            }
+            if (!Validation::validateDate($endDate, 'Y-m-d')) {
+                return Response::validationError(['end_date' => 'Invalid end date']);
+            }
+
+            $expenseByCategory = $this->db->query(
+                'SELECT category, SUM(amount) AS total_cost, COUNT(*) AS transaction_count
+                 FROM ' . FinancialRecord::table() . '
+                 WHERE farm_id = ? AND type = ? AND date >= ? AND date <= ?
+                 GROUP BY category
+                 ORDER BY total_cost DESC',
+                [$farmId, 'expense', $startDate, $endDate]
+            );
+
+            $eventByType = $this->db->query(
+                'SELECT ae.event_type, COUNT(*) AS event_count, SUM(COALESCE(ae.cost, 0)) AS total_cost
+                 FROM animal_events ae
+                 INNER JOIN ' . Livestock::table() . ' l ON l.id = ae.livestock_id
+                 WHERE l.farm_id = ? AND DATE(ae.date) >= ? AND DATE(ae.date) <= ?
+                 GROUP BY ae.event_type
+                 ORDER BY total_cost DESC',
+                [$farmId, $startDate, $endDate]
+            );
+
+            $totalExpense = 0.0;
+            foreach ($expenseByCategory as $row) {
+                $totalExpense += (float) ($row['total_cost'] ?? 0);
+            }
+
+            return Response::success([
+                'period' => [
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                ],
+                'total_expense' => round($totalExpense, 2),
+                'category_allocation' => array_map(static function (array $row): array {
+                    return [
+                        'category' => (string) ($row['category'] ?? 'Unspecified'),
+                        'total_cost' => round((float) ($row['total_cost'] ?? 0), 2),
+                        'transaction_count' => (int) ($row['transaction_count'] ?? 0),
+                    ];
+                }, $expenseByCategory),
+                'livestock_event_costs' => array_map(static function (array $row): array {
+                    return [
+                        'event_type' => (string) ($row['event_type'] ?? 'unknown'),
+                        'event_count' => (int) ($row['event_count'] ?? 0),
+                        'total_cost' => round((float) ($row['total_cost'] ?? 0), 2),
+                    ];
+                }, $eventByType),
+            ]);
+        } catch (\Exception $e) {
+            Logger::error('Failed to retrieve cattle cost allocation', ['error' => $e->getMessage()]);
+            return Response::error('Failed to retrieve livestock cost allocation', 'LIVESTOCK_COST_ALLOCATION_ERROR', 500);
         }
     }
 

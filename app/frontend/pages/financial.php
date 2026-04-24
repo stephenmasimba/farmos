@@ -1,6 +1,6 @@
 <?php
 if (empty($_SESSION['user'])) {
-    header('Location: ../public/index.php?page=login');
+    header('Location: index.php?page=login');
     exit;
 }
 
@@ -185,6 +185,202 @@ require __DIR__ . '/../components/header.php';
         </div>
     </div>
 
+    <div class="mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Budget vs Actual</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Compare budget limits against actual expenses and identify overspending.</p>
+            </div>
+            <button type="button" onclick="refreshBudgetVariance()" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm">Refresh</button>
+        </div>
+        <div class="bg-white dark:bg-gray-800 shadow-sm overflow-hidden sm:rounded-xl border border-gray-100 dark:border-gray-700">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700/50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Category</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Budget</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actual</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Variance</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="budgetVarianceList" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tr><td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">Loading budget performance...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Expense Classification Rules</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Manage keyword-driven category mappings to automate expense classification.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="openCategoryMappingModal()" class="bg-primary-600 text-white px-3 py-2 rounded-md hover:bg-primary-700 text-sm">Add Rule</button>
+                <button type="button" onclick="refreshCategoryMappings()" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm">Refresh Rules</button>
+                <button type="button" onclick="openPeriodCloseModal()" class="bg-amber-600 text-white px-3 py-2 rounded-md hover:bg-amber-700 text-sm">Close Period</button>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 shadow-sm overflow-hidden sm:rounded-xl border border-gray-100 dark:border-gray-700">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700/50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Keyword</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Category</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Active</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="categoryMappingsList" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tr><td colspan="4" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">Loading category mappings...</td></tr>
+                </tbody>
+            </table>
+            <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400">
+                <div id="periodListContainer">Loading financial close history...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Accounting Statements</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Seed a chart of accounts and generate P&amp;L, balance sheet, cash flow, and journal drill-down.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="seedChartOfAccounts(false)" class="bg-slate-700 text-white px-3 py-2 rounded-md hover:bg-slate-800 text-sm">Seed COA</button>
+                <button type="button" onclick="seedChartOfAccounts(true)" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm">Seed (force)</button>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div class="bg-white dark:bg-gray-800 shadow-sm overflow-hidden rounded-xl border border-gray-100 dark:border-gray-700 p-5">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Run Statement</h3>
+                <form id="accountingReportForm" class="grid grid-cols-1 gap-3">
+                    <select name="report_type" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="pl">Profit &amp; Loss</option>
+                        <option value="bs">Balance Sheet</option>
+                        <option value="cf">Cash Flow</option>
+                    </select>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="date" name="start_date" value="<?php echo date('Y-m-01'); ?>" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <input type="date" name="end_date" value="<?php echo date('Y-m-d'); ?>" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    </div>
+                    <input type="date" name="as_of" value="<?php echo date('Y-m-d'); ?>" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    <button type="submit" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 text-sm">Run</button>
+                </form>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 shadow-sm overflow-hidden rounded-xl border border-gray-100 dark:border-gray-700 p-5 lg:col-span-2">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Output</h3>
+                    <button type="button" onclick="clearAccountingOutput()" class="text-sm text-primary-600 hover:text-primary-700">Clear</button>
+                </div>
+                <pre id="accountingOutput" class="p-3 text-xs bg-gray-50 dark:bg-gray-900/40 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto max-h-72">Run a statement to see results.</pre>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 shadow-sm overflow-hidden rounded-xl border border-gray-100 dark:border-gray-700 p-5 lg:col-span-3">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Journal Tools</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                    <input type="number" id="journalEntryId" placeholder="Entry ID" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    <input type="date" id="journalReverseDate" value="<?php echo date('Y-m-d'); ?>" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    <button type="button" onclick="loadJournalDetails()" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm">Details</button>
+                    <button type="button" onclick="reverseJournalEntry()" class="bg-amber-600 text-white px-4 py-2 rounded-md hover:bg-amber-700 text-sm">Reverse</button>
+                </div>
+                <pre id="journalToolsOutput" class="p-3 text-xs bg-gray-50 dark:bg-gray-900/40 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto max-h-72">Enter an Entry ID to view details or reverse.</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">BI & Planning</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Configurable dashboards, export connectors, drill-down reports, and predictive planning.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="refreshBiConnectors()" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm">Refresh</button>
+                <button type="button" onclick="refreshForecast()" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm">Forecast</button>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div class="bg-white dark:bg-gray-800 shadow-sm overflow-hidden rounded-xl border border-gray-100 dark:border-gray-700 p-5">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Export Connectors</h3>
+                <form id="createConnectorForm" class="grid grid-cols-1 gap-3 mb-4">
+                    <input type="text" name="name" placeholder="Connector name (e.g. PowerBI)" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    <select name="format" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="json">JSON</option>
+                        <option value="csv">CSV (metadata only)</option>
+                    </select>
+                    <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded-md hover:bg-slate-800 text-sm">Create Connector</button>
+                </form>
+                <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">Connector data endpoint returns rows for the selected date range.</div>
+                <div id="connectorsList" class="text-sm text-gray-600 dark:text-gray-400">Loading connectors...</div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 shadow-sm overflow-hidden rounded-xl border border-gray-100 dark:border-gray-700 p-5">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Interactive Drill-down Reports</h3>
+                <form id="runReportForm" class="grid grid-cols-1 gap-3 mb-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="date" name="start_date" value="<?php echo date('Y-m-01'); ?>" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <input type="date" name="end_date" value="<?php echo date('Y-m-d'); ?>" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <select name="direction" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                            <option value="expense">Expenses</option>
+                            <option value="income">Income</option>
+                            <option value="both">Both</option>
+                        </select>
+                        <select name="group_by" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                            <option value="category">Category</option>
+                            <option value="month">Month</option>
+                            <option value="vendor">Vendor</option>
+                            <option value="payment_method">Payment Method</option>
+                            <option value="status">Status</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 text-sm">Run Report</button>
+                </form>
+                <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700/50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Bucket</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Count</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportBucketsList" class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <tr><td colspan="4" class="px-6 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">Run a report to see results.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 shadow-sm overflow-hidden rounded-xl border border-gray-100 dark:border-gray-700 p-5">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Predictive Planning</h3>
+                <div class="text-sm text-gray-600 dark:text-gray-400 mb-3">Forecast uses historical trends when no manual forecast is set.</div>
+                <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700/50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Period</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Expenses</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Net</th>
+                            </tr>
+                        </thead>
+                        <tbody id="forecastList" class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <tr><td colspan="4" class="px-6 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">Loading forecast...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Invoices Section -->
     <div class="mb-8">
         <div class="flex justify-between items-center mb-4">
@@ -240,6 +436,7 @@ require __DIR__ . '/../components/header.php';
                 <button type="button" onclick="openJournalModal()" class="bg-primary-600 text-white px-3 py-2 rounded-md hover:bg-primary-700 text-sm">Post Journal</button>
                 <button type="button" onclick="openReceivableModal()" class="bg-emerald-600 text-white px-3 py-2 rounded-md hover:bg-emerald-700 text-sm">Add Receivable</button>
                 <button type="button" onclick="openPayableModal()" class="bg-amber-600 text-white px-3 py-2 rounded-md hover:bg-amber-700 text-sm">Add Payable</button>
+                <button type="button" onclick="refreshAdvancedAccountingMetrics()" class="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-700 text-sm">Refresh Advanced Data</button>
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -258,6 +455,29 @@ require __DIR__ . '/../components/header.php';
             <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
                 <p class="text-xs text-gray-500 uppercase">Open Payables</p>
                 <p class="text-xl font-bold text-amber-600">$<?php echo number_format(array_sum(array_map(fn($i) => (float)($i['amount'] ?? 0), $payables)), 2); ?></p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+                <p class="text-xs text-gray-500 uppercase">Currencies</p>
+                <p id="currencyCount" class="text-xl font-bold text-indigo-600">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+                <p class="text-xs text-gray-500 uppercase">Bank Accounts</p>
+                <p id="bankAccountCount" class="text-xl font-bold text-sky-600">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+                <p class="text-xs text-gray-500 uppercase">Fixed Assets</p>
+                <p id="fixedAssetCount" class="text-xl font-bold text-emerald-600">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+                <p class="text-xs text-gray-500 uppercase">Tax Codes</p>
+                <p id="taxCodeCount" class="text-xl font-bold text-yellow-600">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+                <p class="text-xs text-gray-500 uppercase">Journal Approvals</p>
+                <p id="journalApprovalCount" class="text-xl font-bold text-red-600">0</p>
             </div>
         </div>
 
@@ -487,11 +707,19 @@ require __DIR__ . '/../components/header.php';
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
-                <input type="text" name="category" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                <input type="text" name="category" placeholder="Optional (auto-classified if blank)" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vendor / Payee</label>
+                <input type="text" name="vendor" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                 <input type="text" name="description" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tags</label>
+                <input type="text" name="tags" placeholder="comma,separated,tags" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount</label>
@@ -538,6 +766,123 @@ require __DIR__ . '/../components/header.php';
     </div>
 </div>
 
+<!-- Category Mapping Modal -->
+<div id="categoryMappingModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Add Category Mapping Rule</h3>
+        <form id="categoryMappingForm">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Keyword</label>
+                <input type="text" name="keyword" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                <input type="text" name="category" required class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Match Field</label>
+                    <select name="match_field" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="combined">Combined</option>
+                        <option value="description">Description</option>
+                        <option value="reference_number">Reference</option>
+                        <option value="vendor">Vendor</option>
+                        <option value="payment_method">Payment method</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Match Type</label>
+                    <select name="match_type" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        <option value="contains">Contains</option>
+                        <option value="starts_with">Starts with</option>
+                        <option value="equals">Equals</option>
+                        <option value="regex">Regex</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
+                    <input type="number" name="priority" value="0" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tags</label>
+                    <input type="text" name="tags" placeholder="comma,separated" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="mb-4 flex items-center gap-3">
+                <input type="checkbox" id="mappingActive" name="active" value="1" checked class="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                <label for="mappingActive" class="text-sm text-gray-700 dark:text-gray-300">Active</label>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="closeCategoryMappingModal()" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Cancel</button>
+                <button type="submit" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 text-sm">Save Rule</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Period Close Modal -->
+<div id="periodCloseModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Close Financial Period</h3>
+        <form id="closePeriodForm">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Period Type</label>
+                <select name="period_type" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
+                    <input type="number" name="year" min="1900" max="2100" value="<?php echo date('Y'); ?>" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Month</label>
+                    <input type="number" name="month" min="1" max="12" value="<?php echo date('n'); ?>" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+            </div>
+            <div class="mb-4 flex items-center gap-3">
+                <input type="checkbox" id="forceClosePeriod" name="force" value="1" class="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                <label for="forceClosePeriod" class="text-sm text-gray-700 dark:text-gray-300">Force close (bypass failed checks)</label>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="closePeriodCloseModal()" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm">Cancel</button>
+                <button type="submit" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 text-sm">Close Period</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Budget Drilldown Modal -->
+<div id="budgetDrilldownModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-4xl w-full p-6 border border-gray-100 dark:border-gray-700 m-4">
+        <div class="flex items-center justify-between gap-3 mb-4">
+            <h3 id="budgetDrilldownTitle" class="text-lg font-bold text-gray-900 dark:text-white">Budget Drilldown</h3>
+            <button type="button" onclick="closeBudgetDrilldown()" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700/50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Vendor</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="budgetDrilldownList" class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <tr><td colspan="4" class="px-6 py-8 text-sm text-gray-500 dark:text-gray-400 text-center">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <!-- Create Invoice Modal -->
 <div id="invoiceModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-700">
@@ -569,6 +914,7 @@ require __DIR__ . '/../components/header.php';
 
 <script>
 const token = '<?php echo $_SESSION['access_token'] ?? ''; ?>';
+const FARM_ID = <?php echo json_encode((int) ($_SESSION['farm_id'] ?? 1)); ?>;
 const API_BASE_URL = window.AppApi.baseUrl;
 const headers = window.AppApi.jsonHeaders();
 
@@ -606,9 +952,121 @@ function showFinancialNotice(message, kind = 'success') {
     el.classList.remove('hidden');
 }
 
+function clearAccountingOutput() {
+    const out = document.getElementById('accountingOutput');
+    if (out) out.textContent = '';
+    const j = document.getElementById('journalToolsOutput');
+    if (j) j.textContent = '';
+}
+
+async function seedChartOfAccounts(force) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/accounting/seed-coa`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ farm_id: FARM_ID, force: force ? 1 : 0 })
+        });
+        if (res.ok) {
+            showFinancialNotice('Chart of accounts seeded.', 'success');
+            return;
+        }
+        const err = await res.json().catch(() => ({}));
+        showFinancialNotice(err?.error?.message || err?.message || 'Failed to seed COA.', 'error');
+    } catch (e) {
+        showFinancialNotice('Failed to seed COA.', 'error');
+    }
+}
+
+document.getElementById('accountingReportForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = Object.fromEntries(new FormData(e.target));
+    const type = String(raw.report_type || 'pl');
+    const start = String(raw.start_date || '');
+    const end = String(raw.end_date || '');
+    const asOf = String(raw.as_of || '');
+
+    const out = document.getElementById('accountingOutput');
+    if (out) out.textContent = 'Loading...';
+
+    try {
+        let url = '';
+        if (type === 'pl') {
+            url = `${API_BASE_URL}/api/accounting/profit-loss?farm_id=${encodeURIComponent(String(FARM_ID))}&start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`;
+        } else if (type === 'bs') {
+            url = `${API_BASE_URL}/api/accounting/balance-sheet?farm_id=${encodeURIComponent(String(FARM_ID))}&as_of=${encodeURIComponent(asOf)}`;
+        } else {
+            url = `${API_BASE_URL}/api/accounting/cash-flow?farm_id=${encodeURIComponent(String(FARM_ID))}&start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`;
+        }
+
+        const res = await fetch(url, { headers });
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            if (out) out.textContent = payload?.error?.message || payload?.message || `Request failed (${res.status})`;
+            return;
+        }
+        if (out) out.textContent = JSON.stringify(payload, null, 2);
+    } catch (err) {
+        if (out) out.textContent = err?.message || 'Failed to run statement';
+    }
+});
+
+async function loadJournalDetails() {
+    const id = Number(document.getElementById('journalEntryId')?.value || 0);
+    const out = document.getElementById('journalToolsOutput');
+    if (!id || id <= 0) {
+        if (out) out.textContent = 'Entry ID is required.';
+        return;
+    }
+    if (out) out.textContent = 'Loading...';
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/accounting/journal-entries/${id}?farm_id=${encodeURIComponent(String(FARM_ID))}`, { headers });
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            if (out) out.textContent = payload?.error?.message || payload?.message || `Request failed (${res.status})`;
+            return;
+        }
+        if (out) out.textContent = JSON.stringify(payload, null, 2);
+    } catch (err) {
+        if (out) out.textContent = err?.message || 'Failed to load journal entry';
+    }
+}
+
+async function reverseJournalEntry() {
+    const id = Number(document.getElementById('journalEntryId')?.value || 0);
+    const reverseDate = String(document.getElementById('journalReverseDate')?.value || '');
+    const out = document.getElementById('journalToolsOutput');
+    if (!id || id <= 0) {
+        if (out) out.textContent = 'Entry ID is required.';
+        return;
+    }
+    if (out) out.textContent = 'Reversing...';
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/accounting/journal-entries/${id}/reverse`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ farm_id: FARM_ID, reverse_date: reverseDate })
+        });
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            if (out) out.textContent = payload?.error?.message || payload?.message || `Request failed (${res.status})`;
+            return;
+        }
+        if (out) out.textContent = JSON.stringify(payload, null, 2);
+        showFinancialNotice('Journal entry reversed.', 'success');
+    } catch (err) {
+        if (out) out.textContent = err?.message || 'Failed to reverse entry';
+    }
+}
+
 document.getElementById('addTransactionForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target));
+    data.farm_id = FARM_ID;
+    if (typeof data.tags === 'string' && data.tags.trim() !== '') {
+        data.tags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
+    } else {
+        delete data.tags;
+    }
     if (navigator.onLine) {
         const res = await fetch(`${API_BASE_URL}/api/financial/records`, { method: 'POST', headers, body: JSON.stringify(data) });
         if (res.ok) {
@@ -630,6 +1088,7 @@ document.getElementById('addTransactionForm').addEventListener('submit', async (
 document.getElementById('addBudgetForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target));
+    data.farm_id = FARM_ID;
     const res = await fetch(`${API_BASE_URL}/api/financial/budgets`, { method: 'POST', headers, body: JSON.stringify(data) });
     if (res.ok) {
         window.location.reload();
@@ -641,6 +1100,7 @@ document.getElementById('addBudgetForm').addEventListener('submit', async (e) =>
 document.getElementById('addInvoiceForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target));
+    data.farm_id = FARM_ID;
     const res = await fetch(`${API_BASE_URL}/api/financial/invoices`, { method: 'POST', headers, body: JSON.stringify(data) });
     if (res.ok) {
         window.location.reload();
@@ -686,7 +1146,7 @@ document.getElementById('journalEntryForm').addEventListener('submit', async (e)
     let msg = 'Failed to post journal entry.';
     try {
         const err = await res.json();
-        if (err?.errors?.lines) msg = err.errors.lines;
+        if (err && err.errors && err.errors.lines) msg = err.errors.lines;
     } catch (error) {}
     showFinancialNotice(msg, 'error');
 });
@@ -711,6 +1171,54 @@ document.getElementById('addPayableForm').addEventListener('submit', async (e) =
         return;
     }
     showFinancialNotice('Failed to add payable.', 'error');
+});
+
+document.getElementById('categoryMappingForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    data.farm_id = FARM_ID;
+    if (typeof data.tags === 'string' && data.tags.trim() !== '') {
+        data.tags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
+    } else {
+        delete data.tags;
+    }
+    const res = await fetch(`${API_BASE_URL}/api/financial/category-mappings`, { method: 'POST', headers, body: JSON.stringify(data) });
+    if (res.ok) {
+        closeCategoryMappingModal();
+        refreshCategoryMappings();
+        return;
+    }
+    showFinancialNotice('Failed to save category mapping.', 'error');
+});
+
+document.getElementById('closePeriodForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    data.farm_id = FARM_ID;
+    const res = await fetch(`${API_BASE_URL}/api/financial/periods/close`, { method: 'POST', headers, body: JSON.stringify(data) });
+    if (res.ok) {
+        closePeriodCloseModal();
+        refreshPeriodList();
+        showFinancialNotice('Financial period closed successfully.', 'success');
+        return;
+    }
+    try {
+        const err = await res.json();
+        if (err && err.errors && err.errors.close) {
+            const checklist = err && err.errors ? err.errors.checklist || {} : {};
+            const parts = [];
+            if (typeof checklist.pending_transactions === 'number' && checklist.pending_transactions > 0) {
+                parts.push(`pending=${checklist.pending_transactions}`);
+            }
+            if (typeof checklist.uncategorized_transactions === 'number' && checklist.uncategorized_transactions > 0) {
+                parts.push(`uncategorized=${checklist.uncategorized_transactions}`);
+            }
+            const suffix = parts.length ? ` (${parts.join(', ')})` : '';
+            showFinancialNotice(`${err.errors.close}${suffix}`, 'error');
+            return;
+        }
+    } catch (e) {}
+    showFinancialNotice('Failed to close financial period.', 'error');
 });
 
 function renderTransactions(items) {
@@ -791,6 +1299,333 @@ function renderInvoices(items) {
     `).join('');
 }
 
+function openCategoryMappingModal() { document.getElementById('categoryMappingModal').classList.remove('hidden'); }
+function closeCategoryMappingModal() { document.getElementById('categoryMappingModal').classList.add('hidden'); }
+
+function openPeriodCloseModal() { document.getElementById('periodCloseModal').classList.remove('hidden'); }
+function closePeriodCloseModal() { document.getElementById('periodCloseModal').classList.add('hidden'); }
+
+function openBudgetDrilldown(url, title) {
+    document.getElementById('budgetDrilldownModal').classList.remove('hidden');
+    const t = document.getElementById('budgetDrilldownTitle');
+    if (t) t.textContent = title || 'Budget Drilldown';
+    const tbody = document.getElementById('budgetDrilldownList');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-sm text-gray-500 dark:text-gray-400 text-center">Loading...</td></tr>';
+    fetch(`${API_BASE_URL}${url}`, { headers })
+        .then(r => r.json())
+        .then(payload => {
+            const rows = payload && payload.data && payload.data.records ? payload.data.records : payload.records || [];
+            if (!tbody) return;
+            if (!Array.isArray(rows) || rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-sm text-gray-500 dark:text-gray-400 text-center">No records.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.slice(0, 200).map(r => `
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">${r.date || ''}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">${r.vendor || ''}</td>
+                    <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">${r.description || ''}</td>
+                    <td class="px-4 py-2 text-sm text-right font-medium text-red-600 dark:text-red-400">$${Number(r.amount || 0).toFixed(2)}</td>
+                </tr>
+            `).join('');
+        })
+        .catch(() => {
+            if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-sm text-red-600 dark:text-red-400 text-center">Failed to load.</td></tr>';
+        });
+}
+
+function closeBudgetDrilldown() { document.getElementById('budgetDrilldownModal').classList.add('hidden'); }
+
+function renderBudgetVariance(items) {
+    const tbody = document.getElementById('budgetVarianceList');
+    if (!tbody) return;
+    if (!items || items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">No budget performance available.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = items.map((budget) => {
+        const statusClass = budget.status === 'over_budget'
+            ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+            : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        const drill = '';
+        return `
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${budget.category}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">$${Number(budget.limit || 0).toFixed(2)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">$${Number(budget.spent || 0).toFixed(2)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${budget.variance < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}">$${Number(budget.variance || 0).toFixed(2)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="px-2 inline-flex rounded-full ${statusClass}">${budget.status === 'over_budget' ? 'Over budget' : 'On track'}</span>${drill}
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderCategoryMappings(items) {
+    const tbody = document.getElementById('categoryMappingsList');
+    if (!tbody) return;
+    if (!items || items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">No category mappings found.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = items.map((mapping) => `
+        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${mapping.keyword}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${mapping.category}<div class="text-xs text-gray-500 dark:text-gray-400">${mapping.match_field || 'combined'} • ${mapping.match_type || 'contains'} • p${mapping.priority != null ? mapping.priority : 0}</div></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${mapping.active ? 'Yes' : 'No'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <button type="button" onclick="deleteCategoryMapping(${mapping.id})" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200">Delete</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderPeriodList(items) {
+    const container = document.getElementById('periodListContainer');
+    if (!container) return;
+    if (!items || items.length === 0) {
+        container.textContent = 'No financial close history available yet.';
+        return;
+    }
+    container.innerHTML = items.slice(0, 6).map((period) => `
+        <div class="mb-2 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-3 bg-gray-50 dark:bg-gray-900">
+            <div class="flex items-center justify-between gap-2">
+                <span class="text-sm font-semibold text-gray-900 dark:text-white">${period.name}</span>
+                <span class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">${period.status}</span>
+            </div>
+            <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">${period.period_type.charAt(0).toUpperCase() + period.period_type.slice(1)}: ${period.start_date} to ${period.end_date}</div>
+            <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">Closed: ${period.closed_at != null ? period.closed_at : 'N/A'}</div>
+            ${period.status === 'closed' ? `<div class="mt-2"><button type="button" class="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300" onclick="reopenFinancialPeriod(${period.id})">Reopen</button></div>` : ''}
+        </div>
+    `).join('');
+}
+
+async function reopenFinancialPeriod(periodId) {
+    const res = await fetch(`${API_BASE_URL}/api/financial/periods/reopen`, { method: 'POST', headers, body: JSON.stringify({ farm_id: FARM_ID, period_id: periodId }) });
+    if (res.ok) {
+        await refreshPeriodList();
+        showFinancialNotice('Period reopened.', 'success');
+        return;
+    }
+    showFinancialNotice('Failed to reopen period.', 'error');
+}
+
+function renderConnectors(items) {
+    const el = document.getElementById('connectorsList');
+    if (!el) return;
+    if (!items || items.length === 0) {
+        el.innerHTML = '<div class="text-sm text-gray-500 dark:text-gray-400">No connectors yet.</div>';
+        return;
+    }
+    el.innerHTML = items.map(c => `
+        <div class="flex items-center justify-between gap-2 py-2 border-b border-gray-100 dark:border-gray-700">
+            <div>
+                <div class="font-medium text-gray-900 dark:text-white">${c.name}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">format=${c.format} • last_used=${c.last_used_at != null ? c.last_used_at : 'never'}</div>
+            </div>
+            <button type="button" class="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300" onclick="rotateConnectorToken(${c.id})">Rotate</button>
+        </div>
+    `).join('');
+}
+
+async function refreshBiConnectors() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/bi/connectors`, { headers });
+        if (!res.ok) {
+            return;
+        }
+        const payload = await res.json();
+        renderConnectors(payload.connectors || (payload.data && payload.data.connectors) || []);
+    } catch (e) {}
+}
+
+const createConnectorForm = document.getElementById('createConnectorForm');
+if (createConnectorForm) createConnectorForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    const payload = {
+        name: data.name,
+        format: data.format,
+        scope: { resources: ['financial_records'] }
+    };
+    const res = await fetch(`${API_BASE_URL}/api/bi/connectors`, { method: 'POST', headers, body: JSON.stringify(payload) });
+    if (!res.ok) {
+        showFinancialNotice('Failed to create connector.', 'error');
+        return;
+    }
+    const created = await res.json();
+    const url = created && created.url ? `${API_BASE_URL}${created.url}&resource=financial_records&start_date=<?php echo date('Y-m-01'); ?>&end_date=<?php echo date('Y-m-d'); ?>` : '';
+    if (url) {
+        showFinancialNotice(`Connector created. Use: ${url}`, 'success');
+    } else {
+        showFinancialNotice('Connector created.', 'success');
+    }
+    e.target.reset();
+    refreshBiConnectors();
+});
+
+async function rotateConnectorToken(id) {
+    const res = await fetch(`${API_BASE_URL}/api/bi/connectors/${id}/rotate`, { method: 'POST', headers });
+    if (!res.ok) {
+        showFinancialNotice('Failed to rotate token.', 'error');
+        return;
+    }
+    const data = await res.json();
+    const url = data && data.url ? `${API_BASE_URL}${data.url}&resource=financial_records&start_date=<?php echo date('Y-m-01'); ?>&end_date=<?php echo date('Y-m-d'); ?>` : '';
+    if (url) {
+        showFinancialNotice(`New connector URL: ${url}`, 'success');
+    } else {
+        showFinancialNotice('Token rotated.', 'success');
+    }
+    refreshBiConnectors();
+}
+
+function renderReportBuckets(state, items) {
+    const tbody = document.getElementById('reportBucketsList');
+    if (!tbody) return;
+    if (!items || items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">No data.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = items.slice(0, 40).map(r => `
+        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">${r.bucket || ''}</td>
+            <td class="px-4 py-2 text-sm text-right text-gray-900 dark:text-white">$${Number(r.total || 0).toFixed(2)}</td>
+            <td class="px-4 py-2 text-sm text-right text-gray-500 dark:text-gray-400">${r.count || 0}</td>
+            <td class="px-4 py-2 text-sm">
+                <button type="button" class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium" onclick="openBudgetDrilldown('/api/bi/reports/drilldown?start_date=${encodeURIComponent(state.start_date)}&end_date=${encodeURIComponent(state.end_date)}&group_by=${encodeURIComponent(state.group_by)}&bucket=${encodeURIComponent(r.bucket || '')}&direction=${encodeURIComponent(state.direction)}', 'Report drilldown')">Drill</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+const runReportForm = document.getElementById('runReportForm');
+if (runReportForm) runReportForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    const payload = {
+        report_type: 'financial',
+        start_date: data.start_date,
+        end_date: data.end_date,
+        group_by: data.group_by,
+        direction: data.direction
+    };
+    const tbody = document.getElementById('reportBucketsList');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">Loading...</td></tr>';
+    const res = await fetch(`${API_BASE_URL}/api/bi/reports/run`, { method: 'POST', headers, body: JSON.stringify(payload) });
+    if (!res.ok) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">Failed to load.</td></tr>';
+        return;
+    }
+    const out = await res.json();
+    renderReportBuckets(payload, out.buckets || (out.data && out.data.buckets) || []);
+});
+
+function renderForecast(rows) {
+    const tbody = document.getElementById('forecastList');
+    if (!tbody) return;
+    if (!rows || rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">No forecast available.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = rows.slice(0, 12).map(r => `
+        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">${r.period}</td>
+            <td class="px-4 py-2 text-sm text-right text-gray-900 dark:text-white">$${Number(r.projected_revenue || 0).toFixed(2)}</td>
+            <td class="px-4 py-2 text-sm text-right text-gray-900 dark:text-white">$${Number(r.projected_expenses || 0).toFixed(2)}</td>
+            <td class="px-4 py-2 text-sm text-right font-medium ${Number(r.net_cash_flow || 0) < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}">$${Number(r.net_cash_flow || 0).toFixed(2)}</td>
+        </tr>
+    `).join('');
+}
+
+async function refreshForecast() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/financial-analytics/forecast?farm_id=${FARM_ID}&horizon_months=12`, { headers });
+        if (!res.ok) {
+            return;
+        }
+        const payload = await res.json();
+        const scenarios = payload && payload.forecast_scenarios ? payload.forecast_scenarios : (payload && payload.data ? payload.data.forecast_scenarios || {} : {});
+        renderForecast(scenarios.Baseline || scenarios.Realistic || []);
+    } catch (e) {}
+}
+
+async function refreshBudgetVariance() {
+    const tbody = document.getElementById('budgetVarianceList');
+    if (!tbody) return;
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/financial/budget-vs-actual?farm_id=${FARM_ID}&year=${new Date().getFullYear()}&month=${new Date().getMonth() + 1}`, { headers });
+        if (!response.ok) {
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">Unable to load budget performance.</td></tr>';
+            return;
+        }
+        const data = await response.json();
+        renderBudgetVariance(data.budgets || []);
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">Unable to load budget performance.</td></tr>';
+    }
+}
+
+async function refreshCategoryMappings() {
+    const tbody = document.getElementById('categoryMappingsList');
+    if (!tbody) return;
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/financial/category-mappings?farm_id=${FARM_ID}`, { headers });
+        if (!response.ok) {
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">Unable to load category mappings.</td></tr>';
+            return;
+        }
+        const data = await response.json();
+        renderCategoryMappings(data.mappings || []);
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">Unable to load category mappings.</td></tr>';
+    }
+}
+
+async function refreshPeriodList() {
+    const container = document.getElementById('periodListContainer');
+    if (!container) return;
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/financial/periods?farm_id=${FARM_ID}`, { headers });
+        if (!response.ok) {
+            container.textContent = 'Unable to load financial close history.';
+            return;
+        }
+        const data = await response.json();
+        renderPeriodList(data.periods || []);
+    } catch (error) {
+        container.textContent = 'Unable to load financial close history.';
+    }
+}
+
+async function deleteCategoryMapping(id) {
+    if (!confirm('Delete this category mapping rule?')) {
+        return;
+    }
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/financial/category-mappings/${id}?farm_id=${FARM_ID}`, { method: 'DELETE', headers });
+        if (response.ok) {
+            refreshCategoryMappings();
+            showFinancialNotice('Category mapping deleted', 'success');
+            return;
+        }
+        showFinancialNotice('Failed to delete category mapping.', 'error');
+    } catch (error) {
+        showFinancialNotice('Failed to delete category mapping.', 'error');
+    }
+}
+
+async function loadFinancialTools() {
+    await Promise.all([
+        refreshBudgetVariance(),
+        refreshCategoryMappings(),
+        refreshPeriodList(),
+        refreshBiConnectors(),
+        refreshForecast(),
+    ]);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const res = await window.OfflineService.getCachedData('/financial/transactions', 'transactions');
@@ -819,7 +1654,44 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const list = Array.isArray(invoiceData) ? invoiceData : (Array.isArray(invoiceData.invoices) ? invoiceData.invoices : []);
                 renderInvoices(list);
             }
+
+            await loadFinancialTools();
+            await refreshAdvancedAccountingMetrics();
         }
     } catch (e) {}
 });
+
+async function refreshAdvancedAccountingMetrics() {
+    const endpoints = [
+        { id: 'currencyCount', path: '/api/accounting/currencies' },
+        { id: 'bankAccountCount', path: '/api/accounting/bank-accounts' },
+        { id: 'fixedAssetCount', path: '/api/accounting/fixed-assets' },
+        { id: 'taxCodeCount', path: '/api/accounting/tax-codes' },
+        { id: 'journalApprovalCount', path: '/api/accounting/journal-approvals' },
+    ];
+
+    await Promise.all(endpoints.map(async (endpoint) => {
+        const el = document.getElementById(endpoint.id);
+        if (!el) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint.path}`, { headers });
+            if (!response.ok) {
+                el.textContent = '—';
+                return;
+            }
+            const data = await response.json();
+            const list = Array.isArray(data)
+                ? data
+                : Array.isArray(data.items)
+                    ? data.items
+                    : Array.isArray(data.data)
+                        ? data.data
+                        : [];
+            el.textContent = String(list.length);
+        } catch (error) {
+            el.textContent = '—';
+        }
+    }));
+}
 </script>

@@ -146,6 +146,32 @@ class FinancialService {
     }
   }
 
+  Future<Map<String, dynamic>> getBudgetVariance({int? farmId, int? year, int? month}) async {
+    final params = <String, dynamic>{
+      if (farmId != null) 'farm_id': farmId,
+      if (year != null) 'year': year,
+      if (month != null) 'month': month,
+    };
+    return _api.get(
+      ApiEndpoints.financialBudgetVariance,
+      params: params.isNotEmpty ? params : null,
+    );
+  }
+
+  Future<List<dynamic>> getCategoryMappings({int? farmId}) async {
+    return _api.getList(
+      ApiEndpoints.financialCategoryMappings,
+      params: farmId != null ? {'farm_id': farmId} : null,
+    );
+  }
+
+  Future<List<dynamic>> getFinancialPeriods({int? farmId}) async {
+    return _api.getList(
+      ApiEndpoints.financialPeriods,
+      params: farmId != null ? {'farm_id': farmId} : null,
+    );
+  }
+
   Future<List<String>> getCategories() async {
     final list = await _api.getList(ApiEndpoints.financialCategories);
     return list.map((e) => e.toString()).toList();
@@ -155,6 +181,13 @@ class FinancialService {
     final trial = await _api.get(ApiEndpoints.accountingTrialBalance);
     final receivables = await _api.get(ApiEndpoints.accountingReceivables);
     final payables = await _api.get(ApiEndpoints.accountingPayables);
+
+    final entities = await _safeGetList(ApiEndpoints.accountingEntities);
+    final currencies = await _safeGetList(ApiEndpoints.accountingCurrencies);
+    final bankAccounts = await _safeGetList(ApiEndpoints.accountingBankAccounts);
+    final fixedAssets = await _safeGetList(ApiEndpoints.accountingFixedAssets);
+    final taxCodes = await _safeGetList(ApiEndpoints.accountingTaxCodes);
+    final approvals = await _safeGetList(ApiEndpoints.accountingJournalApprovals);
 
     final arItems =
         (receivables['items'] as List<dynamic>?) ?? const <dynamic>[];
@@ -175,7 +208,95 @@ class FinancialService {
           double.tryParse((trial['total_credits'] ?? '0').toString()) ?? 0.0,
       'open_receivables': countOpen(arItems),
       'open_payables': countOpen(apItems),
+      'entity_count': entities.length,
+      'currency_count': currencies.length,
+      'bank_account_count': bankAccounts.length,
+      'fixed_asset_count': fixedAssets.length,
+      'tax_code_count': taxCodes.length,
+      'journal_approval_count': approvals.length,
     };
+  }
+
+  Future<Map<String, dynamic>> seedChartOfAccounts({
+    required int farmId,
+    bool force = false,
+  }) async {
+    return _api.post(ApiEndpoints.accountingSeedCoa, data: {
+      'farm_id': farmId,
+      if (force) 'force': 1,
+    });
+  }
+
+  Future<Map<String, dynamic>> getProfitLoss({
+    required int farmId,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    return _api.get(ApiEndpoints.accountingProfitLoss, params: {
+      'farm_id': farmId,
+      'start_date': _formatDate(startDate),
+      'end_date': _formatDate(endDate),
+    });
+  }
+
+  Future<Map<String, dynamic>> getBalanceSheet({
+    required int farmId,
+    required DateTime asOf,
+  }) async {
+    return _api.get(ApiEndpoints.accountingBalanceSheet, params: {
+      'farm_id': farmId,
+      'as_of': _formatDate(asOf),
+    });
+  }
+
+  Future<Map<String, dynamic>> getCashFlow({
+    required int farmId,
+    required DateTime startDate,
+    required DateTime endDate,
+    List<int>? cashAccountIds,
+  }) async {
+    return _api.get(ApiEndpoints.accountingCashFlow, params: {
+      'farm_id': farmId,
+      'start_date': _formatDate(startDate),
+      'end_date': _formatDate(endDate),
+      if (cashAccountIds != null && cashAccountIds.isNotEmpty)
+        'cash_account_ids': cashAccountIds.join(','),
+    });
+  }
+
+  Future<Map<String, dynamic>> getJournalEntryDetails({
+    required int farmId,
+    required int entryId,
+  }) async {
+    return _api.get(ApiEndpoints.accountingJournalEntryById(entryId), params: {
+      'farm_id': farmId,
+    });
+  }
+
+  Future<Map<String, dynamic>> reverseJournalEntry({
+    required int farmId,
+    required int entryId,
+    DateTime? reverseDate,
+  }) async {
+    return _api.post(ApiEndpoints.accountingJournalEntryReverse(entryId), data: {
+      'farm_id': farmId,
+      'reverse_date': _formatDate(reverseDate ?? DateTime.now()),
+    });
+  }
+
+  String _formatDate(DateTime value) {
+    final y = value.year.toString().padLeft(4, '0');
+    final m = value.month.toString().padLeft(2, '0');
+    final d = value.day.toString().padLeft(2, '0');
+    return '$y-$m-$d';
+  }
+
+  Future<List<dynamic>> _safeGetList(String path) async {
+    try {
+      return await _api.getList(path);
+    } on ApiException {
+      return const <dynamic>[];
+    }
   }
 
   bool _shouldQueue(ApiException e) => e.statusCode == null;

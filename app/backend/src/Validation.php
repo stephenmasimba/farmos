@@ -95,12 +95,12 @@ class Validation
     }
 
     /**
-     * Validate date in YYYY-MM-DD format
+     * Validate date in the given format
      */
-    public static function validateDate(string $date): bool
+    public static function validateDate(string $date, string $format = 'Y-m-d'): bool
     {
-        $d = \DateTime::createFromFormat('Y-m-d', $date);
-        return $d && $d->format('Y-m-d') === $date;
+        $d = \DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) === $date;
     }
 
     /**

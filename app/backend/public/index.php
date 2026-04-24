@@ -170,7 +170,7 @@ if (!isset($GLOBALS['__FARMOS_TEST_RAW_BODY']) && (getenv('API_ANALYTICS_ENABLED
 }
 
 // Initialize controllers
-use FarmOS\Controllers\{LivestockController, InventoryController, FinancialController, TaskController, DashboardController, WeatherController, IoTController, UsersController, SystemController, FieldsController, EquipmentController, SuppliersController, NotificationsController, TimesheetsController, HRController, ContractsController, PaymentsController, MarketplaceController, SalesCRMController, ComplianceController, VeterinaryController, FeedController, FeedFormulationController, ProductionManagementController, WasteController, PredictiveMaintenanceController, FinancialAnalyticsController, TraceabilityController, QRInventoryController, ImportController, WeatherIrrigationController, BreedingController, CircularityController, BiogasController, AccountingPlatformController, InventoryPlatformController, LivestockPlatformController};
+use FarmOS\Controllers\{LivestockController, InventoryController, FinancialController, TaskController, DashboardController, WeatherController, IoTController, UsersController, SystemController, FieldsController, EquipmentController, SuppliersController, NotificationsController, TimesheetsController, HRController, ContractsController, PaymentsController, MarketplaceController, SalesCRMController, ComplianceController, VeterinaryController, FeedController, FeedFormulationController, ProductionManagementController, WasteController, PredictiveMaintenanceController, FinancialAnalyticsController, TraceabilityController, QRInventoryController, ImportController, WeatherIrrigationController, BreedingController, CircularityController, BiogasController, AccountingPlatformController, AdvancedAccountingController, InventoryPlatformController, LivestockPlatformController};
 use FarmOS\Middleware\{AuthMiddleware, RateLimitMiddleware};
 
 $livestockController = new LivestockController($db, $request);
@@ -208,6 +208,7 @@ $breedingController = new BreedingController($db, $request);
 $circularityController = new CircularityController($db, $request);
 $biogasController = new BiogasController($db, $request);
 $accountingPlatformController = new AccountingPlatformController($db, $request);
+$advancedAccountingController = new AdvancedAccountingController($db, $request);
 $inventoryPlatformController = new InventoryPlatformController($db, $request);
 $livestockPlatformController = new LivestockPlatformController($db, $request);
 
@@ -1319,6 +1320,134 @@ try {
             }
             break;
 
+        case '/api/hr/payroll':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            if ($method === 'GET') {
+                $hrController->listPayroll()->send();
+            } else {
+                $hrController->createPayroll()->send();
+            }
+            break;
+
+        case '/api/hr/benefits':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            if ($method === 'GET') {
+                $hrController->listBenefits()->send();
+            } else {
+                $hrController->createBenefit()->send();
+            }
+            break;
+
+        case '/api/hr/certifications':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            if ($method === 'GET') {
+                $hrController->listCertifications()->send();
+            } else {
+                $hrController->createCertification()->send();
+            }
+            break;
+
+        case '/api/hr/contractors':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            if ($method === 'GET') {
+                $hrController->listContractors()->send();
+            } else {
+                $hrController->createContractor()->send();
+            }
+            break;
+
+        case '/api/hr/attendance':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $hrController->listAttendance()->send();
+            break;
+
+        case '/api/hr/attendance/clock-in':
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $hrController->clockIn()->send();
+            break;
+
+        case '/api/hr/attendance/clock-out':
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $hrController->clockOut()->send();
+            break;
+
+        case '/api/hr/compensation':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $hrController->compensation()->send();
+            break;
+
+        case '/api/hr/benefit-enrollments':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            if ($method === 'GET') {
+                $hrController->listBenefitEnrollments()->send();
+            } else {
+                $hrController->enrollBenefit()->send();
+            }
+            break;
+
+        case '/api/hr/payroll/run':
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $hrController->runPayroll()->send();
+            break;
+
+        case '/api/hr/contractor-logs':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $hrController->contractorLogs()->send();
+            break;
+
+        case '/api/hr/training-courses':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $hrController->trainingCourses()->send();
+            break;
+
+        case '/api/hr/training-records':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $hrController->trainingRecords()->send();
+            break;
+
         case '/api/hr/sops/executions':
             if ($method !== 'GET') {
                 Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
@@ -1434,6 +1563,30 @@ try {
             $accountingPlatformController->journalEntries()->send();
             break;
 
+        case (preg_match('/^\/api\/accounting\/journal-entries\/(\d+)$/', $path, $matches) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $accountingPlatformController->journalEntryDetails((int) $matches[1])->send();
+            break;
+
+        case (preg_match('/^\/api\/accounting\/journal-entries\/(\d+)\/reverse$/', $path, $matches) ? true : false):
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $accountingPlatformController->reverseJournalEntry((int) $matches[1])->send();
+            break;
+
+        case '/api/accounting/seed-coa':
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $accountingPlatformController->seedChartOfAccounts()->send();
+            break;
+
         case '/api/accounting/trial-balance':
             if ($method !== 'GET') {
                 Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
@@ -1441,6 +1594,30 @@ try {
             }
 
             $accountingPlatformController->trialBalance()->send();
+            break;
+
+        case '/api/accounting/profit-loss':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $accountingPlatformController->profitAndLoss()->send();
+            break;
+
+        case '/api/accounting/balance-sheet':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $accountingPlatformController->balanceSheet()->send();
+            break;
+
+        case '/api/accounting/cash-flow':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $accountingPlatformController->cashFlow()->send();
             break;
 
         case '/api/accounting/receivables':
@@ -1461,6 +1638,158 @@ try {
             $accountingPlatformController->payables()->send();
             break;
 
+        case '/api/accounting/entities':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->entities()->send();
+            break;
+
+        case '/api/accounting/books':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->books()->send();
+            break;
+
+        case '/api/accounting/currencies':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->currencies()->send();
+            break;
+
+        case '/api/accounting/bank-accounts':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->bankAccounts()->send();
+            break;
+
+        case '/api/accounting/bank-statements':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->bankStatements()->send();
+            break;
+
+        case '/api/accounting/bank-reconcile':
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->bankReconcile()->send();
+            break;
+
+        case '/api/accounting/cashbook':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->cashbook()->send();
+            break;
+
+        case '/api/accounting/tax-codes':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->taxCodes()->send();
+            break;
+
+        case '/api/accounting/fixed-assets':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->fixedAssets()->send();
+            break;
+
+        case '/api/accounting/depreciation-schedules':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->depreciationSchedules()->send();
+            break;
+
+        case '/api/accounting/credit-notes':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->creditNotes()->send();
+            break;
+
+        case '/api/accounting/refunds':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->refunds()->send();
+            break;
+
+        case '/api/accounting/recurring-invoices':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->recurringInvoices()->send();
+            break;
+
+        case '/api/accounting/payments':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->payments()->send();
+            break;
+
+        case '/api/accounting/journal-approvals':
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->journalApprovals()->send();
+            break;
+
+        case '/api/accounting/periods':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->periods()->send();
+            break;
+
+        case '/api/accounting/close-period':
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->closePeriod()->send();
+            break;
+
+        case '/api/accounting/open-period':
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->openPeriod()->send();
+            break;
+
+        case '/api/accounting/inventory-costing':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $advancedAccountingController->inventoryCosting()->send();
+            break;
+
         case '/api/inventory-platform/warehouses':
             if (!in_array($method, ['GET', 'POST'], true)) {
                 Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
@@ -1468,6 +1797,22 @@ try {
             }
 
             $inventoryPlatformController->warehouses()->send();
+            break;
+
+        case '/api/inventory-platform/locations':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->locations()->send();
+            break;
+
+        case '/api/inventory-platform/stock':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->stock()->send();
             break;
 
         case '/api/inventory-platform/movements':
@@ -1479,6 +1824,22 @@ try {
             $inventoryPlatformController->movements()->send();
             break;
 
+        case '/api/inventory-platform/reservations':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->reservations()->send();
+            break;
+
+        case (preg_match('/^\/api\/inventory-platform\/reservations\/(\d+)\/(cancel|release|fulfill)$/', $path, $matches) ? true : false):
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->reservationAction((int) $matches[1], (string) $matches[2])->send();
+            break;
+
         case '/api/inventory-platform/transfers':
             if ($method !== 'POST') {
                 Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
@@ -1486,6 +1847,70 @@ try {
             }
 
             $inventoryPlatformController->transfer()->send();
+            break;
+
+        case '/api/inventory-platform/transfer-orders':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->transfers()->send();
+            break;
+
+        case (preg_match('/^\/api\/inventory-platform\/transfer-orders\/(\d+)\/(ship|receive)$/', $path, $matches) ? true : false):
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->transferAction((int) $matches[1], (string) $matches[2])->send();
+            break;
+
+        case '/api/inventory-platform/lots':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->lots()->send();
+            break;
+
+        case '/api/inventory-platform/serials':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->serials()->send();
+            break;
+
+        case '/api/inventory-platform/purchase-orders':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->purchaseOrders()->send();
+            break;
+
+        case (preg_match('/^\/api\/inventory-platform\/purchase-orders\/(\d+)$/', $path, $matches) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->purchaseOrderDetails((int) $matches[1])->send();
+            break;
+
+        case (preg_match('/^\/api\/inventory-platform\/purchase-orders\/(\d+)\/(approve|receive)$/', $path, $matches) ? true : false):
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->purchaseOrderAction((int) $matches[1], (string) $matches[2])->send();
+            break;
+
+        case '/api/inventory-platform/receipts':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->receipts()->send();
             break;
 
         case '/api/inventory-platform/valuation':
@@ -1497,6 +1922,14 @@ try {
             $inventoryPlatformController->valuation()->send();
             break;
 
+        case '/api/inventory-platform/cogs':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->cogs()->send();
+            break;
+
         case '/api/inventory-platform/reorder':
             if ($method !== 'GET') {
                 Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
@@ -1504,6 +1937,42 @@ try {
             }
 
             $inventoryPlatformController->reorder()->send();
+            break;
+
+        case '/api/inventory-platform/stocktakes':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->stocktakes()->send();
+            break;
+
+        case (preg_match('/^\/api\/inventory-platform\/stocktakes\/(\d+)\/(lines|count|post)$/', $path, $matches) ? true : false):
+            if ($matches[2] === 'lines' && $method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            if (in_array($matches[2], ['count', 'post'], true) && $method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->stocktakeAction((int) $matches[1], (string) $matches[2])->send();
+            break;
+
+        case '/api/inventory-platform/reconcile':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->reconcile()->send();
+            break;
+
+        case '/api/inventory-platform/audit':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $inventoryPlatformController->auditLog()->send();
             break;
 
         case '/api/livestock-platform/health':
@@ -1540,6 +2009,62 @@ try {
             }
 
             $livestockPlatformController->vaccinations()->send();
+            break;
+
+        case '/api/livestock-platform/alerts':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $livestockPlatformController->alerts()->send();
+            break;
+
+        case '/api/livestock-platform/feed-logs':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $livestockPlatformController->feedLogs()->send();
+            break;
+
+        case '/api/livestock-platform/breeding-plans':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $livestockPlatformController->breedingPlans()->send();
+            break;
+
+        case '/api/livestock-platform/pedigree':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $livestockPlatformController->pedigree()->send();
+            break;
+
+        case '/api/livestock-platform/genetics':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $livestockPlatformController->genetics()->send();
+            break;
+
+        case '/api/livestock-platform/lifecycle-analytics':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $livestockPlatformController->lifecycleAnalytics()->send();
+            break;
+
+        case '/api/livestock-platform/trace':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $livestockPlatformController->trace()->send();
             break;
 
         case '/api/predictive-maintenance/alerts':
@@ -1884,6 +2409,51 @@ try {
             }
 
             $livestockController->costAnalysis()->send();
+            break;
+
+        case (preg_match('/^\/api\/livestock\/traceability$/', $path) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $livestockController->traceability()->send();
+            break;
+
+        case (preg_match('/^\/api\/livestock\/pedigree$/', $path) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $livestockController->pedigree()->send();
+            break;
+
+        case (preg_match('/^\/api\/livestock\/cost-allocation$/', $path) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $livestockController->costAllocation()->send();
             break;
 
         case (preg_match('/^\/api\/livestock\/(\d+)$/', $path, $matches) ? true : false):
@@ -2362,7 +2932,7 @@ try {
             $financialController->getYearlyReport()->send();
             break;
 
-        case (preg_match('/^\/api\/financial\/categories$/', $path) ? true : false):
+        case (preg_match('/^\/api\/financial\/category-list$/', $path) ? true : false):
             if ($method !== 'GET') {
                 Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
                 break;
@@ -2375,6 +2945,183 @@ try {
             }
 
             $financialController->getCategories()->send();
+            break;
+
+        case (preg_match('/^\/api\/financial\/budget-variance$/', $path) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $financialController->getBudgetVariance()->send();
+            break;
+
+        case (preg_match('/^\/api\/financial\/cost-allocation$/', $path) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $financialController->getCostAllocation()->send();
+            break;
+
+        case '/api/financial/category-mappings':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            if ($method === 'GET') {
+                $financialController->getCategoryMappings()->send();
+            } else {
+                $financialController->saveCategoryMapping()->send();
+            }
+            break;
+
+        case '/api/financial/categories':
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $financialController->categories()->send();
+            break;
+
+        case '/api/financial/budget-vs-actual':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $financialController->budgetVsActual()->send();
+            break;
+
+        case '/api/financial/budget-vs-actual/drilldown':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $financialController->budgetVsActualDrilldown()->send();
+            break;
+
+        case '/api/financial/reclassify':
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $financialController->reclassify()->send();
+            break;
+
+        case (preg_match('/^\/api\/financial\/category-mappings\/(\d+)$/', $path, $matches) ? true : false):
+            if ($method !== 'DELETE') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $id = (int) $matches[1];
+            $financialController->deleteCategoryMapping($id)->send();
+            break;
+
+        case '/api/financial/periods':
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $financialController->getPeriods()->send();
+            break;
+
+        case (preg_match('/^\/api\/financial\/periods\/checklist$/', $path) ? true : false):
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            if ($method === 'GET') {
+                $financialController->getCloseChecklist()->send();
+            } else {
+                $financialController->updateCloseChecklist()->send();
+            }
+            break;
+
+        case (preg_match('/^\/api\/financial\/periods\/close$/', $path) ? true : false):
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+
+            $financialController->closePeriod()->send();
+            break;
+
+        case (preg_match('/^\/api\/financial\/periods\/reopen$/', $path) ? true : false):
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $financialController->reopenPeriod()->send();
             break;
 
         case '/api/financial/budgets':
@@ -3306,6 +4053,118 @@ try {
             } else {
                 $iotController->createWaterQuality()->send();
             }
+            break;
+
+        case (preg_match('/^\/api\/bi\/dashboards$/', $path) ? true : false):
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $dashboardController->dashboards()->send();
+            break;
+
+        case (preg_match('/^\/api\/bi\/dashboards\/(\d+)$/', $path, $matches) ? true : false):
+            if (!in_array($method, ['GET', 'PUT', 'DELETE'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $dashboardController->dashboard((int) $matches[1])->send();
+            break;
+
+        case (preg_match('/^\/api\/bi\/dashboards\/(\d+)\/widgets$/', $path, $matches) ? true : false):
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $dashboardController->dashboardWidgets((int) $matches[1])->send();
+            break;
+
+        case (preg_match('/^\/api\/bi\/reports$/', $path) ? true : false):
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $dashboardController->reports()->send();
+            break;
+
+        case (preg_match('/^\/api\/bi\/reports\/run$/', $path) ? true : false):
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $dashboardController->runReport()->send();
+            break;
+
+        case (preg_match('/^\/api\/bi\/reports\/drilldown$/', $path) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $dashboardController->drilldownReport()->send();
+            break;
+
+        case (preg_match('/^\/api\/bi\/connectors$/', $path) ? true : false):
+            if (!in_array($method, ['GET', 'POST'], true)) {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $dashboardController->connectors()->send();
+            break;
+
+        case (preg_match('/^\/api\/bi\/connectors\/(\d+)\/rotate$/', $path, $matches) ? true : false):
+            if ($method !== 'POST') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $auth = new AuthMiddleware($request, $db);
+            if ($auth->handle() !== true) {
+                $auth->handle()->send();
+                break;
+            }
+            $dashboardController->rotateConnector((int) $matches[1])->send();
+            break;
+
+        case (preg_match('/^\/api\/bi\/connector-data$/', $path) ? true : false):
+            if ($method !== 'GET') {
+                Response::error('Method not allowed', 'METHOD_NOT_ALLOWED', 405)->send();
+                break;
+            }
+            $dashboardController->connectorData()->send();
             break;
 
         case (preg_match('/^\/api\/reports\/types$/', $path) ? true : false):

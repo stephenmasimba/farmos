@@ -198,6 +198,7 @@ class LivestockService {
     final production = await _api.getList(ApiEndpoints.livestockPlatformProduction);
     final vaccinations =
         await _api.getList(ApiEndpoints.livestockPlatformVaccinations);
+    final alerts = await _safeGetMap(ApiEndpoints.livestockPlatformAlerts);
 
     int countByStatus(List<dynamic> list, String status) {
       return list.where((e) {
@@ -211,10 +212,253 @@ class LivestockService {
       'reproduction_cycles': reproduction.length,
       'production_logs': production.length,
       'scheduled_vaccinations': countByStatus(vaccinations, 'scheduled'),
+      'alerts': alerts,
     };
   }
 
   bool _shouldQueue(ApiException e) => e.statusCode == null;
+
+  Future<Map<String, dynamic>> _safeGetMap(String path) async {
+    try {
+      final data = await _api.get(path);
+      return data is Map<String, dynamic> ? data : <String, dynamic>{};
+    } on ApiException {
+      return <String, dynamic>{};
+    }
+  }
+
+  Future<List<LivestockFeedLog>> listFeedLogs({
+    int? livestockId,
+    int? farmId,
+  }) async {
+    final params = <String, dynamic>{
+      if (farmId != null) 'farm_id': farmId,
+      if (livestockId != null) 'livestock_id': livestockId,
+    };
+    final list = await _api.getList(
+      ApiEndpoints.livestockPlatformFeedLogs,
+      params: params.isNotEmpty ? params : null,
+    );
+    return list
+        .map((e) => LivestockFeedLog.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> createFeedLog({
+    required int farmId,
+    required int livestockId,
+    required String feedItem,
+    required double feedQty,
+    String unit = 'kg',
+    double costTotal = 0,
+    DateTime? logDate,
+    String? notes,
+    bool postToFinance = false,
+    String? financeCategory,
+  }) async {
+    await _api.post(ApiEndpoints.livestockPlatformFeedLogs, data: {
+      'farm_id': farmId,
+      'livestock_id': livestockId,
+      'feed_item': feedItem,
+      'feed_qty': feedQty,
+      'unit': unit,
+      'cost_total': costTotal,
+      'log_date': _formatDate(logDate ?? DateTime.now()),
+      if (notes != null && notes.isNotEmpty) 'notes': notes,
+      if (postToFinance) 'post_to_finance': 1,
+      if (financeCategory != null && financeCategory.isNotEmpty)
+        'finance_category': financeCategory,
+    });
+  }
+
+  Future<List<LivestockTraceEvent>> listTraceEvents({
+    int? livestockId,
+    int? farmId,
+  }) async {
+    final params = <String, dynamic>{
+      if (farmId != null) 'farm_id': farmId,
+      if (livestockId != null) 'livestock_id': livestockId,
+    };
+    final list = await _api.getList(
+      ApiEndpoints.livestockPlatformTrace,
+      params: params.isNotEmpty ? params : null,
+    );
+    return list
+        .map((e) => LivestockTraceEvent.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> createTraceEvent({
+    required int farmId,
+    required int livestockId,
+    required String eventType,
+    DateTime? eventDate,
+    String? location,
+    double? latitude,
+    double? longitude,
+    String? referenceType,
+    String? referenceId,
+    String? notes,
+  }) async {
+    await _api.post(ApiEndpoints.livestockPlatformTrace, data: {
+      'farm_id': farmId,
+      'livestock_id': livestockId,
+      'event_type': eventType,
+      'event_date': _formatDateTime(eventDate ?? DateTime.now()),
+      if (location != null && location.isNotEmpty) 'location': location,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+      if (referenceType != null && referenceType.isNotEmpty)
+        'reference_type': referenceType,
+      if (referenceId != null && referenceId.isNotEmpty)
+        'reference_id': referenceId,
+      if (notes != null && notes.isNotEmpty) 'notes': notes,
+    });
+  }
+
+  Future<List<LivestockBreedingPlan>> listBreedingPlans({
+    int? farmId,
+    int? damId,
+    String? status,
+  }) async {
+    final params = <String, dynamic>{
+      if (farmId != null) 'farm_id': farmId,
+      if (damId != null) 'dam_id': damId,
+      if (status != null && status.isNotEmpty) 'status': status,
+    };
+    final list = await _api.getList(
+      ApiEndpoints.livestockPlatformBreedingPlans,
+      params: params.isNotEmpty ? params : null,
+    );
+    return list
+        .map((e) => LivestockBreedingPlan.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> createBreedingPlan({
+    required int farmId,
+    required int damId,
+    int? sireId,
+    required DateTime plannedBreedingDate,
+    String method = 'natural',
+    DateTime? expectedBirthDate,
+    String status = 'planned',
+    String? notes,
+  }) async {
+    await _api.post(ApiEndpoints.livestockPlatformBreedingPlans, data: {
+      'farm_id': farmId,
+      'dam_id': damId,
+      if (sireId != null) 'sire_id': sireId,
+      'planned_breeding_date': _formatDate(plannedBreedingDate),
+      'method': method,
+      if (expectedBirthDate != null)
+        'expected_birth_date': _formatDate(expectedBirthDate),
+      'status': status,
+      if (notes != null && notes.isNotEmpty) 'notes': notes,
+    });
+  }
+
+  Future<Map<String, dynamic>> getPedigreeTree({
+    required int farmId,
+    required int livestockId,
+    int generations = 3,
+  }) async {
+    return _api.get(
+      ApiEndpoints.livestockPlatformPedigree,
+      params: {
+        'farm_id': farmId,
+        'livestock_id': livestockId,
+        'generations': generations,
+      },
+    );
+  }
+
+  Future<void> savePedigree({
+    required int farmId,
+    required int livestockId,
+    int? sireId,
+    int? damId,
+    String? herdbookId,
+    String? geneticLine,
+    Map<String, dynamic>? pedigree,
+    String? notes,
+  }) async {
+    await _api.post(ApiEndpoints.livestockPlatformPedigree, data: {
+      'farm_id': farmId,
+      'livestock_id': livestockId,
+      if (sireId != null) 'sire_id': sireId,
+      if (damId != null) 'dam_id': damId,
+      if (herdbookId != null && herdbookId.isNotEmpty) 'herdbook_id': herdbookId,
+      if (geneticLine != null && geneticLine.isNotEmpty) 'genetic_line': geneticLine,
+      if (pedigree != null) 'pedigree': pedigree,
+      if (notes != null && notes.isNotEmpty) 'notes': notes,
+    });
+  }
+
+  Future<List<LivestockGeneticTrait>> listGenetics({
+    required int farmId,
+    int? livestockId,
+  }) async {
+    final params = <String, dynamic>{
+      'farm_id': farmId,
+      if (livestockId != null) 'livestock_id': livestockId,
+    };
+    final list = await _api.getList(ApiEndpoints.livestockPlatformGenetics, params: params);
+    return list
+        .map((e) => LivestockGeneticTrait.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> addGeneticTrait({
+    required int farmId,
+    required int livestockId,
+    required String traitName,
+    required String traitValue,
+    DateTime? measuredOn,
+    String? notes,
+  }) async {
+    await _api.post(ApiEndpoints.livestockPlatformGenetics, data: {
+      'farm_id': farmId,
+      'livestock_id': livestockId,
+      'trait_name': traitName,
+      'trait_value': traitValue,
+      if (measuredOn != null) 'measured_on': _formatDate(measuredOn),
+      if (notes != null && notes.isNotEmpty) 'notes': notes,
+    });
+  }
+
+  Future<LivestockLifecycleAnalytics> getLifecycleAnalytics({
+    required int farmId,
+    int? livestockId,
+  }) async {
+    final params = <String, dynamic>{
+      'farm_id': farmId,
+      if (livestockId != null) 'livestock_id': livestockId,
+    };
+    final data = await _api.get(
+      ApiEndpoints.livestockPlatformLifecycleAnalytics,
+      params: params,
+    );
+    return LivestockLifecycleAnalytics.fromJson(data);
+  }
+
+  String _formatDate(DateTime value) {
+    final y = value.year.toString().padLeft(4, '0');
+    final m = value.month.toString().padLeft(2, '0');
+    final d = value.day.toString().padLeft(2, '0');
+    return '$y-$m-$d';
+  }
+
+  String _formatDateTime(DateTime value) {
+    final dt = value.toLocal();
+    final y = dt.year.toString().padLeft(4, '0');
+    final m = dt.month.toString().padLeft(2, '0');
+    final d = dt.day.toString().padLeft(2, '0');
+    final hh = dt.hour.toString().padLeft(2, '0');
+    final mm = dt.minute.toString().padLeft(2, '0');
+    final ss = dt.second.toString().padLeft(2, '0');
+    return '$y-$m-$d $hh:$mm:$ss';
+  }
 
   Future<List<Livestock>> _applyQueuedChanges(
     List<Livestock> base, {

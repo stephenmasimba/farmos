@@ -19,6 +19,7 @@ class DashboardController
     private AnalyticsService $analyticsService;
     private static bool $reportExportsTableEnsured = false;
     private static bool $apiRequestLogsTableEnsured = false;
+    private static bool $biTablesEnsured = false;
 
     public function __construct(Database $db, Request $request)
     {
@@ -647,6 +648,11 @@ class DashboardController
 
     private function resolveFarmId(?array $user): int
     {
+        $tenantId = $this->request->getHeader('x-tenant-id');
+        if ($tenantId !== null && is_numeric($tenantId)) {
+            return (int) $tenantId;
+        }
+
         $farmId = (int) ($this->request->getQuery('farm_id', 0));
         if ($farmId > 0) {
             return $farmId;
@@ -1128,6 +1134,535 @@ class DashboardController
     public function getReportExportByToken(string $token): ?array
     {
         return $this->reportService->getExportByToken($token);
+    }
+
+    private function ensureBiTables(): void
+    {
+        if (self::$biTablesEnsured) {
+            return;
+        }
+
+        $this->db->execute(
+            'CREATE TABLE IF NOT EXISTS bi_dashboards (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                farm_id INT NOT NULL,
+                user_id INT NOT NULL,
+                name VARCHAR(191) NOT NULL,
+                layout_json TEXT NULL,
+                is_default TINYINT(1) NOT NULL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NULL,
+                INDEX idx_bi_dash_farm_user (farm_id, user_id, is_default)
+            )'
+        );
+
+        $this->db->execute(
+            'CREATE TABLE IF NOT EXISTS bi_dashboard_widgets (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                dashboard_id BIGINT NOT NULL,
+                widget_type VARCHAR(40) NOT NULL,
+                config_json TEXT NULL,
+                position_json TEXT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NULL,
+                INDEX idx_bi_widgets_dash (dashboard_id)
+            )'
+        );
+
+        $this->db->execute(
+            'CREATE TABLE IF NOT EXISTS bi_report_definitions (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                farm_id INT NOT NULL,
+                user_id INT NOT NULL,
+                name VARCHAR(191) NOT NULL,
+                report_type VARCHAR(40) NOT NULL,
+                definition_json TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NULL,
+                INDEX idx_bi_reports_farm_user (farm_id, user_id)
+            )'
+        );
+
+        $this->db->execute(
+            'CREATE TABLE IF NOT EXISTS bi_connectors (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                farm_id INT NOT NULL,
+                name VARCHAR(191) NOT NULL,
+                token VARCHAR(80) NOT NULL,
+                scope_json TEXT NOT NULL,
+                format VARCHAR(10) NOT NULL DEFAULT "json",
+                active TINYINT(1) NOT NULL DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_used_at TIMESTAMP NULL,
+                UNIQUE KEY uniq_bi_connector_token (token),
+                INDEX idx_bi_connectors_farm (farm_id, active)
+            )'
+        );
+
+        self::$biTablesEnsured = true;
+    }
+
+    public function dashboards(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+            $this->ensureBiTables();
+
+            $farmId = $this->resolveFarmId($user);
+            $userId = (int) ($user['user_id'] ?? 0);
+            if ($this->request->getMethod() === 'GET') {
+                $rows = $this->db->query(
+                    'SELECT d.id, d.name, d.is_default, d.created_at, d.updated_at,
+                            (SELECT COUNT(*) FROM bi_dashboard_widgets w WHERE w.dashboard_id = d.id) AS widget_count
+                     FROM bi_dashboards d
+                     WHERE d.farm_id = ? AND d.user_id = ?
+                     ORDER BY d.is_default DESC, d.updated_at DESC, d.id DESC',
+                    [$farmId, $userId]
+                );
+                return Response::success(['dashboards' => $rows]);
+            }
+
+            $input = $this->request->getBody();
+            $name = Validation::sanitizeString((string) ($input['name'] ?? ''));
+            $layout = $input['layout'] ?? null;
+            $isDefault = isset($input['is_default']) && ((int) $input['is_default'] === 1);
+            if ($name === '') {
+                return Response::validationError(['name' => 'Name is required']);
+            }
+            $layoutJson = null;
+            if ($layout !== null) {
+                $layoutJson = json_encode($layout);
+            }
+            if ($isDefault) {
+                $this->db->execute('UPDATE bi_dashboards SET is_default = 0 WHERE farm_id = ? AND user_id = ?', [$farmId, $userId]);
+            }
+            $this->db->execute(
+                'INSERT INTO bi_dashboards (farm_id, user_id, name, layout_json, is_default, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+                [$farmId, $userId, $name, $layoutJson, $isDefault ? 1 : 0, date('Y-m-d H:i:s')]
+            );
+            return Response::success(['id' => (int) $this->db->lastInsertId()], 'Dashboard created', 201);
+        } catch (\Exception $e) {
+            Logger::error('Failed dashboards', ['error' => $e->getMessage()]);
+            return Response::error('Failed dashboards', 'BI_DASHBOARDS_ERROR', 500);
+        }
+    }
+
+    public function dashboard(int $id): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+            $this->ensureBiTables();
+            $farmId = $this->resolveFarmId($user);
+            $userId = (int) ($user['user_id'] ?? 0);
+            $dash = $this->db->queryOne(
+                'SELECT id, name, layout_json, is_default, created_at, updated_at
+                 FROM bi_dashboards WHERE id = ? AND farm_id = ? AND user_id = ? LIMIT 1',
+                [$id, $farmId, $userId]
+            );
+            if (!$dash) {
+                return Response::notFound('Dashboard not found');
+            }
+
+            if ($this->request->getMethod() === 'GET') {
+                $widgets = $this->db->query(
+                    'SELECT id, widget_type, config_json, position_json, created_at, updated_at
+                     FROM bi_dashboard_widgets
+                     WHERE dashboard_id = ?
+                     ORDER BY id ASC',
+                    [$id]
+                );
+                return Response::success(['dashboard' => $dash, 'widgets' => $widgets]);
+            }
+
+            if ($this->request->getMethod() === 'DELETE') {
+                $this->db->execute('DELETE FROM bi_dashboard_widgets WHERE dashboard_id = ?', [$id]);
+                $this->db->execute('DELETE FROM bi_dashboards WHERE id = ?', [$id]);
+                return Response::success(['id' => $id], 'Dashboard deleted');
+            }
+
+            $input = $this->request->getBody();
+            $name = isset($input['name']) ? Validation::sanitizeString((string) $input['name']) : (string) ($dash['name'] ?? '');
+            $layout = $input['layout'] ?? null;
+            $isDefault = isset($input['is_default']) ? ((int) $input['is_default'] === 1) : ((int) ($dash['is_default'] ?? 0) === 1);
+            $layoutJson = $dash['layout_json'] ?? null;
+            if ($layout !== null) {
+                $layoutJson = json_encode($layout);
+            }
+            if ($isDefault) {
+                $this->db->execute('UPDATE bi_dashboards SET is_default = 0 WHERE farm_id = ? AND user_id = ?', [$farmId, $userId]);
+            }
+            $this->db->execute(
+                'UPDATE bi_dashboards SET name = ?, layout_json = ?, is_default = ?, updated_at = ? WHERE id = ?',
+                [$name, $layoutJson, $isDefault ? 1 : 0, date('Y-m-d H:i:s'), $id]
+            );
+            return Response::success(['id' => $id], 'Dashboard updated');
+        } catch (\Exception $e) {
+            Logger::error('Failed dashboard', ['error' => $e->getMessage()]);
+            return Response::error('Failed dashboard', 'BI_DASHBOARD_ERROR', 500);
+        }
+    }
+
+    public function dashboardWidgets(int $dashboardId): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+            $this->ensureBiTables();
+            $farmId = $this->resolveFarmId($user);
+            $userId = (int) ($user['user_id'] ?? 0);
+            $dash = $this->db->queryOne(
+                'SELECT id FROM bi_dashboards WHERE id = ? AND farm_id = ? AND user_id = ? LIMIT 1',
+                [$dashboardId, $farmId, $userId]
+            );
+            if (!$dash) {
+                return Response::notFound('Dashboard not found');
+            }
+
+            if ($this->request->getMethod() === 'GET') {
+                $widgets = $this->db->query(
+                    'SELECT id, widget_type, config_json, position_json, created_at, updated_at
+                     FROM bi_dashboard_widgets WHERE dashboard_id = ? ORDER BY id ASC',
+                    [$dashboardId]
+                );
+                return Response::success(['widgets' => $widgets]);
+            }
+
+            $input = $this->request->getBody();
+            $widgetType = Validation::sanitizeString((string) ($input['widget_type'] ?? ''));
+            if ($widgetType === '') {
+                return Response::validationError(['widget_type' => 'widget_type is required']);
+            }
+            $configJson = isset($input['config']) ? json_encode($input['config']) : null;
+            $positionJson = isset($input['position']) ? json_encode($input['position']) : null;
+            $this->db->execute(
+                'INSERT INTO bi_dashboard_widgets (dashboard_id, widget_type, config_json, position_json, updated_at) VALUES (?, ?, ?, ?, ?)',
+                [$dashboardId, $widgetType, $configJson, $positionJson, date('Y-m-d H:i:s')]
+            );
+            return Response::success(['id' => (int) $this->db->lastInsertId()], 'Widget added', 201);
+        } catch (\Exception $e) {
+            Logger::error('Failed dashboard widgets', ['error' => $e->getMessage()]);
+            return Response::error('Failed widgets', 'BI_WIDGETS_ERROR', 500);
+        }
+    }
+
+    public function reports(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+            $this->ensureBiTables();
+            $farmId = $this->resolveFarmId($user);
+            $userId = (int) ($user['user_id'] ?? 0);
+            if ($this->request->getMethod() === 'GET') {
+                $rows = $this->db->query(
+                    'SELECT id, name, report_type, created_at, updated_at
+                     FROM bi_report_definitions
+                     WHERE farm_id = ? AND user_id = ?
+                     ORDER BY updated_at DESC, id DESC',
+                    [$farmId, $userId]
+                );
+                return Response::success(['reports' => $rows]);
+            }
+
+            $input = $this->request->getBody();
+            $name = Validation::sanitizeString((string) ($input['name'] ?? ''));
+            $type = Validation::sanitizeString((string) ($input['report_type'] ?? 'financial'));
+            $definition = $input['definition'] ?? null;
+            if ($name === '') {
+                return Response::validationError(['name' => 'Name is required']);
+            }
+            if ($definition === null || !is_array($definition)) {
+                return Response::validationError(['definition' => 'definition must be an object']);
+            }
+            $this->db->execute(
+                'INSERT INTO bi_report_definitions (farm_id, user_id, name, report_type, definition_json, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?)',
+                [$farmId, $userId, $name, $type, json_encode($definition), date('Y-m-d H:i:s')]
+            );
+            return Response::success(['id' => (int) $this->db->lastInsertId()], 'Report saved', 201);
+        } catch (\Exception $e) {
+            Logger::error('Failed reports', ['error' => $e->getMessage()]);
+            return Response::error('Failed reports', 'BI_REPORTS_ERROR', 500);
+        }
+    }
+
+    public function runReport(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+            $this->ensureBiTables();
+            $farmId = $this->resolveFarmId($user);
+            $payload = $this->request->getBody();
+            $reportType = Validation::sanitizeString((string) ($payload['report_type'] ?? 'financial'));
+            $startDate = Validation::sanitizeString((string) ($payload['start_date'] ?? date('Y-m-01')));
+            $endDate = Validation::sanitizeString((string) ($payload['end_date'] ?? date('Y-m-d')));
+            $groupBy = Validation::sanitizeString((string) ($payload['group_by'] ?? 'category'));
+            $direction = strtolower(Validation::sanitizeString((string) ($payload['direction'] ?? 'expense')));
+            if (!Validation::validateDate($startDate, 'Y-m-d') || !Validation::validateDate($endDate, 'Y-m-d')) {
+                return Response::validationError(['date' => 'Invalid date format']);
+            }
+            if (!Validation::validateEnum($groupBy, ['category', 'month', 'vendor', 'payment_method', 'status'])) {
+                return Response::validationError(['group_by' => 'Invalid group_by']);
+            }
+            if (!Validation::validateEnum($direction, ['expense', 'income', 'both'])) {
+                return Response::validationError(['direction' => 'Invalid direction']);
+            }
+            if ($reportType !== 'financial') {
+                return Response::validationError(['report_type' => 'Only financial is supported']);
+            }
+
+            $where = 'date >= ? AND date <= ?';
+            $params = [$startDate, $endDate . ' 23:59:59'];
+            if ($direction !== 'both') {
+                $where .= ' AND type = ?';
+                $params[] = $direction;
+            }
+
+            $groupExpr = 'category';
+            if ($groupBy === 'month') {
+                $groupExpr = 'DATE_FORMAT(date, "%Y-%m")';
+            } elseif ($groupBy === 'vendor') {
+                $groupExpr = 'COALESCE(vendor, "")';
+            } elseif ($groupBy === 'payment_method') {
+                $groupExpr = 'COALESCE(payment_method, "")';
+            } elseif ($groupBy === 'status') {
+                $groupExpr = 'COALESCE(status, "")';
+            }
+
+            $rows = $this->db->query(
+                "SELECT {$groupExpr} AS bucket, COALESCE(SUM(amount),0) AS total, COUNT(*) AS count
+                 FROM financial_records
+                 WHERE {$where}
+                 GROUP BY bucket
+                 ORDER BY total DESC, bucket ASC
+                 LIMIT 200",
+                $params
+            );
+
+            return Response::success([
+                'report_type' => 'financial',
+                'group_by' => $groupBy,
+                'direction' => $direction,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'buckets' => $rows,
+                'drilldown' => [
+                    'url' => '/api/bi/reports/drilldown',
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Logger::error('Failed to run report', ['error' => $e->getMessage()]);
+            return Response::error('Failed to run report', 'BI_RUN_REPORT_ERROR', 500);
+        }
+    }
+
+    public function drilldownReport(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+            $q = $this->request->getQuery();
+            $farmId = $this->resolveFarmId($user);
+            $startDate = Validation::sanitizeString((string) ($q['start_date'] ?? date('Y-m-01')));
+            $endDate = Validation::sanitizeString((string) ($q['end_date'] ?? date('Y-m-d')));
+            $groupBy = Validation::sanitizeString((string) ($q['group_by'] ?? 'category'));
+            $bucket = Validation::sanitizeString((string) ($q['bucket'] ?? ''));
+            $direction = strtolower(Validation::sanitizeString((string) ($q['direction'] ?? 'expense')));
+            if (!Validation::validateDate($startDate, 'Y-m-d') || !Validation::validateDate($endDate, 'Y-m-d')) {
+                return Response::validationError(['date' => 'Invalid date format']);
+            }
+            if (!Validation::validateEnum($groupBy, ['category', 'month', 'vendor', 'payment_method', 'status'])) {
+                return Response::validationError(['group_by' => 'Invalid group_by']);
+            }
+            if ($bucket === '') {
+                return Response::validationError(['bucket' => 'bucket is required']);
+            }
+            if (!Validation::validateEnum($direction, ['expense', 'income', 'both'])) {
+                return Response::validationError(['direction' => 'Invalid direction']);
+            }
+
+            $where = 'date >= ? AND date <= ?';
+            $params = [$startDate, $endDate . ' 23:59:59'];
+            if ($direction !== 'both') {
+                $where .= ' AND type = ?';
+                $params[] = $direction;
+            }
+
+            if ($groupBy === 'month') {
+                $where .= ' AND DATE_FORMAT(date, "%Y-%m") = ?';
+                $params[] = $bucket;
+            } elseif ($groupBy === 'vendor') {
+                $where .= ' AND COALESCE(vendor, "") = ?';
+                $params[] = $bucket;
+            } elseif ($groupBy === 'payment_method') {
+                $where .= ' AND COALESCE(payment_method, "") = ?';
+                $params[] = $bucket;
+            } elseif ($groupBy === 'status') {
+                $where .= ' AND COALESCE(status, "") = ?';
+                $params[] = $bucket;
+            } else {
+                $where .= ' AND category = ?';
+                $params[] = $bucket;
+            }
+
+            $rows = $this->db->query(
+                'SELECT id, type, category, vendor, description, amount, currency, date, status, reference_number, payment_method
+                 FROM financial_records
+                 WHERE ' . $where . '
+                 ORDER BY date DESC, id DESC
+                 LIMIT 2000',
+                $params
+            );
+            return Response::success(['records' => $rows]);
+        } catch (\Exception $e) {
+            Logger::error('Failed drilldown report', ['error' => $e->getMessage()]);
+            return Response::error('Failed drilldown', 'BI_DRILLDOWN_ERROR', 500);
+        }
+    }
+
+    public function connectors(): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+            $this->ensureBiTables();
+            $farmId = $this->resolveFarmId($user);
+            if ($this->request->getMethod() === 'GET') {
+                $rows = $this->db->query(
+                    'SELECT id, name, format, active, created_at, last_used_at
+                     FROM bi_connectors
+                     WHERE farm_id = ?
+                     ORDER BY active DESC, id DESC',
+                    [$farmId]
+                );
+                return Response::success(['connectors' => $rows]);
+            }
+
+            $input = $this->request->getBody();
+            $name = Validation::sanitizeString((string) ($input['name'] ?? ''));
+            $format = strtolower(Validation::sanitizeString((string) ($input['format'] ?? 'json')));
+            $scope = $input['scope'] ?? ['resources' => ['financial_records']];
+            if ($name === '') {
+                return Response::validationError(['name' => 'Name is required']);
+            }
+            if (!Validation::validateEnum($format, ['json', 'csv'])) {
+                return Response::validationError(['format' => 'Invalid format']);
+            }
+            if (!is_array($scope)) {
+                return Response::validationError(['scope' => 'scope must be an object']);
+            }
+            $token = bin2hex(random_bytes(24));
+            $this->db->execute(
+                'INSERT INTO bi_connectors (farm_id, name, token, scope_json, format, active) VALUES (?, ?, ?, ?, ?, 1)',
+                [$farmId, $name, $token, json_encode($scope), $format]
+            );
+            return Response::success([
+                'id' => (int) $this->db->lastInsertId(),
+                'token' => $token,
+                'url' => '/api/bi/connector-data?token=' . $token,
+            ], 'Connector created', 201);
+        } catch (\Exception $e) {
+            Logger::error('Failed connectors', ['error' => $e->getMessage()]);
+            return Response::error('Failed connectors', 'BI_CONNECTORS_ERROR', 500);
+        }
+    }
+
+    public function rotateConnector(int $id): Response
+    {
+        try {
+            $user = $this->request->getUser();
+            if (!$user) {
+                return Response::unauthorized();
+            }
+            $this->ensureBiTables();
+            $farmId = $this->resolveFarmId($user);
+            $row = $this->db->queryOne('SELECT id FROM bi_connectors WHERE farm_id = ? AND id = ? LIMIT 1', [$farmId, $id]);
+            if (!$row) {
+                return Response::notFound('Connector not found');
+            }
+            $token = bin2hex(random_bytes(24));
+            $this->db->execute('UPDATE bi_connectors SET token = ?, last_used_at = last_used_at WHERE id = ?', [$token, $id]);
+            return Response::success(['id' => $id, 'token' => $token, 'url' => '/api/bi/connector-data?token=' . $token], 'Token rotated');
+        } catch (\Exception $e) {
+            Logger::error('Failed rotate connector', ['error' => $e->getMessage()]);
+            return Response::error('Failed rotate connector', 'BI_CONNECTOR_ROTATE_ERROR', 500);
+        }
+    }
+
+    public function connectorData(): Response
+    {
+        try {
+            $this->ensureBiTables();
+            $q = $this->request->getQuery();
+            $token = Validation::sanitizeString((string) ($q['token'] ?? ''));
+            if ($token === '') {
+                return Response::validationError(['token' => 'token is required']);
+            }
+            $connector = $this->db->queryOne(
+                'SELECT id, farm_id, scope_json, format, active FROM bi_connectors WHERE token = ? LIMIT 1',
+                [$token]
+            );
+            if (!$connector || (int) ($connector['active'] ?? 0) !== 1) {
+                return Response::unauthorized();
+            }
+            $farmId = (int) ($connector['farm_id'] ?? 0);
+            $format = strtolower((string) ($connector['format'] ?? 'json'));
+            $resource = Validation::sanitizeString((string) ($q['resource'] ?? 'financial_records'));
+            $startDate = Validation::sanitizeString((string) ($q['start_date'] ?? date('Y-m-01')));
+            $endDate = Validation::sanitizeString((string) ($q['end_date'] ?? date('Y-m-d')));
+            if (!Validation::validateDate($startDate, 'Y-m-d') || !Validation::validateDate($endDate, 'Y-m-d')) {
+                return Response::validationError(['date' => 'Invalid date format']);
+            }
+
+            $scope = json_decode((string) ($connector['scope_json'] ?? '{}'), true);
+            $resources = is_array($scope) ? ($scope['resources'] ?? []) : [];
+            if (!is_array($resources) || !in_array($resource, $resources, true)) {
+                return Response::unauthorized();
+            }
+
+            if ($resource !== 'financial_records') {
+                return Response::validationError(['resource' => 'Unsupported resource']);
+            }
+
+            $rows = $this->db->query(
+                'SELECT id, type, category, vendor, description, amount, currency, date, reference_number, payment_method, status
+                 FROM financial_records
+                 WHERE date >= ? AND date <= ?
+                 ORDER BY date ASC, id ASC
+                 LIMIT 20000',
+                [$startDate, $endDate . ' 23:59:59']
+            );
+            $this->db->execute('UPDATE bi_connectors SET last_used_at = NOW() WHERE id = ?', [(int) $connector['id']]);
+
+            return Response::success([
+                'resource' => $resource,
+                'farm_id' => $farmId,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'format' => $format,
+                'rows' => $rows,
+            ]);
+        } catch (\Exception $e) {
+            Logger::error('Failed connector data', ['error' => $e->getMessage()]);
+            return Response::error('Failed connector data', 'BI_CONNECTOR_DATA_ERROR', 500);
+        }
     }
 
     public function analyticsDashboard(): Response

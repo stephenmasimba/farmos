@@ -36,13 +36,19 @@ abstract class Middleware
 class AuthMiddleware extends Middleware
 {
     private static bool $blacklistEnsured = false;
+    private $cachedResult = null;
 
     public function handle()
     {
+        if ($this->cachedResult !== null) {
+            return $this->cachedResult;
+        }
+
         $user = $this->request->getUser();
 
         if (!$user || empty($user['user_id'])) {
-            return Response::unauthorized('Invalid or expired token')->setStatusCode(401);
+            $this->cachedResult = Response::unauthorized('Invalid or expired token')->setStatusCode(401);
+            return $this->cachedResult;
         }
 
         if (!empty($user['jti'])) {
@@ -57,18 +63,21 @@ class AuthMiddleware extends Middleware
             }
             $row = $this->db->queryOne('SELECT jti FROM jwt_blacklist WHERE jti = ? AND expires_at > NOW()', [$user['jti']]);
             if ($row) {
-                return Response::unauthorized('Token revoked')->setStatusCode(401);
+                $this->cachedResult = Response::unauthorized('Token revoked')->setStatusCode(401);
+                return $this->cachedResult;
             }
         }
 
         // Optional: Verify user still exists in database
         $userModel = User::find($user['user_id'], $this->db);
         if (!$userModel || !$userModel->isActive()) {
-            return Response::unauthorized('User account inactive')->setStatusCode(401);
+            $this->cachedResult = Response::unauthorized('User account inactive')->setStatusCode(401);
+            return $this->cachedResult;
         }
 
         // User is authenticated, continue
-        return true;
+        $this->cachedResult = true;
+        return $this->cachedResult;
     }
 }
 
